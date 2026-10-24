@@ -1,0 +1,203 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #gc-canvas, #gc-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #gc-leaders { pointer-events: none; }
+    .gc-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .gc-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .gc-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .gc-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .gc-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .gc-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #gc-end { position: absolute; left: 0; width: 1080px; top: 780px; text-align: center; color: #fff; text-shadow: 0 6px 40px rgba(0,0,0,0.7); }
+    #gc-end1 { display: block; font-size: 104px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+    #gc-title { position: absolute; left: 0; width: 1080px; top: 800px; text-align: center; font-size: 76px; font-weight: 800; letter-spacing: -0.01em; line-height: 1.12; color: #ff8a2a; text-shadow: 0 6px 40px rgba(0,0,0,0.7); }
+    #gc-bubble { position: absolute; left: 130px; top: 770px; width: 820px; padding: 36px 40px; border-radius: 40px; background: #1c2b52; border: 4px solid #4aa8ff; box-shadow: 0 0 40px rgba(74,168,255,0.5); color: #fff; font-weight: 800; font-size: 58px; line-height: 1.15; text-align: center; }
+    #gc-bubble::after { content: ""; position: absolute; left: 90px; bottom: -34px; width: 0; height: 0; border-left: 28px solid transparent; border-right: 28px solid transparent; border-top: 36px solid #4aa8ff; }
+    .gc-btn { position: absolute; padding: 20px 40px; border-radius: 999px; font-weight: 800; font-size: 44px; white-space: nowrap; }
+    .gc-q { position: absolute; font-size: 150px; font-weight: 800; color: #ff8a2a; text-shadow: 0 0 40px rgba(255,138,42,0.8); }
+  </style>
+  <div id="root" data-composition-id="stageC" data-width="1080" data-height="1920">
+    <canvas id="gc-canvas" width="1080" height="1920"></canvas>
+    <svg id="gc-leaders" viewBox="0 0 1080 1920">
+      <g id="gc-ld-box" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#b26bff" stroke-width="3"></line><circle r="8" fill="#b26bff"></circle></g>
+      <g id="gc-ld-zone" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#38d27a" stroke-width="3"></line><circle r="8" fill="#38d27a"></circle></g>
+    </svg>
+    <div id="gc-tag-a" class="gc-mono clip" data-start="0.20" data-duration="10.4" style="left: 60px; top: 200px"><span class="gc-dot"></span>DES MILLIONS DE TÉLÉPHONES</div>
+    <div id="gc-tag-b" class="gc-mono clip" data-start="11.00" data-duration="12.2" style="left: 60px; top: 200px"><span class="gc-dot"></span>TOUT RECOUPER</div>
+    <div id="gc-tag-c" class="gc-mono clip" data-start="23.60" data-duration="7.4" style="left: 60px; top: 200px"><span class="gc-dot"></span>LE VERDICT</div>
+    <div id="gc-tag-d" class="gc-mono clip" data-start="31.60" data-duration="6.2" style="left: 60px; top: 200px"><span class="gc-dot"></span>ET TOI ?</div>
+    <div id="gc-illu" class="gc-mono clip" data-start="0.20" data-duration="31.0" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="gc-lab-gps" class="gc-chip clip" data-start="2.90" data-duration="7.9" style="background: #38d27a; color: #04230f; left: 70px; top: 1010px">POSITION CONNUE (GPS)</div>
+    <div id="gc-lab-note" class="gc-chip gc-neon clip" data-start="4.60" data-duration="6.2" style="--c: #b26bff; left: 70px; top: 1090px">ILS NOTENT LES BOX</div>
+    <div id="gc-lab-map" class="gc-chip gc-neon clip" data-start="6.00" data-duration="4.8" style="--c: #4aa8ff; left: 70px; top: 330px">LA CARTE SE REMPLIT</div>
+    <div id="gc-lab-box" class="gc-chip gc-neon clip" data-start="8.30" data-duration="2.5" style="--c: #b26bff">TA BOX = UNE BALISE</div>
+    <div id="gc-l1" class="gc-chip gc-neon clip" data-start="11.30" data-duration="12.0" style="--c: #ff8a2a; left: 60px; top: 290px">ANTENNES</div>
+    <div id="gc-l2" class="gc-chip gc-neon clip" data-start="11.90" data-duration="11.4" style="--c: #b26bff; left: 60px; top: 370px">WI-FI</div>
+    <div id="gc-l3" class="gc-chip gc-neon clip" data-start="12.90" data-duration="10.4" style="--c: #4aa8ff; left: 60px; top: 450px">BLUETOOTH</div>
+    <div id="gc-l4" class="gc-chip gc-neon clip" data-start="14.40" data-duration="8.9" style="--c: #38d27a; left: 60px; top: 530px">PAS</div>
+    <div id="gc-lab-zone" class="gc-chip clip" data-start="17.50" data-duration="3.2">INCERTITUDE ↓</div>
+    <div id="gc-lab-few" class="gc-chip clip" data-start="20.80" data-duration="2.5" style="background: #38d27a; color: #04230f; left: 70px; top: 1090px">QUELQUES DIZAINES DE MÈTRES</div>
+    <div id="gc-end" class="clip" data-start="25.30" data-duration="1.4"><span id="gc-end1">Il recoupe.</span></div>
+    <div id="gc-e1" class="gc-chip gc-neon clip" data-start="26.70" data-duration="2.4" style="--c: #ff8a2a; left: 70px; top: 800px">ANTENNES</div>
+    <div id="gc-e2" class="gc-chip gc-neon clip" data-start="27.50" data-duration="1.6" style="--c: #b26bff; left: 380px; top: 800px">BOX WI-FI</div>
+    <div id="gc-e3" class="gc-chip gc-neon clip" data-start="28.30" data-duration="0.8" style="--c: #38d27a; left: 720px; top: 800px">PAS</div>
+    <div id="gc-title" class="clip" data-start="29.20" data-duration="2.1">C'est de la géométrie,<br>en silence.</div>
+    <div id="gc-q1" class="gc-q clip" data-start="31.80" data-duration="6.1" style="left: 100px; top: 430px">?</div>
+    <div id="gc-q2" class="gc-q clip" data-start="32.00" data-duration="5.9" style="left: 850px; top: 560px">?</div>
+    <div id="gc-bubble" class="clip" data-start="31.70" data-duration="6.2">Localisation :<br>activée ou coupée ?</div>
+    <div id="gc-on" class="gc-btn clip" data-start="33.00" data-duration="4.9" style="left: 150px; top: 985px; background: #38d27a; color: #04230f; font-size: 38px">ACTIVÉE</div>
+    <div id="gc-off" class="gc-btn clip" data-start="33.40" data-duration="4.5" style="left: 450px; top: 985px; background: #ff4a4a; color: #fff; font-size: 38px">COUPÉE</div>
+    <div id="gc-b1" class="gc-btn clip" data-start="35.40" data-duration="2.5" style="left: 90px; top: 1105px; background: #fff; color: #0a0f1c; font-size: 40px">COMMENTE</div>
+    <div id="gc-b2" class="gc-btn clip" data-start="36.20" data-duration="1.7" style="left: 540px; top: 1105px; background: #ff3b3b; color: #fff; font-size: 40px">ABONNE-TOI</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/geo.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 55.0, T1 = 92.92;
+      var renderer = HF.makeRenderer($("gc-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 14, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      var hemi = new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.35); scene.add(hemi);
+      var key = new THREE.DirectionalLight(0xffd9b0, 0.6); key.position.set(2.5, 6, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.7); rim.position.set(-3, 3, -3); scene.add(rim);
+      function std(c, o) { return new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.7, metalness: 0.1 }, o || {})); }
+      var rnd = HF.mulberry32(88);
+      var city = HF.makeCity(3); scene.add(city.group);
+      var P0 = new THREE.Vector3(0, 0.08, 0.1);
+      var phone = new THREE.Mesh(new THREE.SphereGeometry(0.1, 20, 16), new THREE.MeshBasicMaterial({ color: 0x4aa8ff, toneMapped: false })); scene.add(phone);
+      var pGlow = HF.makeGlow(0x4aa8ff, 1.0); pGlow.material.opacity = 0.7; scene.add(pGlow);
+      var zone = HF.makeRing(0x38d27a, true); scene.add(zone);
+      // routers on 24 roofs
+      var routers = [];
+      var picks = city.blocks.filter(function (b, i) { return i % 2 === 0; }).slice(0, 26);
+      var rb0 = city.blocks.filter(function (b) { return Math.abs(b.x + 1.15) < 0.01 && Math.abs(b.z) < 0.01; })[0];
+      if (picks.indexOf(rb0) < 0) picks.push(rb0);
+      picks.forEach(function (b) { var r = HF.makeRouter(0xb26bff); r.position.set(b.x, b.h + 0.05, b.z); r.scale.setScalar(1.5); r.userData.glow.material.opacity = 0.3; scene.add(r); routers.push(r); });
+      var hot = routers[routers.length - 1];
+      var hotRing = HF.makeRing(0xb26bff, false); hotRing.position.set(hot.position.x, hot.position.y + 0.02, hot.position.z); scene.add(hotRing);
+      // walkers on the streets
+      var walkers = [];
+      for (var i = 0; i < 16; i++) {
+        var vert = i % 2 === 0, lane = (Math.floor(rnd() * 6) - 3 + 0.5) * 1.15;
+        var m = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 10), new THREE.MeshBasicMaterial({ color: 0x4aa8ff, toneMapped: false }));
+        scene.add(m);
+        var ln = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]), new THREE.LineBasicMaterial({ color: 0xb26bff, transparent: true, opacity: 0 })); scene.add(ln);
+        walkers.push({ m: m, ln: ln, vert: vert, lane: lane, sp: 0.5 + rnd() * 0.6, ph: rnd() * 10 });
+      }
+      // the map panel
+      var mc = document.createElement("canvas"); mc.width = 480; mc.height = 320;
+      var mg = mc.getContext("2d"); mg.fillStyle = "#0e1a33"; mg.fillRect(0, 0, 480, 320); mg.strokeStyle = "rgba(120,160,255,0.35)"; mg.lineWidth = 2;
+      for (var gx = 0; gx <= 480; gx += 40) { mg.beginPath(); mg.moveTo(gx, 0); mg.lineTo(gx, 320); mg.stroke(); }
+      for (var gy = 0; gy <= 320; gy += 40) { mg.beginPath(); mg.moveTo(0, gy); mg.lineTo(480, gy); mg.stroke(); }
+      var mtex = new THREE.CanvasTexture(mc); mtex.encoding = THREE.sRGBEncoding;
+      var panel = new THREE.Group(); panel.position.set(0.5, 2.0, -4.3); panel.rotation.x = -0.8; scene.add(panel);
+      panel.add(new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.6), new THREE.MeshBasicMaterial({ map: mtex, toneMapped: false })));
+      var pins = routers.map(function (r) { var q = new THREE.Mesh(new THREE.SphereGeometry(0.035, 8, 8), new THREE.MeshBasicMaterial({ color: 0xb26bff, toneMapped: false })); q.position.set(r.position.x / 3.6 * 1.1, -r.position.z / 4.6 * 0.7, 0.02); panel.add(q); return q; });
+      // steps
+      var steps = [];
+      for (var s = 0; s < 22; s++) { var st = new THREE.Mesh(new THREE.CylinderGeometry(0.035, 0.035, 0.01, 10), new THREE.MeshBasicMaterial({ color: 0x38d27a, toneMapped: false })); scene.add(st); steps.push(st); }
+      // bluetooth beacons around the phone
+      var bt = [[0.5, 0.35], [-0.45, -0.3]].map(function (q) { var b = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 10), new THREE.MeshBasicMaterial({ color: 0x4aa8ff, toneMapped: false })); b.position.set(q[0], 0.06, q[1]); scene.add(b); var r = HF.makeRing(0x4aa8ff, false); r.position.set(q[0], 0.03, q[1]); scene.add(r); return { b: b, r: r }; });
+      var wl = [0, 1, 2].map(function () { var l = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]), new THREE.LineBasicMaterial({ color: 0xb26bff, transparent: true, opacity: 0 })); scene.add(l); return l; });
+      var tw = [new THREE.Vector3(-1.8, 0, -1.6), new THREE.Vector3(1.9, 0, -0.8), new THREE.Vector3(0.4, 0, 2.4)].map(function (v) { var t = HF.makeTower(0xff8a2a); t.position.copy(v); t.scale.setScalar(1.4); t.userData.glow.material.opacity = 0.3; scene.add(t); return t; });
+      var al = [0, 1, 2].map(function () { var l = new THREE.Line(new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3()]), new THREE.LineBasicMaterial({ color: 0xff8a2a, transparent: true, opacity: 0 })); scene.add(l); return l; });
+
+      var labBox = $("gc-lab-box"), labZone = $("gc-lab-zone");
+      var tmp = new THREE.Vector3();
+      function pj(v) { return HF.project(camera, v); }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        // phone position: stands still in the square, then walks
+        var walk = ease(seg(t, 67.0, 76.0));
+        var pos = new THREE.Vector3(lerp(-0.1, 1.15, walk), 0.08, lerp(0.15, 0.55, walk));
+        if (t < 66.0) pos.set(0, 0.08, 0.1);
+        phone.position.copy(pos); pGlow.position.copy(pos);
+        zone.position.set(pos.x, 0.02, pos.z);
+        // routers gently pulse
+        routers.forEach(function (r, k) { var pul = 0.5 + 0.5 * Math.sin(t * 2 + k); r.userData.glow.material.opacity = 0.25 + 0.2 * pul; });
+        // walkers (55 -> 66)
+        var wk = (t < 66.0) ? 1 : 0;
+        walkers.forEach(function (w, k) {
+          var u = ((t * 0.12 * w.sp + w.ph) % 1);
+          var a = lerp(-4.2, 4.2, u);
+          w.m.position.set(w.vert ? w.lane : a, 0.08, w.vert ? a : w.lane);
+          w.m.visible = wk > 0 && t > 55.6;
+          var near = null, bd = 1.0;
+          routers.forEach(function (r) { var d = r.position.distanceTo(w.m.position); if (d < bd) { bd = d; near = r; } });
+          var lp = w.ln.geometry.attributes.position;
+          if (near && w.m.visible) { lp.setXYZ(0, w.m.position.x, w.m.position.y, w.m.position.z); lp.setXYZ(1, near.position.x, near.position.y, near.position.z); lp.needsUpdate = true; w.ln.material.opacity = 0.8 * (1 - bd) * ease(seg(t, 59.6, 60.4)); }
+          else w.ln.material.opacity = 0;
+        });
+        // pins on the map
+        var np = ease(seg(t, 57.9, 63.2)) * pins.length;
+        pins.forEach(function (q, k) { q.scale.setScalar(Math.max(0.001, HF.clamp(np - k, 0, 1))); });
+        var pAppear = ease(seg(t, 55.6, 56.2)) * (1 - ease(seg(t, 66.0, 66.8)));
+        panel.scale.setScalar(Math.max(0.001, pAppear));
+        // beacon for "ta box"
+        var hotf = ease(seg(t, 63.3, 63.9)) * (1 - ease(seg(t, 65.4, 65.9)));
+        hot.userData.glow.material.opacity = 0.3 + 0.7 * hotf;
+        hot.scale.setScalar(1.5 + 0.8 * hotf);
+        var cy = (t * 0.7) % 1;
+        HF.setRing(hotRing, cy * 1.2, (1 - cy) * 0.9 * hotf);
+        // part two: signals, circle, steps
+        var sig = ease(seg(t, 66.0, 66.6)) * (1 - ease(seg(t, 78.4, 79.2)));
+        var R = 1.2;
+        R = lerp(R, 0.8, ease(seg(t, 67.9, 68.9)));
+        R = lerp(R, 0.55, ease(seg(t, 69.4, 70.6)));
+        R = lerp(R, 0.22, ease(seg(t, 72.4, 75.6)));
+        var zOp = t >= 66.0 ? 1 : 0;
+        var zEnd = t > 78.4 ? 1 - 0.5 * ease(seg(t, 78.4, 79.4)) : 1;
+        HF.setRing(zone, R, zOp * 0.9 * zEnd, zOp * 0.22 * zEnd);
+        for (var j = 0; j < 3; j++) {
+          var b2 = routers[routers.length - 1 - j] ; var rp = b2.position;
+          var lp2 = wl[j].geometry.attributes.position; lp2.setXYZ(0, rp.x, rp.y, rp.z); lp2.setXYZ(1, pos.x, 0.1, pos.z); lp2.needsUpdate = true;
+          wl[j].material.opacity = 0.7 * ease(seg(t, 66.9, 67.5)) * sig;
+          var tp = tw[j].position; var la = al[j].geometry.attributes.position; la.setXYZ(0, tp.x, 0.5, tp.z); la.setXYZ(1, pos.x, 0.1, pos.z); la.needsUpdate = true;
+          al[j].material.opacity = 0.5 * ease(seg(t, 66.3, 66.9)) * sig;
+        }
+        bt.forEach(function (o, k) { var cyc = (t * 0.6 + k * 0.4) % 1; HF.setRing(o.r, cyc * 0.7, (1 - cyc) * 0.9 * ease(seg(t, 67.9, 68.5)) * sig); o.b.visible = t >= 67.9 && sig > 0; });
+        steps.forEach(function (st, k) {
+          var tk = 69.4 + k * 0.3; var on = t > tk && t < 78.6;
+          st.visible = on;
+          var wtk = ease(seg(tk, 67.0, 76.0));
+          st.position.set(lerp(-0.1, 1.15, wtk) + (k % 2 ? 0.05 : -0.05), 0.03, lerp(0.15, 0.55, wtk));
+        });
+        // camera
+        var c1 = ease(seg(t, 65.8, 67.8)), c2 = ease(seg(t, 78.4, 80.4)), c3 = ease(seg(t, 86.0, 88.0));
+        var camY = lerp(lerp(13.5, 7.2, c1), 12.5, c2), camZ = lerp(lerp(8.5, 4.6, c1), 8.4, c2);
+        camera.position.set(Math.sin(t * 0.2) * 0.2 + lerp(0, 0.4, c1) * (1 - c2), camY + 1.5 * c3, camZ);
+        camera.lookAt(lerp(0, 0.3, c1) * (1 - c2), 0, lerp(-0.4, 0.1, c1));
+        var dim = (1 - 0.45 * ease(seg(t, 79.2, 80.4))) * (1 - 0.4 * ease(seg(t, 86.0, 87.5)));
+        hemi.intensity = 0.35 * dim; key.intensity = 0.6 * dim;
+        camera.updateMatrixWorld();
+        var bx = pj(new THREE.Vector3(hot.position.x, hot.position.y + 0.3, hot.position.z));
+        HF.place(labBox, bx.x + 60, bx.y - 120, false);
+        HF.leader(camera, "gc-ld-box", labBox, new THREE.Vector3(hot.position.x, hot.position.y + 0.1, hot.position.z), 63.3, 65.8, t);
+        var zp = pj(new THREE.Vector3(pos.x + R * 0.7, 0.05, pos.z + R * 0.5));
+        HF.place(labZone, zp.x + 80, zp.y - 60, false);
+        HF.leader(camera, "gc-ld-zone", labZone, new THREE.Vector3(pos.x + R * 0.7, 0.05, pos.z + R * 0.5), 72.5, 75.7, t);
+        renderer.render(scene, camera);
+      }
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, d) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: d || 0.25, ease: "back.out(2)" }, at); };
+      ["#gc-lab-gps|2.90", "#gc-lab-note|4.60", "#gc-lab-map|6.00", "#gc-lab-box|8.30", "#gc-l1|11.30", "#gc-l2|11.90", "#gc-l3|12.90", "#gc-l4|14.40", "#gc-lab-zone|17.50", "#gc-lab-few|20.80", "#gc-e1|26.70", "#gc-e2|27.50", "#gc-e3|28.30", "#gc-on|33.00", "#gc-off|33.40", "#gc-b1|35.40", "#gc-b2|36.20"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      popd("#gc-q1", 31.80, 0.3); popd("#gc-q2", 32.00, 0.3);
+      tl.fromTo("#gc-end1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 25.35);
+      tl.fromTo("#gc-title", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 29.25);
+      tl.fromTo("#gc-bubble", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 31.70);
+      window.__timelines["stageC"] = tl;
+    })();
+
+  </script>
+</template>
