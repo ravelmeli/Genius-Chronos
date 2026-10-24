@@ -1,0 +1,136 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #ad-canvas, #ad-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #ad-leaders { pointer-events: none; }
+    .ad-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .ad-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .ad-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .ad-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .ad-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .ad-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #ad-bubble { position: absolute; left: 130px; top: 700px; width: 820px; padding: 36px 40px; border-radius: 40px; background: #1c2b52; border: 4px solid #4aa8ff; box-shadow: 0 0 40px rgba(74,168,255,0.5); color: #fff; font-weight: 800; font-size: 60px; line-height: 1.15; text-align: center; }
+    #ad-bubble::after { content: ""; position: absolute; left: 90px; bottom: -34px; width: 0; height: 0; border-left: 28px solid transparent; border-right: 28px solid transparent; border-top: 36px solid #4aa8ff; }
+    .ad-btn { position: absolute; padding: 20px 40px; border-radius: 999px; font-weight: 800; font-size: 40px; white-space: nowrap; }
+    .ad-big { position: absolute; left: 0; width: 1080px; text-align: center; color: #fff; font-weight: 800; letter-spacing: -0.02em; text-shadow: 0 6px 40px rgba(0,0,0,0.7); }
+
+    #ad-badge { position: absolute; left: 390px; top: 400px; width: 300px; height: 300px; border-radius: 50%; border: 16px solid #ffb21a; background: rgba(40,24,0,0.78); box-shadow: 0 0 60px rgba(255,178,26,0.7), inset 0 0 40px rgba(255,178,26,0.3); display: flex; align-items: center; justify-content: center; color: #ffb21a; font-weight: 800; font-size: 104px; letter-spacing: -0.02em; }
+    #ad-dim { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: rgba(7,11,22,0.62); }
+    .ad-q { position: absolute; font-size: 150px; font-weight: 800; color: #ffc41a; text-shadow: 0 0 40px rgba(255,196,26,0.8); }
+  </style>
+  <div id="root" data-composition-id="stageD" data-width="1080" data-height="1920">
+    <canvas id="ad-canvas" width="1080" height="1920"></canvas>
+    <div id="ad-tag-a" class="ad-mono clip" data-start="0.20" data-duration="5.5" style="left: 60px; top: 200px"><span class="ad-dot"></span>ATTENTION</div>
+    <div id="ad-tag-b" class="ad-mono clip" data-start="5.90" data-duration="5.8" style="left: 60px; top: 200px"><span class="ad-dot"></span>LE VOYANT</div>
+    <div id="ad-tag-c" class="ad-mono clip" data-start="11.90" data-duration="3.8" style="left: 60px; top: 200px"><span class="ad-dot"></span>LE RÉSUMÉ</div>
+    <div id="ad-tag-d" class="ad-mono clip" data-start="15.90" data-duration="5.4" style="left: 60px; top: 200px"><span class="ad-dot"></span>ET TOI ?</div>
+    <div id="ad-illu" class="ad-mono clip" data-start="0.20" data-duration="21.2" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="ad-lab-wet" class="ad-chip ad-neon clip" data-start="2.00" data-duration="3.7" style="left: 70px; top: 290px; --c: #4aa8ff;">ROUTE : TOUJOURS GLISSANTE</div>
+    <div id="ad-lab-ctrl" class="ad-chip  clip" data-start="3.80" data-duration="1.9" style="left: 70px; top: 370px; background: #38d27a; color: #04230f;">IL AIDE À GARDER LE CONTRÔLE</div>
+    <div id="ad-lab-miracle" class="ad-chip  clip" data-start="5.10" data-duration="0.6" style="left: 70px; top: 450px; background: #ffc41a; color: #1a1400;">PAS DE MIRACLE</div>
+    <div id="ad-badge" class="clip" data-start="6.00" data-duration="5.7">ABS</div>
+    <div id="ad-lab-light" class="ad-chip ad-neon clip" data-start="6.30" data-duration="1.7" style="left: 70px; top: 1010px; --c: #ffb21a;">VOYANT ABS ALLUMÉ</div>
+    <div id="ad-lab-dead" class="ad-chip  clip" data-start="8.10" data-duration="1.4" style="left: 70px; top: 1010px; background: #ff4a4a; color: #fff;">SYSTÈME HORS SERVICE</div>
+    <div id="ad-lab-brakes" class="ad-chip  clip" data-start="9.60" data-duration="2.1" style="left: 70px; top: 1010px; background: #38d27a; color: #04230f;">FREINS : FONCTIONNENT</div>
+    <div id="ad-lab-noabs" class="ad-chip  clip" data-start="10.60" data-duration="1.1" style="left: 70px; top: 1090px; background: #ff4a4a; color: #fff;">SANS ANTIBLOCAGE</div>
+    <div id="ad-lab-sens" class="ad-chip ad-neon clip" data-start="12.20" data-duration="3.6" style="left: 700px; top: 605px; --c: #38d27a;">CAPTEUR</div>
+    <div id="ad-lab-calc" class="ad-chip ad-neon clip" data-start="12.80" data-duration="3.0" style="left: 700px; top: 820px; --c: #4aa8ff;">CALCUL</div>
+    <div id="ad-lab-pres" class="ad-chip ad-neon clip" data-start="13.40" data-duration="2.4" style="left: 700px; top: 1033px; --c: #b26bff;">PRESSION</div>
+    <div id="ad-big" class="ad-big clip" data-start="14.70" data-duration="1.1" style="top: 330px; font-size: 96px">Voilà le secret.</div>
+    <div id="ad-dim" class="clip" data-start="15.80" data-duration="5.6"></div>
+    <div id="ad-q1" class="ad-q clip" data-start="16.80" data-duration="4.6" style="left: 100px; top: 470px">?</div>
+    <div id="ad-q2" class="ad-q clip" data-start="17.00" data-duration="4.4" style="left: 850px; top: 580px">?</div>
+    <div id="ad-bubble" class="clip" data-start="15.90" data-duration="5.5" style="top: 720px">Déjà senti l'ABS<br>vibrer ?</div>
+    <div id="ad-b1" class="ad-btn clip" data-start="18.40" data-duration="3.0" style="left: 90px; top: 1040px; background: #fff; color: #0a0f1c">COMMENTE</div>
+    <div id="ad-b2" class="ad-btn clip" data-start="19.50" data-duration="1.9" style="left: 540px; top: 1040px; background: #ff3b3b; color: #fff">ABONNE-TOI</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 73.6, T1 = 95.0;
+
+      var renderer = HF.makeRenderer($("ad-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 40); fl.position.set(0, 6, 6); scene.add(fl);
+      // D1: car on ice
+      var road = HF.makeRoad(60, 5.4); scene.add(road.group);
+      var ice = new THREE.Mesh(new THREE.BoxGeometry(3.4, 0.02, 7), HF.std(0x9fd0ff, { roughness: 0.08, metalness: 0.2, emissive: 0x3a78c0, emissiveIntensity: 0.25, transparent: true, opacity: 0.28 })); ice.position.set(0, 0.02, 0.5); scene.add(ice);
+      var car = HF.makeCar(0x3a7bff); scene.add(car.group);
+      var rain = HF.makeRain(260, 14, 7, 30, 21); rain.position.set(0, 0, 4); scene.add(rain);
+      var sparkle = HF.makeParticles(60, 8, 0.22, 0xdff0ff); sparkle.position.set(0, 0.05, 0.5); scene.add(sparkle);
+      // D2: brake disc (x = 60)
+      var g2 = new THREE.Group(); g2.position.set(60, 0, 0); scene.add(g2);
+      var disc = HF.makeDisc(); g2.add(disc.group);
+      // D3: chain (x = -60)
+      var g3 = new THREE.Group(); g3.position.set(-60, 0, 0); g3.scale.setScalar(1.4); scene.add(g3);
+      var ring = HF.makeToothRing(0.35); ring.group.position.set(0, 1.15, 0); g3.add(ring.group);
+      var ecu = HF.makeEcu(); ecu.group.position.set(0, 0, 0); ecu.group.rotation.z = -Math.PI / 2; g3.add(ecu.group);
+      var vb = HF.makeValveBlock(); vb.group.position.set(0, -1.2, 0); vb.group.rotation.y = 0; vb.group.scale.setScalar(0.8); g3.add(vb.group);
+      var b1 = HF.makeBeads(24, 0x38d27a, 0.12), b2 = HF.makeBeads(24, 0x4aa8ff, 0.12); g3.add(b1); g3.add(b2);
+      var k1 = [{ t: 0, p: [-3.6, 1.8, -6.8], l: [0, -0.2, 0.8] }];
+      var k2 = [{ t: 0, p: [68.2, 0.6, 0.4], l: [60, 0.2, 0] }];
+      var k3 = [{ t: 0, p: [-45, -0.4, 0], l: [-60, -0.57, 0] }];
+      var dimEl = $("ad-dim");
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        var s1 = t < 79.5, s2 = t >= 79.5 && t < 85.5, s3 = t >= 85.5;
+        road.group.visible = s1; ice.visible = s1; car.group.visible = s1; rain.visible = s1; sparkle.visible = s1; g2.visible = s2; g3.visible = s3;
+        if (s1) {
+          var d = (t - 73.6) * 3.4;
+          HF.setRoad(road, d); HF.setRain(rain, t);
+          var sw = 0.16 * Math.sin((t - 73.6) * 2.4) * ease(seg(t, 74.4, 75.6));
+          car.group.position.set(sw, 0, 0); car.group.rotation.y = 0.12 * Math.cos((t - 73.6) * 2.4) * ease(seg(t, 74.4, 75.6));
+          car.wheels.forEach(function (w) { w.spin.rotation.x = d / 0.26; });
+          car.tail.emissiveIntensity = 2.2;
+          HF.updateParticles(sparkle, t, 0.8, 0.5, 4.0);
+          HF.camKeys(camera, k1, t, 0.05);
+        } else if (s2) {
+          disc.spin.rotation.x = (t - 79.5) * 3.0;
+          disc.calMat.emissiveIntensity = 0.7 * ease(seg(t, 83.2, 83.6)) * (0.6 + 0.4 * Math.sin(t * 9));
+          disc.group.rotation.y = 0;
+          HF.camKeys(camera, k2, t, 0.04);
+        } else {
+          ring.spin.rotation.x = (t - 85.5) * 5;
+          ring.glow.material.opacity = 0.2 + 0.25 * Math.sin(t * 8);
+          ecu.glow.material.opacity = 0.3 + 0.3 * Math.sin(t * 6) * ease(seg(t, 86.2, 86.8));
+          var open = 0.5 + 0.5 * Math.sin(t * 7) * ease(seg(t, 87.0, 87.6));
+          vb.sols.forEach(function (s) { s.mat.emissiveIntensity = open * 1.2; });
+          var a1 = b1.geometry.attributes.position.array, a2 = b2.geometry.attributes.position.array;
+          for (var i = 0; i < 24; i++) {
+            var u = ((i / 24) + t * 0.7) % 1;
+            a1[i * 3] = 0; a1[i * 3 + 1] = lerp(0.85, 0.2, u); a1[i * 3 + 2] = 0.2;
+            a2[i * 3] = 0; a2[i * 3 + 1] = lerp(-0.2, -0.8, u); a2[i * 3 + 2] = 0.2;
+          }
+          b1.geometry.attributes.position.needsUpdate = true; b2.geometry.attributes.position.needsUpdate = true;
+          b1.material.opacity = 0.9 * ease(seg(t, 86.1, 86.6)); b2.material.opacity = 0.9 * ease(seg(t, 86.7, 87.2));
+          HF.camKeys(camera, k3, t, 0.04);
+        }
+        renderer.render(scene, camera);
+      }
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#ad-lab-wet|2.00", "#ad-lab-ctrl|3.80", "#ad-lab-miracle|5.10", "#ad-badge|6.00", "#ad-lab-light|6.30", "#ad-lab-dead|8.10", "#ad-lab-brakes|9.60", "#ad-lab-noabs|10.60", "#ad-lab-sens|12.20", "#ad-lab-calc|12.80", "#ad-lab-pres|13.40", "#ad-q1|16.80", "#ad-q2|17.00", "#ad-b1|18.40", "#ad-b2|19.50"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      tl.fromTo("#ad-big", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 14.70);
+      tl.fromTo("#ad-dim", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 15.80);
+      tl.fromTo("#ad-bubble", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 15.90);
+      tl.to("#ad-badge", { opacity: 0.55, duration: 0.3, repeat: 15, yoyo: true, ease: "sine.inOut" }, 6.50);
+      window.__timelines["stageD"] = tl;
+    })();
+
+  </script>
+</template>

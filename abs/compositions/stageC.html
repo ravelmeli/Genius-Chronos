@@ -1,0 +1,161 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #ac-canvas, #ac-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #ac-leaders { pointer-events: none; }
+    .ac-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .ac-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .ac-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .ac-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .ac-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .ac-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #ac-graph, #ac-cyc { position: absolute; left: 90px; top: 300px; width: 900px; height: 270px; border-radius: 28px; background: rgba(10,16,32,0.82); border: 3px solid rgba(255,255,255,0.22); box-shadow: 0 10px 40px rgba(0,0,0,0.5); overflow: hidden; }
+    #ac-cyc { height: 250px; }
+    #ac-graph canvas, #ac-cyc canvas { position: absolute; left: 0; top: 0; }
+    #ac-graph .ttl, #ac-cyc .ttl { position: absolute; left: 28px; top: 14px; font-family: "Space Mono", monospace; font-size: 26px; letter-spacing: 0.12em; color: rgba(255,255,255,0.85); }
+    .ac-tag2 { position: absolute; padding: 10px 24px; border-radius: 999px; font-weight: 800; font-size: 30px; white-space: nowrap; }
+  </style>
+  <div id="root" data-composition-id="stageC" data-width="1080" data-height="1920">
+    <canvas id="ac-canvas" width="1080" height="1920"></canvas>
+    <div id="ac-tag-a" class="ac-mono clip" data-start="0.20" data-duration="4.4" style="left: 60px; top: 200px"><span class="ac-dot"></span>LE RÉSULTAT</div>
+    <div id="ac-tag-b" class="ac-mono clip" data-start="4.60" data-duration="3.5" style="left: 60px; top: 200px"><span class="ac-dot"></span>L'OBSTACLE</div>
+    <div id="ac-tag-c" class="ac-mono clip" data-start="8.40" data-duration="6.7" style="left: 60px; top: 200px"><span class="ac-dot"></span>LES VIBRATIONS</div>
+    <div id="ac-illu" class="ac-mono clip" data-start="0.20" data-duration="15.0" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="ac-graph" class="clip" data-start="0.40" data-duration="4.1"><canvas id="ac-gc" width="900" height="270"></canvas><div class="ttl">ADHÉRENCE · ILLUSTRATIF</div></div>
+    <div id="ac-cyc" class="clip" data-start="8.80" data-duration="3.6"><canvas id="ac-cc" width="900" height="250"></canvas><div class="ttl">CYCLES D'ABS · ILLUSTRATIF</div></div>
+    <div id="ac-tg-no" class="ac-tag2 clip" data-start="4.80" data-duration="3.3" style="background: #ff4a4a; color: #fff">SANS ABS</div>
+    <div id="ac-tg-yes" class="ac-tag2 clip" data-start="4.80" data-duration="3.3" style="background: #38d27a; color: #04230f">AVEC ABS</div>
+    <div id="ac-lab-lim" class="ac-chip ac-neon clip" data-start="2.10" data-duration="2.4" style="left: 70px; top: 1010px; --c: #38d27a;">À LA LIMITE DE L'ADHÉRENCE</div>
+    <div id="ac-lab-never" class="ac-chip  clip" data-start="3.60" data-duration="0.9" style="left: 70px; top: 1090px; background: #ffc41a; color: #1a1400;">JAMAIS BLOQUÉE</div>
+    <div id="ac-lab-dir" class="ac-chip ac-neon clip" data-start="5.00" data-duration="3.2" style="left: 70px; top: 1090px; --c: #38d27a;">TU GARDES LA DIRECTION</div>
+    <div id="ac-lab-crash" class="ac-chip  clip" data-start="6.00" data-duration="2.2" style="left: 70px; top: 290px; background: #38d27a; color: #04230f;">OBSTACLE ÉVITÉ</div>
+    <div id="ac-lab-vib" class="ac-chip ac-neon clip" data-start="8.60" data-duration="3.8" style="left: 70px; top: 1010px; --c: #ffc41a;">LA PÉDALE VIBRE</div>
+    <div id="ac-lab-cyc" class="ac-chip  clip" data-start="10.00" data-duration="2.4" style="left: 70px; top: 1090px;">CE SONT LES CYCLES</div>
+    <div id="ac-lab-hard" class="ac-chip  clip" data-start="12.60" data-duration="2.5" style="left: 70px; top: 1010px; background: #38d27a; color: #04230f;">APPUIE FORT</div>
+    <div id="ac-lab-hold" class="ac-chip  clip" data-start="13.80" data-duration="1.3" style="left: 70px; top: 1090px; background: #ffc41a; color: #1a1400;">NE RELÂCHE PAS</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 58.4, T1 = 73.6;
+
+      var renderer = HF.makeRenderer($("ac-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 40); fl.position.set(0, 6, 6); scene.add(fl);
+      // C1: one wheel on its own road (x = 60)
+      var g1 = new THREE.Group(); g1.position.set(60, 0, 0); scene.add(g1);
+      var road1 = HF.makeRoad(40, 5.4); g1.add(road1.group);
+      var wh = HF.makeWheel(0.5, 0.34); wh.group.position.set(0, 0.5, 0); g1.add(wh.group);
+      var heat1 = HF.makeGlow(0xffa23a, 1.4); heat1.position.set(0, 0.1, 0); g1.add(heat1);
+      // C2: two cars and obstacles on the main road
+      var road2 = HF.makeRoad(40, 5.6); scene.add(road2.group);
+      var carN = HF.makeCar(0xe0443a), carY = HF.makeCar(0x3a7bff); scene.add(carN.group); scene.add(carY.group);
+      [carN, carY].forEach(function (c) { c.tail.emissiveIntensity = 2.2; });
+      var obMat = HF.std(0xff7a2a, { emissive: 0xff5a00, emissiveIntensity: 0.35, roughness: 0.5 });
+      var obs = [-1.45, 1.45].map(function (x) { var o = new THREE.Mesh(new THREE.BoxGeometry(1.0, 0.8, 0.6), obMat); o.position.set(x, 0.4, 2.2); scene.add(o); return o; });
+      var smokeN = HF.makeParticles(60, 5, 0.5, 0xd5d9e6); scene.add(smokeN);
+      var hit = HF.makeGlow(0xff3a2a, 2.6); hit.position.set(-1.45, 0.6, 1.9); scene.add(hit);
+      var trailY = HF.makeBeads(50, 0x38c8ff, 0.16), trailN = HF.makeBeads(50, 0xff4a4a, 0.16); scene.add(trailY); scene.add(trailN);
+      // C3: pedal (x = -60)
+      var g3 = new THREE.Group(); g3.position.set(-60, 0, 0); scene.add(g3);
+      var pd = HF.makePedal(); g3.add(pd.group); g3.scale.setScalar(0.85);
+      var base = new THREE.Mesh(new THREE.BoxGeometry(3.0, 0.1, 2.4), HF.std(0x0e1424, { metalness: 0, roughness: 0.95 })); base.position.set(0, -0.62, 0.6);
+      function zN(t) { return Math.min(0.45, -2.4 + 2.0 * (t - 63.0)); }
+      function zY(t) { return -2.4 + 2.0 * (t - 63.0); }
+      function xY(t) { return 1.45 - 1.25 * ease(seg(t, 64.1, 65.3)); }
+      function yawY(t) { var dx = xY(t + 0.02) - xY(t - 0.02), dz = zY(t + 0.02) - zY(t - 0.02); return Math.atan2(dx, dz); }
+      function P(t) { var ph = ((t - 66.8) / 0.9) % 1; return ph < 0.35 ? lerp(1, 0.3, ease(ph / 0.35)) : lerp(0.3, 1, ease((ph - 0.35) / 0.65)); }
+      var labN = $("ac-tg-no"), labY = $("ac-tg-yes");
+      var gctx = $("ac-gc").getContext("2d"), cctx = $("ac-cc").getContext("2d");
+      function fr(s) { return s <= 0.2 ? Math.sin((s / 0.2) * 1.5708) : 1 - 0.35 * ((s - 0.2) / 0.8); }
+      function graph(t) {
+        var c = gctx; c.clearRect(0, 0, 900, 270);
+        var x0 = 60, x1 = 840, yb = 225, hh = 150;
+        c.fillStyle = "rgba(56,210,122,0.22)"; c.fillRect(x0 + 0.14 * (x1 - x0), 70, 0.12 * (x1 - x0), yb - 70);
+        c.fillStyle = "#38d27a"; c.font = "700 26px 'Space Mono', monospace"; c.textAlign = "center"; c.fillText("ABS", x0 + 0.2 * (x1 - x0), 62);
+        c.strokeStyle = "#6fb3ff"; c.lineWidth = 6; c.shadowColor = "#6fb3ff"; c.shadowBlur = 14; c.beginPath();
+        for (var i = 0; i <= 100; i++) { var s = i / 100, x = x0 + s * (x1 - x0), y = yb - fr(s) * hh; if (i === 0) c.moveTo(x, y); else c.lineTo(x, y); }
+        c.stroke(); c.shadowBlur = 0;
+        var ds = 0.2 + 0.05 * Math.sin(t * 11), dx = x0 + ds * (x1 - x0), dy = yb - fr(ds) * hh;
+        c.fillStyle = "#fff"; c.beginPath(); c.arc(dx, dy, 11, 0, 6.2832); c.fill();
+        c.fillStyle = "rgba(255,255,255,0.8)"; c.font = "700 24px 'Space Mono', monospace"; c.textAlign = "left"; c.fillText("ROUE QUI ROULE", x0, 258); c.textAlign = "right"; c.fillText("BLOQUÉE", x1, 258);
+      }
+      function cyc(t) {
+        var c = cctx; c.clearRect(0, 0, 900, 250);
+        c.strokeStyle = "#ffc41a"; c.lineWidth = 6; c.shadowColor = "#ffc41a"; c.shadowBlur = 14; c.beginPath();
+        for (var x = 0; x <= 852; x += 4) { var y = 215 - P(t - 4 * (1 - x / 852)) * 130; if (x === 0) c.moveTo(24, y); else c.lineTo(24 + x, y); }
+        c.stroke(); c.shadowBlur = 0;
+      }
+      var k1 = [{ t: 0, p: [67.6, 1.0, 0], l: [60, 0.2, 0] }];
+      var k2 = [{ t: 0, p: [0, 11.4, -9.8], l: [0, 0, -1.2] }];
+      var k3 = [{ t: 0, p: [-50.5, 0.4, 0.7], l: [-60, 0.2, 0.7] }, { t: 70.8, p: [-51.0, 0.45, 0.7], l: [-60, 0.2, 0.7] }];
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        var s1 = t < 63.0, s2 = t >= 63.0 && t < 66.7, s3 = t >= 66.7;
+        g1.visible = s1; road2.group.visible = s2; carN.group.visible = s2; carY.group.visible = s2; g3.visible = s3;
+        obs.forEach(function (o) { o.visible = s2; }); trailY.visible = s2; trailN.visible = s2; smokeN.visible = s2; hit.visible = s2;
+        if (s1) {
+          var d = (t - 58.4) * 3.5;
+          HF.setRoad(road1, d); wh.spin.rotation.x = d / 0.5;
+          heat1.material.opacity = 0.25 + 0.2 * Math.sin(t * 14) ** 2;
+          HF.camKeys(camera, k1, t, 0.04);
+          graph(t);
+        } else if (s2) {
+          HF.setRoad(road2, (t - 63.0) * 2.2);
+          carN.group.position.set(-1.45, 0, zN(t));
+          var bounce = t > 64.4 ? 0.05 * Math.exp(-(t - 64.43) * 6) * Math.sin((t - 64.43) * 40) : 0;
+          carN.group.position.z += bounce;
+          carN.wheels.forEach(function (w) { w.spin.rotation.x = 1.5; });
+          carY.group.position.set(xY(t), 0, zY(t)); carY.group.rotation.y = yawY(t);
+          carY.wheels.forEach(function (w) { w.spin.rotation.x = (t - 63) * 8; });
+          var sm = ease(seg(t, 63.4, 63.9)); smokeN.position.set(-1.45, 0.05, zN(t) - 0.8);
+          HF.updateParticles(smokeN, t, sm * (t < 66.5 ? 1 : 0), 1.0, 2.2);
+          var hg = ease(seg(t, 64.43, 64.6)) * (1 - ease(seg(t, 65.2, 66.0)));
+          hit.material.opacity = 0.8 * hg;
+          obs[0].position.z = 2.2 + (t > 64.4 ? 0.12 * Math.exp(-(t - 64.43) * 8) : 0);
+          var a = trailY.geometry.attributes.position.array, b = trailN.geometry.attributes.position.array;
+          for (var i = 0; i < 50; i++) {
+            var tt = Math.max(63.0, t - i * 0.06);
+            a[i * 3] = xY(tt); a[i * 3 + 1] = 0.08; a[i * 3 + 2] = zY(tt) - 1.4;
+            b[i * 3] = -1.45; b[i * 3 + 1] = 0.08; b[i * 3 + 2] = zN(tt) - 1.4;
+          }
+          trailY.geometry.attributes.position.needsUpdate = true; trailN.geometry.attributes.position.needsUpdate = true;
+          var vis = ease(seg(t, 63.6, 64.2));
+          trailY.material.opacity = 0.9 * vis; trailN.material.opacity = 0.9 * vis;
+          HF.camKeys(camera, k2, t, 0.04);
+          var pn = HF.project(camera, new THREE.Vector3(-1.45, 0.4, zN(t) - 1.0)), py = HF.project(camera, new THREE.Vector3(xY(t), 0.4, zY(t) - 1.0));
+          HF.place(labN, pn.x - 90, pn.y - 220, false); HF.place(labY, py.x - 90, py.y - 220, false);
+        } else {
+          var press = ease(seg(t, 66.8, 67.4));
+          var vib = (t > 67.2 && t < 72.4) ? 0.018 * Math.sin(t * 60) * (0.5 + 0.5 * P(t)) : 0;
+          pd.pivot.rotation.x = 0.32 * press + vib;
+          HF.camKeys(camera, k3, t, 0.03);
+          cyc(t);
+        }
+        renderer.render(scene, camera);
+      }
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#ac-lab-lim|2.10", "#ac-lab-never|3.60", "#ac-lab-dir|5.00", "#ac-lab-crash|6.00", "#ac-lab-vib|8.60", "#ac-lab-cyc|10.00", "#ac-lab-hard|12.60", "#ac-lab-hold|13.80", "#ac-tg-no|4.80", "#ac-tg-yes|4.80"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      tl.fromTo("#ac-graph", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 0.40);
+      tl.fromTo("#ac-cyc", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 8.80);
+      window.__timelines["stageC"] = tl;
+    })();
+
+  </script>
+</template>

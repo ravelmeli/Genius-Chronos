@@ -1,0 +1,116 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #aa-canvas, #aa-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #aa-leaders { pointer-events: none; }
+    .aa-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .aa-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .aa-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .aa-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .aa-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .aa-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+  </style>
+  <div id="root" data-composition-id="stageA" data-width="1080" data-height="1920">
+    <canvas id="aa-canvas" width="1080" height="1920"></canvas>
+    <div id="aa-tag-a" class="aa-mono clip" data-start="0.3" data-duration="9.6" style="left: 60px; top: 200px"><span class="aa-dot"></span>FREINAGE D'URGENCE</div>
+    <div id="aa-tag-b" class="aa-mono clip" data-start="10.2" data-duration="6.0" style="left: 60px; top: 200px"><span class="aa-dot"></span>LE BUT</div>
+    <div id="aa-tag-c" class="aa-mono clip" data-start="16.5" data-duration="8.0" style="left: 60px; top: 200px"><span class="aa-dot"></span>POURQUOI ?</div>
+    <div id="aa-tag-d" class="aa-mono clip" data-start="24.6" data-duration="6.2" style="left: 60px; top: 200px"><span class="aa-dot"></span>LA DIRECTION</div>
+    <div id="aa-illu" class="aa-mono clip" data-start="0.3" data-duration="30.5" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="aa-lab-vib" class="aa-chip aa-neon clip" data-start="3.3" data-duration="6.3" style="left: 70px; top: 290px; --c: #ffc41a;">PÉDALE : ÇA VIBRE</div>
+    <div id="aa-lab-panne" class="aa-chip  clip" data-start="5.0" data-duration="4.6" style="left: 70px; top: 370px; background: #38d27a; color: #04230f;">PAS UNE PANNE</div>
+    <div id="aa-lab-abs" class="aa-chip aa-neon clip" data-start="6.0" data-duration="3.6" style="left: 70px; top: 450px; --c: #4aa8ff;">C'EST L'ABS</div>
+    <div id="aa-lab-def" class="aa-chip  clip" data-start="8.6" data-duration="7.6" style="left: 70px; top: 1010px;">ABS = ANTIBLOCAGE DES ROUES</div>
+    <div id="aa-lab-turn" class="aa-chip  clip" data-start="13.9" data-duration="2.3" style="left: 70px; top: 1090px;">ROUE : TOURNE</div>
+    <div id="aa-lab-moves" class="aa-chip  clip" data-start="14.9" data-duration="1.3" style="left: 560px; top: 1090px; background: #ffc41a; color: #1a1400;">VOITURE : AVANCE</div>
+    <div id="aa-lab-roll" class="aa-chip  clip" data-start="18.7" data-duration="5.7" style="left: 70px; top: 1010px; background: #38d27a; color: #04230f;">ROULE : COLLE</div>
+    <div id="aa-lab-lock" class="aa-chip  clip" data-start="20.5" data-duration="3.9" style="left: 560px; top: 1010px; background: #ff4a4a; color: #fff;">BLOQUÉE : GLISSE</div>
+    <div id="aa-lab-less" class="aa-chip  clip" data-start="22.5" data-duration="1.9" style="left: 70px; top: 1090px;">MOINS D'ADHÉRENCE</div>
+    <div id="aa-lab-steer" class="aa-chip aa-neon clip" data-start="25.4" data-duration="5.2" style="left: 70px; top: 290px; --c: #38c8ff;">VOLANT : À GAUCHE</div>
+    <div id="aa-lab-nodir" class="aa-chip  clip" data-start="27.6" data-duration="3.0" style="left: 70px; top: 370px; background: #ff4a4a; color: #fff;">ROUE BLOQUÉE : NE DIRIGE PLUS</div>
+    <div id="aa-lab-straight" class="aa-chip aa-neon clip" data-start="29.9" data-duration="0.7" style="left: 70px; top: 1010px; --c: #ff4a4a;">TOUT DROIT</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 0, T1 = 30.8, V0 = 9;
+
+      var renderer = HF.makeRenderer($("aa-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var road = HF.makeRoad(64, 5.4); scene.add(road.group);
+      var rain = HF.makeRain(320, 14, 7, 30, 11); rain.position.set(0, 0, 4); scene.add(rain);
+      var car = HF.makeCar(0x3a7bff); scene.add(car.group);
+      var pair = new THREE.Group(); scene.add(pair);
+      var w1 = HF.makeWheel(0.46, 0.3), w2 = HF.makeWheel(0.46, 0.3);
+      w1.group.position.set(0, 0.46, 0.95); w2.group.position.set(0, 0.46, -0.95); pair.add(w1.group); pair.add(w2.group);
+      var smoke = HF.makeParticles(70, 3, 0.55, 0xd5d9e6); smoke.position.set(0, 0.05, -0.95); pair.add(smoke);
+      var skid = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.012, 1), HF.std(0x3a1208, { emissive: 0xff5a00, emissiveIntensity: 0.45 })); skid.position.y = 0.012; pair.add(skid);
+      var heat = HF.makeGlow(0xff7a1a, 1.6); heat.position.set(0, 0.2, -0.95); pair.add(heat);
+      var arc = HF.makeBeads(50, 0x38c8ff, 0.16), straight = HF.makeBeads(50, 0xff4a4a, 0.16); scene.add(arc); scene.add(straight);
+      function speed(t) { return t < 2.6 ? 1 : 1 - 0.6 * seg(t, 2.6, 9.8); }
+      function dist(t) { var d = 0, s = 0.1, x; for (x = 0; x < t; x += s) d += V0 * speed(x + s / 2) * Math.min(s, t - x); return d; }
+      var lockAng = dist(20.0) / 0.46, lockCar = dist(25.9) / 0.26;
+      var keys = [
+        { t: 0, p: [-4.4, 2.1, -8.6], l: [0, -0.5, 0.8] },
+        { t: 5.2, p: [-3.4, 1.7, -6.6], l: [0, -0.2, 0.6] },
+        { t: 10.4, p: [4.2, 1.2, 1.0], l: [0.6, -0.1, 0.8] },
+        { t: 16.8, p: [10.4, 1.3, 0], l: [0, -0.55, 0] },
+        { t: 25.0, p: [0, 9.8, -6.4], l: [0, 0, -2.2] }
+      ];
+      function renderAt(t) {
+        if (t > T1 + 0.05) return;
+        var d = dist(t);
+        HF.setRoad(road, d); HF.setRain(rain, t);
+        var inCar = t < 16.5 || t >= 24.6, inPair = t >= 16.3 && t < 24.7;
+        car.group.visible = inCar; pair.visible = inPair;
+        var vib = (t > 3.3 && t < 6.9) ? 1 : 0;
+        car.group.position.set(0, vib * 0.012 * Math.sin(t * 70), t >= 24.6 ? -1.6 : 0);
+        car.tail.emissiveIntensity = 0.2 + 2.2 * (t > 2.6 ? 1 : 0);
+        car.wheels.forEach(function (w, i) {
+          var locked = t >= 25.9 && i < 2;
+          w.spin.rotation.x = locked ? lockCar : d / 0.26;
+          w.pivot.rotation.y = i < 2 && t >= 24.6 ? 0.45 * ease(seg(t, 25.0, 25.8)) : 0;
+        });
+        w1.spin.rotation.x = d / 0.46;
+        w2.spin.rotation.x = t >= 20.0 ? lockAng : d / 0.46;
+        var sm = t >= 20.0 && t < 24.7 ? ease(seg(t, 20.0, 20.8)) : 0;
+        HF.updateParticles(smoke, t, sm, 1.0, 2.6);
+        heat.material.opacity = 0.6 * sm * (0.7 + 0.3 * Math.sin(t * 17));
+        var L = Math.max(0.001, 3.6 * (t - 20.0));
+        skid.visible = t >= 20.0; skid.scale.z = L; skid.position.z = -0.95 - L / 2;
+        var g = ease(seg(t, 26.0, 27.4));
+        var a = arc.geometry.attributes.position.array, b = straight.geometry.attributes.position.array;
+        for (var i = 0; i < 50; i++) {
+          var s = (i / 49) * g;
+          a[i * 3] = 2.0 * s * s; a[i * 3 + 1] = 0.1; a[i * 3 + 2] = -0.2 + 3.6 * s;
+          b[i * 3] = 0; b[i * 3 + 1] = 0.1; b[i * 3 + 2] = -0.2 + 3.6 * s;
+        }
+        arc.geometry.attributes.position.needsUpdate = true; straight.geometry.attributes.position.needsUpdate = true;
+        var vis = t >= 24.6 ? 1 : 0;
+        arc.material.opacity = 0.95 * vis * g; straight.material.opacity = 0.95 * vis * g;
+        HF.camKeys(camera, keys, t, 0.05);
+        renderer.render(scene, camera);
+      }
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#aa-lab-vib|3.3", "#aa-lab-panne|5.0", "#aa-lab-abs|6.0", "#aa-lab-def|8.6", "#aa-lab-turn|13.9", "#aa-lab-moves|14.9", "#aa-lab-roll|18.7", "#aa-lab-lock|20.5", "#aa-lab-less|22.5", "#aa-lab-steer|25.4", "#aa-lab-nodir|27.6", "#aa-lab-straight|29.9"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      tl.to("#aa-lab-vib", { x: 4, duration: 0.04, repeat: 80, yoyo: true, ease: "none" }, 3.6);
+      window.__timelines["stageA"] = tl;
+    })();
+
+  </script>
+</template>
