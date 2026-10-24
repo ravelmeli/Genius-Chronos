@@ -1,0 +1,163 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #fb-canvas, #fb-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #fb-leaders { pointer-events: none; }
+    .fb-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .fb-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .fb-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .fb-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .fb-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .fb-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #fb-legend { position: absolute; left: 900px; top: 330px; width: 36px; height: 420px; border-radius: 18px; background: linear-gradient(to bottom, #ffffff 0%, #4de1ff 45%, #3a5fff 100%); box-shadow: 0 0 24px rgba(77,225,255,0.4); }
+    .fb-lg { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; color: #fff; background: rgba(10,16,32,0.6); padding: 2px 10px; border-radius: 10px; white-space: nowrap; }
+    #fb-no { position: absolute; left: 290px; top: 420px; width: 500px; height: 500px; border-radius: 50%; border: 22px solid #ff4a4a; box-shadow: 0 0 40px rgba(255,74,74,0.6); }
+    #fb-no::after { content: ""; position: absolute; left: 50%; top: -22px; width: 22px; height: 500px; margin-left: -11px; background: #ff4a4a; transform: rotate(45deg); }
+  </style>
+  <div id="root" data-composition-id="stageB" data-width="1080" data-height="1920">
+    <canvas id="fb-canvas" width="1080" height="1920"></canvas>
+    <svg id="fb-leaders" viewBox="0 0 1080 1920">
+      <g id="fb-ld-near" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#ffd23a" stroke-width="3"></line><circle r="8" fill="#ffd23a"></circle></g>
+      <g id="fb-ld-far" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#ffd23a" stroke-width="3"></line><circle r="8" fill="#ffd23a"></circle></g>
+    </svg>
+    <div id="fb-tag-a" class="fb-mono clip" data-start="0.10" data-duration="6.3" style="left: 60px; top: 200px"><span class="fb-dot"></span>CAMÉRA INFRAROUGE</div>
+    <div id="fb-tag-b" class="fb-mono clip" data-start="6.60" data-duration="7.4" style="left: 60px; top: 200px"><span class="fb-dot"></span>CARTE DE PROFONDEUR</div>
+    <div id="fb-tag-c" class="fb-mono clip" data-start="14.20" data-duration="4.5" style="left: 60px; top: 200px"><span class="fb-dot"></span>ET UNE PHOTO ?</div>
+    <div id="fb-illu" class="fb-mono clip" data-start="0.10" data-duration="18.5" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="fb-lab-near" class="fb-chip fb-neon clip" data-start="3.40" data-duration="3.0" style="--c: #ffd23a; left: 70px; top: 560px">POINT PROCHE</div>
+    <div id="fb-lab-far" class="fb-chip fb-neon clip" data-start="4.40" data-duration="2.0" style="--c: #ffd23a; left: 640px; top: 880px">POINT LOINTAIN</div>
+    <div id="fb-depth" class="fb-chip clip" data-start="9.80" data-duration="4.2" style="left: 70px; top: 1010px">CARTE DE PROFONDEUR</div>
+    <div id="fb-legend" class="clip" data-start="10.40" data-duration="3.6"></div>
+    <div id="fb-lg-near" class="fb-lg clip" data-start="10.40" data-duration="3.6" style="left: 740px; top: 320px">PROCHE</div>
+    <div id="fb-lg-far" class="fb-lg clip" data-start="10.40" data-duration="3.6" style="left: 790px; top: 722px">LOIN</div>
+    <div id="fb-no" class="clip" data-start="17.30" data-duration="1.4"></div>
+    <div id="fb-flat" class="fb-chip clip" data-start="16.00" data-duration="2.7" style="background: #ff4a4a; color: #fff; left: 70px; top: 1010px">PLAT = REFUSÉ</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/face.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 28.6, T1 = 47.4;
+      var renderer = HF.makeRenderer($("fb-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x04060d);
+      scene.fog = new THREE.Fog(0x04060d, 8, 20);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 50);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x0a0c14, 0.2));
+      var keyL = new THREE.DirectionalLight(0x9bb8ff, 0.5);
+      keyL.position.set(1.5, 2, 4);
+      scene.add(keyL);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.5);
+      rim.position.set(-3, 2.5, -3);
+      scene.add(rim);
+      var face = HF.makeFace();
+      face.group.position.set(0, 0.2, 0);
+      scene.add(face.group);
+      face.mat.color.set(0x8f93a6);
+      var K = 0.35;
+      // dim reference grid (where the dots would land on a flat wall)
+      var refGeo = new THREE.BufferGeometry();
+      var ra = new Float32Array(face.n * 3), rc = new Float32Array(face.n * 3);
+      for (var i = 0; i < face.n; i++) { ra[i * 3] = face.tx[i]; ra[i * 3 + 1] = face.ty[i]; ra[i * 3 + 2] = -0.02; rc[i * 3] = 0.55; rc[i * 3 + 1] = 0.58; rc[i * 3 + 2] = 0.7; }
+      refGeo.setAttribute("position", new THREE.BufferAttribute(ra, 3));
+      refGeo.setAttribute("color", new THREE.BufferAttribute(rc, 3));
+      var refMat = new THREE.PointsMaterial({ size: 0.04, map: HF.spriteTex, vertexColors: true, transparent: true, opacity: 0, depthWrite: false, toneMapped: false });
+      var ref = new THREE.Points(refGeo, refMat);
+      ref.frustumCulled = false;
+      face.group.add(ref);
+      // the photo
+      var pc = document.createElement("canvas");
+      pc.width = 340; pc.height = 440;
+      var g = pc.getContext("2d");
+      g.fillStyle = "#f4f4f6"; g.fillRect(0, 0, 340, 440);
+      g.fillStyle = "#c98f6b"; g.beginPath(); g.ellipse(170, 215, 112, 150, 0, 0, Math.PI * 2); g.fill();
+      g.fillStyle = "#2b2420"; g.beginPath(); g.ellipse(170, 120, 112, 60, 0, Math.PI, 0); g.fill();
+      g.fillStyle = "#1b1f2e"; g.beginPath(); g.ellipse(130, 195, 16, 9, 0, 0, Math.PI * 2); g.ellipse(210, 195, 16, 9, 0, 0, Math.PI * 2); g.fill();
+      g.strokeStyle = "#9a6a4c"; g.lineWidth = 6; g.beginPath(); g.moveTo(170, 200); g.lineTo(160, 255); g.lineTo(180, 258); g.stroke();
+      g.strokeStyle = "#7a3f3a"; g.lineWidth = 7; g.beginPath(); g.moveTo(135, 305); g.quadraticCurveTo(170, 325, 205, 305); g.stroke();
+      var ptex = new THREE.CanvasTexture(pc); ptex.encoding = THREE.sRGBEncoding;
+      var photo = new THREE.Mesh(new THREE.PlaneGeometry(1.75, 2.26), new THREE.MeshBasicMaterial({ map: ptex, transparent: true, opacity: 0, toneMapped: false }));
+      photo.position.set(0, 0, -0.01);
+      face.group.add(photo);
+      // two highlighted dots (near = nose tip, far = cheek edge)
+      function nearest(x, y) { var b = 0, bd = 9; for (var q = 0; q < face.n; q++) { var d = (face.tx[q] - x) * (face.tx[q] - x) + (face.ty[q] - y) * (face.ty[q] - y); if (d < bd) { bd = d; b = q; } } return b; }
+      var iN = nearest(0, -0.28), iF = nearest(0.58, -0.1);
+      var gN = HF.makeGlow(0xffd23a, 0.45), gF = HF.makeGlow(0xffd23a, 0.45);
+      face.group.add(gN); face.group.add(gF);
+      var tmp = new THREE.Vector3();
+      function proj(x, y, z) { tmp.set(x, y, z); face.group.localToWorld(tmp); return HF.project(camera, tmp); }
+      var ldNear = $("fb-ld-near"), ldFar = $("fb-ld-far");
+      var labNear = $("fb-lab-near"), labFar = $("fb-lab-far");
+
+      function depthColor(z, o, mix) {
+        var u = HF.clamp(z / 0.7, 0, 1);
+        var r = u > 0.6 ? lerp(0.3, 1, (u - 0.6) / 0.4) : lerp(0.23, 0.3, u / 0.6);
+        var gg = u > 0.6 ? 1 : lerp(0.4, 0.9, u / 0.6);
+        var b = 1;
+        o.r = lerp(o.r, r, mix); o.g = lerp(o.g, gg, mix); o.b = lerp(o.b, b, mix);
+      }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        var fl = ease(seg(t, 28.9, 31.5));
+        var rise = ease(seg(t, 35.4, 38.5));
+        var toPhoto = ease(seg(t, 42.8, 43.5));
+        var colorMix = ease(seg(t, 35.5, 37.2)) * (1 - toPhoto);
+        face.dmat.opacity = 1;
+        face.setDots(function (i, o) {
+          var z = face.tz[i], x = face.tx[i], y = face.ty[i];
+          var ax = x + K * z;
+          var px = lerp(x, ax, fl), pz = lerp(z, 0, fl);
+          px = lerp(px, x, rise); pz = lerp(pz, z, rise);
+          px = lerp(px, x, toPhoto); pz = lerp(pz, 0.012, toPhoto);
+          o.x = px; o.y = y; o.z = pz;
+          o.v = 0.8 + 0.2 * Math.sin(t * 8 + face.hs[i] * 30);
+          depthColor(z, o, colorMix);
+          if (normal) { o.r = 0.5; o.g = 0.12; o.b = 1; o.v = 1; }
+        });
+        var normal = t >= 42.8;
+        var wantBlend = normal ? THREE.NormalBlending : THREE.AdditiveBlending;
+        if (face.dmat.blending !== wantBlend) { face.dmat.blending = wantBlend; face.dmat.needsUpdate = true; }
+        face.mat.opacity = lerp(1, 0.0, ease(seg(t, 28.9, 29.9))) * (1 - toPhoto) + (t >= 35.4 ? 0.0 : 0);
+        face.mat.visible = face.mat.opacity > 0.01;
+        for (var e = 0; e < 2; e++) face.eyes[e].visible = face.mat.visible;
+        face.wmat.opacity = ease(seg(t, 38.0, 40.5)) * (1 - toPhoto);
+        refMat.opacity = 0.45 * ease(seg(t, 30.0, 31.0)) * (1 - ease(seg(t, 35.4, 36.2)));
+        photo.material.opacity = ease(seg(t, 43.0, 43.6)) * (1 - ease(seg(t, 47.0, 47.4)));
+        face.group.rotation.y = t > 38.4 && t < 42.8 ? 0.5 * Math.sin((t - 38.4) * 1.1) * ease(seg(t, 38.4, 39.4)) : 0.0;
+        var k = ease(seg(t, T0, T1));
+        camera.position.set(0, 0.3, lerp(lerp(4.9, 4.4, k), 6.6, toPhoto));
+        camera.lookAt(0, 0.25, 0);
+        camera.updateMatrixWorld();
+        // highlighted dots and displacement lines during the flat phase
+        var show = ease(seg(t, 32.0, 32.5)) * (1 - ease(seg(t, 34.9, 35.4)));
+        var zN = face.tz[iN], zF = face.tz[iF];
+        var apN = [face.tx[iN] + K * zN, face.ty[iN], 0], rfN = [face.tx[iN], face.ty[iN], -0.02];
+        var apF = [face.tx[iF] + K * zF, face.ty[iF], 0], rfF = [face.tx[iF], face.ty[iF], -0.02];
+        gN.position.set(apN[0], apN[1], 0.02); gF.position.set(apF[0], apF[1], 0.02);
+        gN.material.opacity = show; gF.material.opacity = show;
+        var a1 = proj(apN[0], apN[1], 0), b1 = proj(rfN[0], rfN[1], -0.02);
+        var a2 = proj(apF[0], apF[1], 0), b2 = proj(rfF[0], rfF[1], -0.02);
+        HF.place(labNear, a1.x + 70, a1.y - 190, false);
+        HF.place(labFar, a2.x + 50, a2.y + 200, false);
+        HF.setLeader(ldNear, b1.x, b1.y, a1.x, a1.y, show);
+        HF.setLeader(ldFar, b2.x, b2.y, a2.x, a2.y, show);
+        renderer.render(scene, camera);
+      }
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+
+      var tl = gsap.timeline({ paused: true });
+      var pop = function (sel, at) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, at); };
+      pop("#fb-lab-near", 3.40); pop("#fb-lab-far", 4.40); pop("#fb-depth", 9.80);
+      tl.fromTo("#fb-legend", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 10.40);
+      pop("#fb-flat", 16.00);
+      tl.fromTo("#fb-no", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 17.30);
+      window.__timelines["stageB"] = tl;
+    })();
+
+  </script>
+</template>

@@ -1,0 +1,209 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #fc-canvas, #fc-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #fc-leaders { pointer-events: none; }
+    .fc-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .fc-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .fc-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .fc-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .fc-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .fc-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    .fc-pill { position: absolute; padding: 12px 24px; border-radius: 999px; font-weight: 700; font-size: 32px; white-space: nowrap; background: rgba(10,16,32,0.92); color: #fff; border: 3px solid rgba(255,255,255,0.7); box-shadow: 0 0 24px rgba(255,255,255,0.25); }
+    #fc-num { top: 780px; height: 330px; }
+    #fc-num .ttl { position: absolute; left: 36px; top: 22px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; color: #4de1ff; }
+    #fc-num .rows { position: absolute; left: 36px; top: 76px; font-family: "Space Mono", monospace; font-size: 34px; line-height: 1.45; color: #fff; white-space: pre; }
+    #fc-chip { position: absolute; right: 90px; top: 92px; width: 150px; height: 150px; border-radius: 22px; border: 6px solid #4aa8ff; background: #101a33; outline: 10px dashed #4aa8ff; outline-offset: 8px; }
+    #fc-chip::after { content: ""; position: absolute; left: 36px; top: 36px; width: 70px; height: 70px; border-radius: 12px; background: #4de1ff; opacity: 0.35; }
+    #fc-chiplab { position: absolute; right: 36px; top: 276px; width: 260px; text-align: center; font-family: "Space Mono", monospace; font-size: 28px; color: #fff; }
+    .fc-lock { position: relative; width: 110px; height: 84px; border-radius: 14px; background: var(--lc); }
+    .fc-lock::before { content: ""; position: absolute; left: 18px; top: -50px; width: 74px; height: 64px; border: 14px solid var(--lc); border-bottom: none; border-radius: 44px 44px 0 0; }
+    .fc-lock.open::before { top: -64px; left: 46px; height: 50px; }
+    #fc-lockbig { position: absolute; right: 120px; top: 168px; transform: scale(0.8); transform-origin: right top; }
+    #fc-ok, #fc-no { position: absolute; left: 90px; top: 800px; width: 900px; height: 180px; }
+    #fc-ok .lock, #fc-no .lock { position: absolute; left: 60px; top: 66px; }
+    #fc-ok .txt, #fc-no .txt { position: absolute; left: 220px; top: 38px; font-weight: 800; font-size: 44px; color: #fff; line-height: 1.15; }
+    #fc-ok .txt small, #fc-no .txt small { display: block; font-family: "Space Mono", monospace; font-size: 28px; font-weight: 400; letter-spacing: 0.06em; color: rgba(255,255,255,0.75); }
+    #fc-bars { top: 780px; height: 330px; }
+    #fc-bars .lbl { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.08em; }
+    #fc-bars .bar { position: absolute; left: 36px; width: 828px; height: 30px; border-radius: 15px; background: rgba(255,255,255,0.12); overflow: hidden; }
+    #fc-bars .fill { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border-radius: 15px; transform-origin: left center; }
+    #fc-bars .val { position: absolute; left: 36px; font-weight: 800; font-size: 40px; }
+    #fc-end { position: absolute; left: 0; width: 1080px; top: 780px; text-align: center; color: #fff; text-shadow: 0 6px 40px rgba(0,0,0,0.7); }
+    #fc-end1 { display: block; font-size: 104px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+    #fc-end2 { display: block; margin-top: 14px; font-size: 68px; font-weight: 800; color: #ff8a2a; letter-spacing: -0.01em; }
+  </style>
+  <div id="root" data-composition-id="stageC" data-width="1080" data-height="1920">
+    <canvas id="fc-canvas" width="1080" height="1920"></canvas>
+    <div id="fc-tag-a" class="fc-mono clip" data-start="0.20" data-duration="9.3" style="left: 60px; top: 200px"><span class="fc-dot"></span>L'EMPREINTE</div>
+    <div id="fc-tag-b" class="fc-mono clip" data-start="9.70" data-duration="8.5" style="left: 60px; top: 200px"><span class="fc-dot"></span>LA COMPARAISON</div>
+    <div id="fc-tag-c" class="fc-mono clip" data-start="18.40" data-duration="5.1" style="left: 60px; top: 200px"><span class="fc-dot"></span>L'ATTENTION</div>
+    <div id="fc-tag-d" class="fc-mono clip" data-start="23.70" data-duration="6.8" style="left: 60px; top: 200px"><span class="fc-dot"></span>LA FIABILITÉ</div>
+    <div id="fc-tag-e" class="fc-mono clip" data-start="30.70" data-duration="4.8" style="left: 60px; top: 200px"><span class="fc-dot"></span>LE VERDICT</div>
+    <div id="fc-illu" class="fc-mono clip" data-start="0.20" data-duration="35.3" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="fc-noimg" class="fc-pill clip" data-start="0.40" data-duration="2.2" style="background: #ff4a4a; border-color: #ff4a4a; left: 70px; top: 1010px">PAS D'IMAGE STOCKÉE</div>
+    <div id="fc-num" class="fc-card clip" data-start="3.00" data-duration="6.4">
+      <div class="ttl">EMPREINTE MATHÉMATIQUE</div>
+      <div class="rows"><span id="fc-r0"></span>
+<span id="fc-r1"></span>
+<span id="fc-r2"></span></div>
+      <div id="fc-chip"></div>
+      <div id="fc-lockbig" class="fc-lock" style="--lc: #4de1ff"></div>
+      <div id="fc-chiplab">PUCE SÉCURISÉE</div>
+    </div>
+    <div id="fc-lab-ref" class="fc-chip fc-neon clip" data-start="9.90" data-duration="8.3" style="--c: #4de1ff; left: 60px; top: 260px">CARTE ENREGISTRÉE</div>
+    <div id="fc-lab-live" class="fc-chip fc-neon clip" data-start="11.00" data-duration="7.2" style="--c: #b26bff; left: 640px; top: 330px">NOUVEAU SCAN</div>
+    <div id="fc-p-gl" class="fc-pill clip" data-start="13.80" data-duration="4.4" style="left: 60px; top: 1010px">LUNETTES</div>
+    <div id="fc-p-ha" class="fc-pill clip" data-start="14.90" data-duration="3.3" style="left: 340px; top: 1010px">CHAPEAU</div>
+    <div id="fc-p-be" class="fc-pill clip" data-start="16.30" data-duration="1.9" style="left: 610px; top: 1010px">BARBE</div>
+    <div id="fc-adapt" class="fc-pill clip" data-start="16.90" data-duration="1.3" style="background: #38d27a; border-color: #38d27a; color: #04230f; left: 60px; top: 1090px">IL S'ADAPTE</div>
+    <div id="fc-ok" class="fc-card clip" data-start="18.50" data-duration="3.55">
+      <div class="lock fc-lock open" style="--lc: #38d27a"></div>
+      <div class="txt">REGARDE L'ÉCRAN<small>YEUX OUVERTS : OK</small></div>
+    </div>
+    <div id="fc-no" class="fc-card clip" data-start="22.10" data-duration="1.45">
+      <div class="lock fc-lock" style="--lc: #ff4a4a"></div>
+      <div class="txt">YEUX FERMÉS<small>RESTE VERROUILLÉ</small></div>
+    </div>
+    <div id="fc-bars" class="fc-card clip" data-start="23.90" data-duration="6.6">
+      <div class="lbl" style="top: 20px; color: #4de1ff">VISAGE</div>
+      <div class="bar" style="top: 60px"><div id="fc-b1" class="fill" style="background: #4de1ff"></div></div>
+      <div class="val" style="top: 104px">1 CHANCE SUR 1 000 000</div>
+      <div id="fc-row2"><div class="lbl" style="top: 176px; color: #9aa6c4">CODE À 4 CHIFFRES</div>
+      <div class="bar" style="top: 216px"><div id="fc-b2" class="fill" style="background: #9aa6c4"></div></div>
+      <div class="val" style="top: 258px; font-size: 34px">1 CHANCE SUR 10 000</div></div>
+    </div>
+    <div id="fc-sel" class="fc-pill clip" data-start="24.60" data-duration="5.9" style="left: 90px; top: 1130px; font-size: 28px; padding: 8px 20px">SELON LE CONSTRUCTEUR</div>
+    <div id="fc-end" class="clip" data-start="33.00" data-duration="2.6"><span id="fc-end1">Il te mesure.</span><span id="fc-end2">C'est de la géométrie.</span></div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/face.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 47.4, T1 = 82.96;
+      var renderer = HF.makeRenderer($("fc-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x04060d);
+      scene.fog = new THREE.Fog(0x04060d, 8, 22);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 50);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x0a0c14, 0.2));
+      var keyL = new THREE.DirectionalLight(0x9bb8ff, 0.5);
+      keyL.position.set(1.5, 2, 4);
+      scene.add(keyL);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.5);
+      rim.position.set(-3, 2.5, -3);
+      scene.add(rim);
+      var face = HF.makeFace();
+      face.group.position.set(0, 0.1, 0);
+      scene.add(face.group);
+      face.mat.color.set(0x8f93a6);
+      var eg = [HF.makeGlow(0x38d27a, 0.5), HF.makeGlow(0x38d27a, 0.5)];
+      eg.forEach(function (e, i) { e.position.set((i ? 1 : -1) * 0.28, 0.2, HF.fz(0.28, 0.2) + 0.12); face.group.add(e); });
+      var rnd = HF.mulberry32(11);
+      var drift = [];
+      for (var i = 0; i < face.n; i++) drift.push([(rnd() - 0.5) * 0.6, -2.2 - rnd() * 2.2, (rnd() - 0.5) * 0.6, rnd()]);
+
+      function depthRGB(z, o) {
+        var u = HF.clamp(z / 0.7, 0, 1);
+        o.r = u > 0.6 ? lerp(0.3, 1, (u - 0.6) / 0.4) : lerp(0.23, 0.3, u / 0.6);
+        o.g = u > 0.6 ? 1 : lerp(0.4, 0.9, u / 0.6);
+        o.b = 1;
+      }
+      function pop(obj, t, t0) { var s = easeOut(seg(t, t0, t0 + 0.3)); obj.visible = s > 0.01; obj.scale.setScalar(Math.max(0.01, s)); }
+
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        // layout weight: 1 = small face on top (cards below), 0 = big face
+        var w = 1 - ease(seg(t, 57.0, 57.8)) + ease(seg(t, 65.5, 66.2));
+        w = HF.clamp(w, 0, 1);
+        face.group.scale.setScalar(lerp(1, 0.68, w));
+        camera.position.set(0, lerp(0.3, -1.4, w), lerp(4.9, 8.2, w));
+        camera.lookAt(0, lerp(0.3, -1.4, w), 0);
+        face.group.rotation.y = 0.25 * Math.sin(t * 0.7);
+        face.glasses.visible = false; face.hat.visible = false; face.beard.visible = false;
+        face.dmat.blending = THREE.AdditiveBlending;
+        var mesh = 0, wire = 0, dotsOp = 0, eyesOpen = 1, eyeGlow = 0, eyeCol = 0;
+
+        if (t < 57.0) { // S6 : depth map becomes numbers
+          wire = 0.9 * (1 - ease(seg(t, 50.3, 51.6)));
+          mesh = 0;
+          dotsOp = 1 - ease(seg(t, 53.6, 55.2));
+          face.setDots(function (i, o) {
+            var z = face.tz[i];
+            var e = ease(seg(t, 50.4 + drift[i][3] * 2.6, 52.6 + drift[i][3] * 2.6));
+            o.x = lerp(face.tx[i], face.tx[i] + drift[i][0], e); o.y = lerp(face.ty[i], face.ty[i] + drift[i][1], e); o.z = lerp(z, z + drift[i][2], e);
+            depthRGB(z, o); o.v = 1;
+          });
+          for (var q = 0; q < 2; q++) face.eyes[q].visible = false;
+        } else {
+          for (var q2 = 0; q2 < 2; q2++) face.eyes[q2].visible = true;
+        }
+        if (t >= 56.8 && t < 65.7) { // S7 : compare and adapt
+          mesh = ease(seg(t, 56.8, 57.6));
+          wire = 0.55 * ease(seg(t, 57.5, 58.1));
+          dotsOp = ease(seg(t, 58.2, 58.8));
+          face.setDots(function (i, o) { o.x = face.tx[i]; o.y = face.ty[i]; o.z = face.tz[i]; o.r = 0.7; o.g = 0.42; o.b = 1; o.v = 0.55 + 0.45 * Math.sin(t * 9 + face.hs[i] * 40); });
+          pop(face.glasses, t, 61.2); pop(face.hat, t, 62.3); pop(face.beard, t, 63.7);
+        }
+        if (t >= 65.7 && t < 71.0) { // S8 : attention
+          mesh = 1; wire = 0.18 * (1 - ease(seg(t, 65.7, 66.4)));
+          dotsOp = 0.0;
+          eyesOpen = 1 - ease(seg(t, 69.5, 69.8));
+          eyeGlow = 0.8 * ease(seg(t, 65.9, 66.3));
+          eyeCol = ease(seg(t, 69.5, 69.8));
+        }
+        if (t >= 71.0) { // S9, S10
+          mesh = t < 78.0 ? 1 : 0.55;
+          wire = t < 78.0 ? 0.45 : 0.9;
+          dotsOp = t >= 78.0 ? ease(seg(t, 78.2, 79.0)) : 0;
+          if (t >= 78.0) {
+            face.setDots(function (i, o) { var z = face.tz[i]; o.x = face.tx[i]; o.y = face.ty[i]; o.z = z; depthRGB(z, o); o.v = 0.7 + 0.3 * Math.sin(t * 6 + face.hs[i] * 30); });
+          }
+        }
+        face.mat.opacity = mesh; face.mat.visible = mesh > 0.01;
+        face.wmat.opacity = wire;
+        face.dmat.opacity = dotsOp;
+        face.setEyes(eyesOpen);
+        for (var k = 0; k < 2; k++) { eg[k].material.opacity = eyeGlow * eyesOpen; eg[k].material.color.setRGB(lerp(0.22, 1, eyeCol), lerp(0.82, 0.29, eyeCol), lerp(0.48, 0.29, eyeCol)); }
+
+        // numbers (deterministic: depend on the time slot only)
+        if (t >= 50.4 && t < 56.8) {
+          var slot = Math.floor(t * 6);
+          for (var r = 0; r < 3; r++) {
+            var rr = HF.mulberry32(slot * 7 + r * 131), line = "";
+            for (var c = 0; c < 3; c++) { var v = (rr() * 2 - 1) * 1.6; line += (v >= 0 ? "+" : "−") + Math.abs(v).toFixed(3) + (c < 2 ? "  " : ""); }
+            $("fc-r" + r).textContent = line;
+          }
+        }
+        renderer.render(scene, camera);
+      }
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, at); };
+      var card = function (sel, at) { tl.fromTo(sel, { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, at); };
+      popd("#fc-noimg", 0.40);
+      card("#fc-num", 3.00);
+      tl.fromTo("#fc-chip", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 5.00);
+      tl.fromTo("#fc-chiplab", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 6.20);
+      tl.fromTo("#fc-lockbig", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 0.8, duration: 0.3, ease: "back.out(2)" }, 6.80);
+      popd("#fc-lab-ref", 9.90); popd("#fc-lab-live", 11.00);
+      popd("#fc-p-gl", 13.80); popd("#fc-p-ha", 14.90); popd("#fc-p-be", 16.30); popd("#fc-adapt", 16.90);
+      card("#fc-ok", 18.50); card("#fc-no", 22.10);
+      card("#fc-bars", 23.90);
+      tl.fromTo("#fc-b1", { scaleX: 0 }, { scaleX: 1, duration: 1.2, ease: "power2.out" }, 24.40);
+      tl.fromTo("#fc-row2", { opacity: 0 }, { opacity: 1, duration: 0.3 }, 28.60);
+      tl.fromTo("#fc-b2", { scaleX: 0 }, { scaleX: 0.66, duration: 0.9, ease: "power2.out" }, 28.80);
+      popd("#fc-sel", 24.60);
+      tl.fromTo("#fc-end1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 33.05);
+      tl.fromTo("#fc-end2", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 34.45);
+      window.__timelines["stageC"] = tl;
+    })();
+
+  </script>
+</template>

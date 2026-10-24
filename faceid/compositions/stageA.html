@@ -1,0 +1,188 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #fa-canvas, #fa-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #fa-leaders { pointer-events: none; }
+    .fa-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .fa-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .fa-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .fa-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .fa-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .fa-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #fa-lux { position: absolute; left: 60px; top: 290px; padding: 10px 28px 10px 24px; border-left: 6px solid #4aa8ff; border-radius: 0 18px 18px 0; background: rgba(10,16,32,0.62); color: #fff; font-weight: 800; font-size: 96px; line-height: 1; }
+    #fa-lux small { display: block; margin-top: 8px; font-family: "Space Mono", monospace; font-size: 28px; font-weight: 400; letter-spacing: 0.12em; color: rgba(255,255,255,0.7); }
+    .fa-q { position: absolute; font-size: 150px; font-weight: 800; color: #4aa8ff; text-shadow: 0 0 40px rgba(74,168,255,0.8); }
+    #fa-div { position: absolute; left: 0; top: 958px; width: 1080px; height: 4px; background: rgba(255,255,255,0.85); }
+    #fa-count { position: absolute; left: 60px; top: 290px; padding: 10px 28px 10px 24px; border-left: 6px solid #b26bff; border-radius: 0 18px 18px 0; background: rgba(10,16,32,0.62); color: #fff; font-weight: 800; font-size: 96px; line-height: 1; }
+    #fa-count small { display: block; margin-top: 8px; font-family: "Space Mono", monospace; font-size: 28px; font-weight: 400; letter-spacing: 0.1em; color: rgba(255,255,255,0.75); }
+  </style>
+  <div id="root" data-composition-id="stageA" data-width="1080" data-height="1920">
+    <canvas id="fa-canvas" width="1080" height="1920"></canvas>
+    <svg id="fa-leaders" viewBox="0 0 1080 1920">
+      <g id="fa-ld-nez" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#b26bff" stroke-width="3"></line><circle r="8" fill="#b26bff"></circle></g>
+      <g id="fa-ld-joues" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#b26bff" stroke-width="3"></line><circle r="8" fill="#b26bff"></circle></g>
+      <g id="fa-ld-yeux" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#b26bff" stroke-width="3"></line><circle r="8" fill="#b26bff"></circle></g>
+    </svg>
+    <div id="fa-tag-a" class="fa-mono clip" data-start="0.3" data-duration="9.3" style="left: 60px; top: 200px"><span class="fa-dot"></span>DANS LE NOIR</div>
+    <div id="fa-tag-b" class="fa-mono clip" data-start="9.8" data-duration="8.5" style="left: 60px; top: 200px"><span class="fa-dot"></span>L'INFRAROUGE</div>
+    <div id="fa-tag-c" class="fa-mono clip" data-start="18.5" data-duration="10.0" style="left: 60px; top: 200px"><span class="fa-dot"></span>LES POINTS</div>
+    <div id="fa-illu" class="fa-mono clip" data-start="0.3" data-duration="28.0" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="fa-lux" class="clip" data-start="0.6" data-duration="8.8">0 LUX<small>NOIR TOTAL</small></div>
+    <div id="fa-q1" class="fa-q clip" data-start="8.34" data-duration="1.35" style="left: 150px; top: 520px">?</div>
+    <div id="fa-q2" class="fa-q clip" data-start="8.5" data-duration="1.2" style="left: 820px; top: 640px">?</div>
+    <div id="fa-q3" class="fa-q clip" data-start="8.66" data-duration="1.04" style="left: 300px; top: 900px">?</div>
+    <div id="fa-div" class="clip" data-start="9.7" data-duration="8.7"></div>
+    <div id="fa-lab-vis" class="fa-chip fa-neon clip" data-start="10.0" data-duration="8.4" style="--c: #9aa6c4; left: 60px; top: 260px">LUMIÈRE VISIBLE</div>
+    <div id="fa-lab-ir" class="fa-chip fa-neon clip" data-start="12.2" data-duration="6.2" style="--c: #b26bff; left: 60px; top: 1010px">INFRAROUGE</div>
+    <div id="fa-count" class="clip" data-start="19.6" data-duration="4.6"><span id="fa-num">0</span>+<small>POINTS INFRAROUGES</small></div>
+    <div id="fa-lab-nez" class="fa-chip fa-neon clip" data-start="25.9" data-duration="2.6" style="--c: #b26bff">NEZ</div>
+    <div id="fa-lab-joues" class="fa-chip fa-neon clip" data-start="26.6" data-duration="1.9" style="--c: #b26bff">JOUES</div>
+    <div id="fa-lab-yeux" class="fa-chip fa-neon clip" data-start="27.4" data-duration="1.1" style="--c: #b26bff">CREUX DES YEUX</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/face.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T1 = 28.6;
+      var canvas = $("fa-canvas");
+      var renderer = HF.makeRenderer(canvas);
+      var scene = new THREE.Scene();
+      scene.fog = new THREE.Fog(0x04060d, 8, 20);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 50);
+      var hemi = new THREE.HemisphereLight(0x6f8cff, 0x0a0c14, 0.12);
+      scene.add(hemi);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.5);
+      rim.position.set(-3, 2.5, -3);
+      scene.add(rim);
+      var keyL = new THREE.DirectionalLight(0x9bb8ff, 0.5);
+      keyL.position.set(1.5, 2, 4);
+      scene.add(keyL);
+      var glow = new THREE.PointLight(0x7ab4ff, 0, 7, 1.4);
+      glow.position.set(0, -1.1, 1.8);
+      scene.add(glow);
+
+      var face = HF.makeFace();
+      face.group.position.set(0, 0.35, 0);
+      scene.add(face.group);
+      var ph = HF.makePhone();
+      ph.group.position.set(0, -1.65, 1.3);
+      ph.group.rotation.x = -0.45;
+      ph.group.scale.setScalar(0.85);
+      scene.add(ph.group);
+      var phoneGlow = HF.makeGlow(0x7ab4ff, 2.2);
+      phoneGlow.position.set(0, -1.5, 1.5);
+      scene.add(phoneGlow);
+
+      var tmp = new THREE.Vector3();
+      var O = new THREE.Vector3(0, -1.65 - 0.35, 1.3);
+      var labNez = $("fa-lab-nez"), labJoues = $("fa-lab-joues"), labYeux = $("fa-lab-yeux");
+      var ld = { nez: $("fa-ld-nez"), joues: $("fa-ld-joues"), yeux: $("fa-ld-yeux") };
+      var anchors = {
+        nez: [0.0, -0.26], joues: [0.45, -0.22], yeux: [-0.28, 0.2]
+      };
+      function leaderTo(key, label, t0, t1, t) {
+        var a = anchors[key];
+        tmp.set(a[0], a[1], HF.fz(a[0], a[1]) + 0.03);
+        face.group.localToWorld(tmp);
+        var p = HF.project(camera, tmp);
+        var cx = label.offsetLeft + label.offsetWidth / 2, cy = label.offsetTop + label.offsetHeight / 2;
+        HF.setLeader(ld[key], p.x, p.y, cx, cy, ease(seg(t, t0, t0 + 0.2)) * (1 - seg(t, t1 - 0.12, t1)));
+      }
+
+      function setPanel(kind) {
+        // kind: "visible" (almost black), "ir" (violet), "normal"
+        if (kind === "visible") {
+          scene.background = new THREE.Color(0x02030a); scene.fog.color.set(0x02030a);
+          face.mat.color.set(0x14161f); face.mat.emissive.set(0x000000); glow.intensity = 0.06; hemi.intensity = 0.03; phoneGlow.material.opacity = 0.05;
+        } else if (kind === "ir") {
+          scene.background = new THREE.Color(0x14072b); scene.fog.color.set(0x14072b);
+          face.mat.color.set(0xa66bff); face.mat.emissive.set(0x4a1c96); glow.intensity = 0.0; hemi.intensity = 0.55; phoneGlow.material.opacity = 0.0;
+        } else {
+          scene.background = new THREE.Color(0x04060d); scene.fog.color.set(0x04060d);
+          face.mat.color.set(0xc9ccd8); face.mat.emissive.set(0x000000); hemi.intensity = 0.12;
+        }
+      }
+
+      function renderAt(t) {
+        if (t > T1 + 0.05) return;
+        face.group.rotation.y = 0.18 * Math.sin(t * 0.6);
+        face.dmat.opacity = 0;
+        face.wmat.opacity = 0;
+        if (t < 9.7) {
+          setPanel("normal");
+          var on = ease(seg(t, 0.4, 1.1));
+          glow.intensity = 1.6 * on;
+          phoneGlow.material.opacity = 0.6 * on;
+          ph.tintMat.opacity = 0;
+          camera.aspect = HF.W / HF.H; camera.updateProjectionMatrix();
+          renderer.setScissorTest(false);
+          renderer.setViewport(0, 0, HF.W, HF.H);
+          var k = ease(seg(t, 0, 9.7));
+          camera.position.set(0, lerp(0.25, 0.3, k), lerp(5.6, 4.9, k));
+          camera.lookAt(0, 0.2, 0);
+          renderer.render(scene, camera);
+          return;
+        }
+        if (t < 18.4) {
+          camera.aspect = HF.W / (HF.H / 2); camera.updateProjectionMatrix();
+          var k2 = ease(seg(t, 9.7, 18.4));
+          camera.position.set(0, 0.35, lerp(4.8, 4.3, k2));
+          camera.lookAt(0, 0.35, 0);
+          renderer.setScissorTest(true);
+          renderer.setViewport(0, HF.H / 2, HF.W, HF.H / 2); renderer.setScissor(0, HF.H / 2, HF.W, HF.H / 2);
+          setPanel("visible"); renderer.render(scene, camera);
+          renderer.setViewport(0, 0, HF.W, HF.H / 2); renderer.setScissor(0, 0, HF.W, HF.H / 2);
+          setPanel("ir"); renderer.render(scene, camera);
+          renderer.setScissorTest(false);
+          return;
+        }
+        // S3 : points flying from the phone to the face
+        setPanel("normal");
+        face.mat.color.set(0x8f93a6);
+        glow.intensity = 0.9;
+        phoneGlow.material.opacity = 0.5;
+        camera.aspect = HF.W / HF.H; camera.updateProjectionMatrix();
+        renderer.setScissorTest(false);
+        renderer.setViewport(0, 0, HF.W, HF.H);
+        var pulse = ease(seg(t, 18.9, 19.3));
+        ph.tintMat.color.set(0xb26bff); ph.tintMat.opacity = 0.35 * pulse;
+        face.dmat.opacity = ease(seg(t, 18.9, 19.4));
+        face.setDots(function (i, o) {
+          var h = face.hs[i];
+          var e = ease(seg(t, 19.0 + 0.9 * h, 20.6 + 0.9 * h));
+          o.x = lerp(O.x, face.tx[i], e); o.y = lerp(O.y, face.ty[i], e); o.z = lerp(O.z, face.tz[i], e);
+          o.v = 0.45 + 0.55 * (0.5 + 0.5 * Math.sin(t * 9 + h * 40)) * e + (1 - e) * 0.5;
+        });
+        var k3 = ease(seg(t, 18.4, 28.6));
+        camera.position.set(lerp(0.3, 0.0, k3), 0.3, lerp(5.2, 4.5, k3));
+        camera.lookAt(0, 0.25, 0);
+        camera.updateMatrixWorld();
+        function sp(key) { var q = anchors[key]; tmp.set(q[0], q[1], HF.fz(q[0], q[1]) + 0.03); face.group.localToWorld(tmp); return HF.project(camera, tmp); }
+        var pn = sp("nez"), pj = sp("joues"), py = sp("yeux");
+        HF.place(labNez, pn.x - 90, pn.y + 80, true); HF.place(labJoues, pj.x + 70, pj.y + 40, false); HF.place(labYeux, py.x - 60, py.y - 120, true);
+        leaderTo("nez", labNez, 25.9, 28.6, t);
+        leaderTo("joues", labJoues, 26.6, 28.6, t);
+        leaderTo("yeux", labYeux, 27.4, 28.6, t);
+        renderer.render(scene, camera);
+      }
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(0);
+
+      var tl = gsap.timeline({ paused: true });
+      var pop = function (sel, at, d) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: d || 0.25, ease: "back.out(2)" }, at); };
+      tl.fromTo("#fa-lux", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.3, ease: "power3.out" }, 0.6);
+      pop("#fa-q1", 8.34, 0.3); pop("#fa-q2", 8.5, 0.3); pop("#fa-q3", 8.66, 0.3);
+      pop("#fa-lab-vis", 10.0); pop("#fa-lab-ir", 12.2);
+      tl.fromTo("#fa-count", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.3, ease: "power3.out" }, 19.6);
+      var cnt = { v: 0 };
+      tl.to(cnt, { v: 30000, duration: 2.2, ease: "power2.out", onUpdate: function () { var n = $("fa-num"); if (n) n.textContent = Math.round(cnt.v).toString().replace(/\B(?=(\d{3})+(?!\d))/g, " "); } }, 19.8);
+      pop("#fa-lab-nez", 25.9); pop("#fa-lab-joues", 26.6); pop("#fa-lab-yeux", 27.4);
+      window.__timelines["stageA"] = tl;
+    })();
+
+  </script>
+</template>
