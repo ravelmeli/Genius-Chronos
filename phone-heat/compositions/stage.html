@@ -48,6 +48,9 @@
       top: 290px;
       padding: 10px 0 10px 24px;
       border-left: 6px solid #ff8a2a;
+      background: rgba(10, 16, 32, 0.62);
+      border-radius: 0 18px 18px 0;
+      padding-right: 28px;
       color: #fff;
       font-weight: 800;
       font-size: 112px;
@@ -64,24 +67,75 @@
     }
     .st-pill {
       top: 1090px;
-      background: rgba(20, 28, 48, 0.92);
-      color: rgba(255, 255, 255, 0.9);
-      border: 3px solid rgba(255, 255, 255, 0.22);
+      background: rgba(10, 16, 32, 0.9);
+      color: #fff;
+      border: 3px solid var(--c);
+      box-shadow: 0 0 30px var(--c), inset 0 0 18px rgba(255, 255, 255, 0.06);
       font-size: 32px;
       padding: 14px 24px;
     }
     .st-pill b {
-      color: #ff8a2a;
+      color: var(--c);
       margin-right: 12px;
     }
     #st-pill-1 {
       left: 110px;
+      --c: #ffc41a;
     }
     #st-pill-2 {
       left: 372px;
+      --c: #ff7a1a;
     }
     #st-pill-3 {
       left: 690px;
+      --c: #4aa8ff;
+    }
+    #st-leaders {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 1080px;
+      height: 1920px;
+      pointer-events: none;
+    }
+    #st-loupe {
+      position: absolute;
+      left: 330px;
+      top: 770px;
+      width: 420px;
+      height: 420px;
+    }
+    #st-loupe .lp-glass {
+      position: absolute;
+      inset: 0;
+      border-radius: 50%;
+      border: 10px solid rgba(255, 255, 255, 0.92);
+      background: radial-gradient(circle at 50% 40%, #16223d 0%, #0a1020 80%);
+      box-shadow: 0 0 40px rgba(90, 160, 255, 0.35), 0 10px 40px rgba(0, 0, 0, 0.5);
+      overflow: hidden;
+    }
+    #st-loupe svg {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+    }
+    #st-loupe .lp-tag {
+      position: absolute;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      font-family: "Space Mono", monospace;
+      font-size: 28px;
+      letter-spacing: 0.02em;
+    }
+    #lp-tag-ac {
+      top: 92px;
+      color: #ff9a3a;
+    }
+    #lp-tag-dc {
+      bottom: 88px;
+      color: #ffd23a;
     }
     .st-lab {
       transform-origin: left center;
@@ -94,6 +148,14 @@
   <div id="root" data-composition-id="stage" data-width="1080" data-height="1920">
     <canvas id="st-canvas" width="1080" height="1920"></canvas>
 
+    <svg id="st-leaders" viewBox="0 0 1080 1920">
+      <g id="ld-chargeur" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#fff" stroke-width="3"></line><circle r="8" fill="#fff"></circle></g>
+      <g id="ld-prise" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#fff" stroke-width="3"></line><circle r="8" fill="#fff"></circle></g>
+      <g id="ld-tel" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#fff" stroke-width="3"></line><circle r="8" fill="#fff"></circle></g>
+      <g id="ld-heat" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#ff8a2a" stroke-width="3"></line><circle r="8" fill="#ff8a2a"></circle></g>
+      <g id="ld-loupe" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#fff" stroke-width="3"></line><circle r="8" fill="#fff"></circle></g>
+    </svg>
+
     <div id="st-tag-a" class="st-mono clip" data-start="0.3" data-duration="5.6" style="left: 60px; top: 200px">
       <span class="st-dot"></span>EN CHARGE · 1 H
     </div>
@@ -103,7 +165,7 @@
     <div id="st-tag-c" class="st-mono clip" data-start="12.9" data-duration="7.3" style="left: 60px; top: 200px">
       <span class="st-dot"></span>DE LA PRISE AU TÉLÉPHONE
     </div>
-    <div id="st-illu" class="st-mono clip" data-start="0.3" data-duration="19.9" style="right: 60px; top: 200px; font-size: 22px; opacity: 0.6">
+    <div id="st-illu" class="st-mono clip" data-start="0.3" data-duration="19.9" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10, 16, 32, 0.6)">
       ILLUSTRATIF
     </div>
 
@@ -115,6 +177,19 @@
     <div id="st-pill-1" class="st-chip st-pill clip" data-start="8.9" data-duration="3.7"><b>1</b>Chargeur</div>
     <div id="st-pill-2" class="st-chip st-pill clip" data-start="9.2" data-duration="3.4"><b>2</b>Résistance</div>
     <div id="st-pill-3" class="st-chip st-pill clip" data-start="9.5" data-duration="3.1"><b>3</b>Batterie</div>
+
+    <div id="st-loupe" class="clip" data-start="14.8" data-duration="3.4">
+      <div class="lp-glass">
+        <svg viewBox="0 0 400 400">
+          <line x1="30" y1="200" x2="370" y2="200" stroke="rgba(255,255,255,0.12)" stroke-width="2" stroke-dasharray="6 8"></line>
+          <line x1="200" y1="110" x2="200" y2="290" stroke="rgba(255,255,255,0.25)" stroke-width="2" stroke-dasharray="4 6"></line>
+          <path id="lp-ac" d="M30.0 200.0 L32.8 185.4 L35.7 171.5 L38.5 158.9 L41.3 148.0 L44.2 139.4 L47.0 133.4 L49.8 130.4 L52.7 130.4 L55.5 133.4 L58.3 139.4 L61.2 148.0 L64.0 158.9 L66.8 171.5 L69.7 185.4 L72.5 200.0 L75.3 214.6 L78.2 228.5 L81.0 241.1 L83.8 252.0 L86.7 260.6 L89.5 266.6 L92.3 269.6 L95.2 269.6 L98.0 266.6 L100.8 260.6 L103.7 252.0 L106.5 241.1 L109.3 228.5 L112.2 214.6 L115.0 200.0 L117.8 185.4 L120.7 171.5 L123.5 158.9 L126.3 148.0 L129.2 139.4 L132.0 133.4 L134.8 130.4 L137.7 130.4 L140.5 133.4 L143.3 139.4 L146.2 148.0 L149.0 158.9 L151.8 171.5 L154.7 185.4 L157.5 200.0 L160.3 214.6 L163.2 228.5 L166.0 241.1 L168.8 252.0 L171.7 260.6 L174.5 266.6 L177.3 269.6 L180.2 269.6 L183.0 266.6 L185.8 260.6 L188.7 252.0 L191.5 241.1 L194.3 228.5 L197.2 214.6 L200.0 200.0" fill="none" stroke="#ff9a3a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"></path>
+          <path id="lp-dc" d="M200.0 200.0 L202.8 194.7 L205.7 191.4 L208.5 191.4 L211.3 194.7 L214.2 200.0 L217.0 205.3 L219.8 208.6 L222.7 208.6 L225.5 205.3 L228.3 200.0 L231.2 194.7 L234.0 191.4 L236.8 191.4 L239.7 194.7 L242.5 200.0 L245.3 205.3 L248.2 208.6 L251.0 208.6 L253.8 205.3 L256.7 200.0 L259.5 194.7 L262.3 191.4 L265.2 191.4 L268.0 194.7 L270.8 200.0 L273.7 205.3 L276.5 208.6 L279.3 208.6 L282.2 205.3 L285.0 200.0 L287.8 194.7 L290.7 191.4 L293.5 191.4 L296.3 194.7 L299.2 200.0 L302.0 205.3 L304.8 208.6 L307.7 208.6 L310.5 205.3 L313.3 200.0 L316.2 194.7 L319.0 191.4 L321.8 191.4 L324.7 194.7 L327.5 200.0 L330.3 205.3 L333.2 208.6 L336.0 208.6 L338.8 205.3 L341.7 200.0 L344.5 194.7 L347.3 191.4 L350.2 191.4 L353.0 194.7 L355.8 200.0 L358.7 205.3 L361.5 208.6 L364.3 208.6 L367.2 205.3 L370.0 200.0" fill="none" stroke="#ffd23a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" pathLength="1" stroke-dasharray="1" stroke-dashoffset="1"></path>
+        </svg>
+        <div id="lp-tag-ac" class="lp-tag">PRISE · ALTERNATIF</div>
+        <div id="lp-tag-dc" class="lp-tag">TÉLÉPHONE · CONTINU</div>
+      </div>
+    </div>
 
     <div id="st-lab-chargeur" class="st-chip st-lab clip" data-start="13.6" data-duration="6.6">CHARGEUR</div>
     <div id="st-lab-prise" class="st-chip st-lab clip" data-start="15.85" data-duration="4.35">PRISE</div>
@@ -342,6 +417,12 @@
         }
       }
 
+      function makeGlow(color, scale) {
+        var m = new THREE.SpriteMaterial({ map: spriteTex, color: color, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, depthTest: false, toneMapped: false });
+        var sp = new THREE.Sprite(m);
+        sp.scale.set(scale, scale, 1);
+        return sp;
+      }
       // ---------- scene A : phone on the table ----------
       var gA = new THREE.Group();
       scene.add(gA);
@@ -349,6 +430,28 @@
       var table = new THREE.Mesh(new THREE.PlaneGeometry(14, 14), tableMat);
       table.rotation.x = -Math.PI / 2;
       gA.add(table);
+      var wallA = new THREE.Mesh(new THREE.PlaneGeometry(16, 8), new THREE.MeshStandardMaterial({ color: 0x0b1224, roughness: 1 }));
+      wallA.position.set(0, 3, -3.4);
+      gA.add(wallA);
+      var lampBase = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.2, 0.05, 6), new THREE.MeshStandardMaterial({ color: 0x2a2f44, flatShading: true }));
+      lampBase.position.set(0.55, 0.03, -2.3);
+      gA.add(lampBase);
+      var lampPost = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.03, 0.55, 6), new THREE.MeshStandardMaterial({ color: 0x2a2f44, flatShading: true }));
+      lampPost.position.set(0.55, 0.3, -2.3);
+      gA.add(lampPost);
+      var lampShade = new THREE.Mesh(new THREE.ConeGeometry(0.26, 0.3, 6, 1, true), new THREE.MeshBasicMaterial({ color: 0xffc27a, side: THREE.DoubleSide, toneMapped: false }));
+      lampShade.position.set(0.55, 0.7, -2.3);
+      gA.add(lampShade);
+      var lampGlow = makeGlow(0xffb060, 2.2);
+      lampGlow.position.set(0.55, 0.62, -2.3);
+      lampGlow.material.opacity = 0.55;
+      gA.add(lampGlow);
+      var lampLight = new THREE.PointLight(0xffb060, 1.1, 6, 1.5);
+      lampLight.position.set(0.55, 0.6, -2.2);
+      gA.add(lampLight);
+      var glowA = makeGlow(0xff7a1a, 2.4);
+      glowA.position.set(0.1, 0.25, 0);
+      gA.add(glowA);
       var phoneA = makePhone();
       phoneA.rotation.x = -Math.PI / 2;
       phoneA.rotation.z = 0.35;
@@ -406,6 +509,9 @@
         var om = new THREE.MeshBasicMaterial({ color: 0xff7a1a, transparent: true, toneMapped: false });
         var ob = new THREE.Mesh(new THREE.SphereGeometry(0.12, 24, 24), om);
         gB.add(ob);
+        var og = makeGlow(0xff7a1a, 0.8);
+        ob.add(og);
+        ob.userData.glow = og;
         orbs.push(ob);
       }
 
@@ -427,7 +533,7 @@
       );
       plate.position.set(0, 2.6, -1.47);
       gC.add(plate);
-      var brickMat = new THREE.MeshStandardMaterial({ color: 0xf2f3f7, roughness: 0.45, emissive: 0xff5a00, emissiveIntensity: 0 });
+      var brickMat = new THREE.MeshStandardMaterial({ color: 0xc4c8d4, roughness: 0.5, emissive: 0xff5a00, emissiveIntensity: 0 });
       var brick = new THREE.Mesh(roundedBox(0.5, 0.55, 0.42, 0.07, 0.02), brickMat);
       brick.position.set(0, 2.6, -1.18);
       gC.add(brick);
@@ -446,6 +552,9 @@
       phoneC.rotation.x = -Math.PI / 2;
       phoneC.position.set(0.1, 0.05, 0.1);
       gC.add(phoneC);
+      var glowC = makeGlow(0xff7a1a, 2.6);
+      glowC.position.set(0, 2.6, -0.8);
+      gC.add(glowC);
       var partsC = makeParticles(160, 23);
       partsC.position.set(0, 2.9, -1.1);
       gC.add(partsC);
@@ -468,9 +577,31 @@
         var x = anchorRight ? p.x - w : p.x;
         x = clamp(x, 60, W - 60 - w);
         node.style.left = x.toFixed(1) + "px";
-        node.style.top = clamp(p.y, 270, 1180).toFixed(1) + "px";
+        node.style.top = clamp(p.y, 270, 1110).toFixed(1) + "px";
       }
 
+      function leader(id, node, anchor, t0, t1, t) {
+        var a = project(anchor);
+        var cx = node.offsetLeft + node.offsetWidth / 2,
+          cy = node.offsetTop + node.offsetHeight / 2;
+        setLeader(el(id), a.x, a.y, cx, cy, t0, t1, t);
+      }
+      function leaderTo(id, tx, ty, anchor, t0, t1, t) {
+        var a = project(anchor);
+        setLeader(el(id), a.x, a.y, tx, ty, t0, t1, t);
+      }
+      function setLeader(g, x, y, cx, cy, t0, t1, t) {
+        var line = g.firstElementChild,
+          dot = g.lastElementChild;
+        line.setAttribute("x1", x.toFixed(1));
+        line.setAttribute("y1", y.toFixed(1));
+        line.setAttribute("x2", cx.toFixed(1));
+        line.setAttribute("y2", cy.toFixed(1));
+        dot.setAttribute("cx", x.toFixed(1));
+        dot.setAttribute("cy", y.toFixed(1));
+        g.setAttribute("opacity", (ease(seg(t, t0, t0 + 0.2)) * (1 - seg(t, t1 - 0.12, t1))).toFixed(2));
+      }
+      var allLeaders = ["ld-chargeur", "ld-prise", "ld-tel", "ld-heat", "ld-loupe"];
       // ---------- per-frame ----------
       var A_END = 6.2,
         B_END = 12.75;
@@ -480,6 +611,7 @@
         var inA = t < A_END,
           inB = t >= A_END && t < B_END,
           inC = t >= B_END;
+        if (!inC) for (var li = 0; li < allLeaders.length; li++) el(allLeaders[li]).setAttribute("opacity", "0");
         gA.visible = inA;
         gB.visible = inB;
         gC.visible = inC;
@@ -493,7 +625,7 @@
           gA.scale.setScalar(0.92 + 0.08 * pop);
           var heat = ease(seg(t, 2.6, 4.4));
           phoneBodyMat.emissiveIntensity = heat * 0.55;
-          heatTint.opacity = heat * 0.38;
+          heatTint.opacity = heat * 0.22;
           heatLight.position.set(0.1, 0.5, 0.1);
           heatLight.intensity = heat * 2.2;
           placeCurrent(currentA, curveA, t, 0.55, 1 - seg(t, 1.7, 2.3));
@@ -501,6 +633,7 @@
           ringA.scale.setScalar(0.7 + rp * 1.6);
           ringA.material.opacity = (1 - rp) * seg(t, 4.3, 4.45) * 0.9;
           updateParticles(partsA, t, heat, 1.3);
+          glowA.material.opacity = heat * 0.4;
           var k = ease(seg(t, 0, A_END));
           camera.position.set(lerp(1.4, 0.5, k), lerp(3.7, 3.0, k), lerp(3.6, 2.6, k));
           camTarget.set(0.1, 0.0, 0.15);
@@ -526,6 +659,7 @@
             var show = ease(seg(t, 8.9 + i * 0.3, 9.3 + i * 0.3));
             orbs[i].scale.setScalar(Math.max(0.001, s * show));
             orbs[i].material.opacity = 1;
+            orbs[i].userData.glow.material.opacity = 0.5 * show;
           }
           var bg = ease(seg(t, 11.5, 12.2));
           battGlow.material.opacity = bg * 0.6;
@@ -535,6 +669,7 @@
           var kb = ease(seg(t, A_END, B_END));
           camera.position.set(Math.sin(lt * 0.25) * 0.6, lerp(1.9, 1.6, kb), lerp(6.4, 5.2, kb));
           camTarget.set(0, 0.85, 0);
+          camera.position.y += Math.sin(lt * 1.1) * 0.02;
           camera.lookAt(camTarget);
         }
 
@@ -544,13 +679,16 @@
           var flow = seg(t, 14.5, 14.9) * (1 - seg(t, 18.4, 19.0) * 0.4);
           placeCurrent(currentC, curveC, t, 0.28, flow);
           var heatC = ease(seg(t, 18.4, 19.6));
-          brickMat.emissiveIntensity = heatC * 0.9;
+          brickMat.emissiveIntensity = heatC * 0.35;
           heatLight.position.set(0, 2.6, -0.7);
-          heatLight.intensity = heatC * 2.4;
+          heatLight.intensity = heatC * 1.4;
           updateParticles(partsC, t, heatC, 1.1);
+          glowC.material.opacity = heatC * 0.28;
           var c1 = ease(seg(t, 14.0, 16.6));
           var c2 = ease(seg(t, 17.2, 20.2));
           camera.position.set(lerp(lerp(0.6, 0.35, c1), 0.1, c2), lerp(lerp(2.9, 1.9, c1), 1.7, c2), lerp(lerp(3.2, 5.0, c1), 5.2, c2));
+          camera.position.x += Math.sin(t * 0.9) * 0.025;
+          camera.position.y += Math.sin(t * 1.3) * 0.02;
           camTarget.set(0, lerp(lerp(2.5, 1.5, c1), 1.5, c2), -0.3);
           camera.lookAt(camTarget);
           camera.updateMatrixWorld();
@@ -559,6 +697,11 @@
           place(labPrise, project(new THREE.Vector3(-0.38, 2.9, -1.47), -24, -60), true);
           place(labTel, project(new THREE.Vector3(-0.45, 0.05, 0.1), -30, -90), true);
           place(labHeat, project(new THREE.Vector3(0.3, 3.1, -1.0), 30, -30), false);
+          leader("ld-chargeur", labChargeur, new THREE.Vector3(0.22, 2.5, -0.97), 13.8, 20.2, t);
+          leader("ld-prise", labPrise, new THREE.Vector3(-0.28, 2.82, -1.46), 16.05, 20.2, t);
+          leader("ld-tel", labTel, new THREE.Vector3(-0.3, 0.08, 0.1), 17.75, 20.2, t);
+          leader("ld-heat", labHeat, new THREE.Vector3(0.15, 2.9, -1.0), 18.9, 20.2, t);
+          leaderTo("ld-loupe", 540, 770, new THREE.Vector3(0.0, 2.45, -0.95), 14.95, 18.1, t);
         }
 
         renderer.render(scene, camera);
@@ -590,6 +733,12 @@
       tl.fromTo("#st-lab-prise", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 15.85);
       tl.fromTo("#st-lab-tel", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 17.55);
       tl.fromTo("#st-heat", { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, 18.7);
+      tl.fromTo("#st-loupe", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.6)" }, 14.8);
+      tl.fromTo("#lp-tag-ac", { opacity: 0 }, { opacity: 1, duration: 0.2 }, 15.5);
+      tl.fromTo("#lp-ac", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.9, ease: "none" }, 15.5);
+      tl.fromTo("#lp-tag-dc", { opacity: 0 }, { opacity: 1, duration: 0.2 }, 16.7);
+      tl.fromTo("#lp-dc", { strokeDashoffset: 1 }, { strokeDashoffset: 0, duration: 0.9, ease: "none" }, 16.7);
+      tl.to("#st-loupe", { opacity: 0, scale: 0.6, duration: 0.25, ease: "power2.in" }, 17.9);
       window.__timelines["stage"] = tl;
     })();
   </script>
