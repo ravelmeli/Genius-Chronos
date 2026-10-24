@@ -58,7 +58,3 @@ Doubler le courant, c'est quatre fois plus de chaleur. Tu charges plutôt en rap
 Des millions d'ions lithium se frayent un passage à chaque charge. Penses-tu que les batteries seront un jour sans chaleur ? Abonne-toi pour plus d'histoires de science et technologie. #lithium #batterie #technologie #sciencetok #futur
 
 Ton téléphone ralentit la charge pour se protéger. Tu le laisses chauffer ou tu le débranches ? Abonne-toi pour plus d'histoires de science et technologie. #smartphone #astuces #tech #vulgarisation #science
-
-## ➤ Version courte TikTok
-
-Ton téléphone chauffe en charge, et ce n'est pas un défaut 🔥 Chargeur, câble, batterie : voici d'où vient vraiment la chaleur. Tu charges en rapide ou en lent ? 👇 Abonne-toi pour plus d'histoires de science et technologie. #science #technologie #smartphone #batterie #sciencetok
