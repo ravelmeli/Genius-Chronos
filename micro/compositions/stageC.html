@@ -1,0 +1,235 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #mc-canvas, #mc-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #mc-leaders { pointer-events: none; }
+    .mc-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .mc-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .mc-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .mc-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .mc-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .mc-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #mc-volt { top: 400px; height: 130px; width: 900px; }
+    #mc-volt .lbl { position: absolute; left: 36px; top: 16px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; color: #ffc41a; }
+    #mc-volt .bar { position: absolute; left: 36px; top: 62px; width: 828px; height: 30px; border-radius: 15px; background: rgba(255,255,255,0.12); overflow: hidden; }
+    #mc-volt .fill { position: absolute; left: 0; top: 0; width: 100%; height: 100%; border-radius: 15px; background: linear-gradient(90deg, #ffc41a, #ff4a4a); transform-origin: left center; }
+  </style>
+  <div id="root" data-composition-id="stageC" data-width="1080" data-height="1920">
+    <canvas id="mc-canvas" width="1080" height="1920"></canvas>
+    <svg id="mc-leaders" viewBox="0 0 1080 1920">
+      <g id="mc-ld-ice" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#7ac4ff" stroke-width="3"></line><circle r="8" fill="#7ac4ff"></circle></g>
+      <g id="mc-ld-pen" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#ff8a2a" stroke-width="3"></line><circle r="8" fill="#ff8a2a"></circle></g>
+      <g id="mc-ld-strong" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#ff4a4a" stroke-width="3"></line><circle r="8" fill="#ff4a4a"></circle></g>
+      <g id="mc-ld-weak" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#4aa8ff" stroke-width="3"></line><circle r="8" fill="#4aa8ff"></circle></g>
+      <g id="mc-ld-tip" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#ffc41a" stroke-width="3"></line><circle r="8" fill="#ffc41a"></circle></g>
+    </svg>
+    <div id="mc-tag-a" class="mc-mono clip" data-start="0.20" data-duration="8.1" style="left: 60px; top: 200px"><span class="mc-dot"></span>GLACE ET PROFONDEUR</div>
+    <div id="mc-tag-b" class="mc-mono clip" data-start="8.70" data-duration="5.7" style="left: 60px; top: 200px"><span class="mc-dot"></span>LE PLATEAU TOURNANT</div>
+    <div id="mc-tag-c" class="mc-mono clip" data-start="14.70" data-duration="13.9" style="left: 60px; top: 200px"><span class="mc-dot"></span>LE MÉTAL</div>
+    <div id="mc-illu" class="mc-mono clip" data-start="0.20" data-duration="28.4" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="mc-lab-ice" class="mc-chip mc-neon clip" data-start="0.30" data-duration="8.1" style="--c: #7ac4ff">GLACE : MOLÉCULES COINCÉES</div>
+    <div id="mc-lab-cm" class="mc-chip clip" data-start="4.60" data-duration="3.8" style="background: #ff8a2a; color: #1a0c00">QUELQUES CENTIMÈTRES</div>
+    <div id="mc-lab-core" class="mc-chip mc-neon clip" data-start="6.50" data-duration="1.9" style="--c: #ffc41a; left: 70px; top: 1010px">CŒUR : PAR CONTACT</div>
+    <div id="mc-lab-strong" class="mc-chip mc-neon clip" data-start="9.40" data-duration="5.1" style="--c: #ff4a4a">ZONES FORTES</div>
+    <div id="mc-lab-weak" class="mc-chip mc-neon clip" data-start="10.60" data-duration="3.9" style="--c: #4aa8ff">ZONES FAIBLES</div>
+    <div id="mc-lab-turn" class="mc-chip clip" data-start="11.90" data-duration="2.6" style="left: 70px; top: 1010px">LE PLATEAU TOURNE</div>
+    <div id="mc-lab-even" class="mc-chip clip" data-start="13.60" data-duration="0.9" style="background: #38d27a; color: #04230f; left: 70px; top: 1090px">À PEU PRÈS PAREIL</div>
+    <div id="mc-lab-free" class="mc-chip mc-neon clip" data-start="16.40" data-duration="12.2" style="--c: #ffc41a; left: 70px; top: 290px">MÉTAL : ÉLECTRONS LIBRES</div>
+    <div id="mc-lab-tip" class="mc-chip clip" data-start="19.40" data-duration="9.2" style="background: #ffc41a; color: #1a1400">POINTES</div>
+    <div id="mc-volt" class="mc-card clip" data-start="23.30" data-duration="4.0">
+      <div class="lbl">TENSION ENTRE LES POINTES</div>
+      <div class="bar"><div id="mc-vf" class="fill"></div></div>
+    </div>
+    <div id="mc-lab-air" class="mc-chip mc-neon clip" data-start="26.20" data-duration="2.4" style="--c: #cfe6ff; left: 70px; top: 1010px">L'AIR DEVIENT CONDUCTEUR</div>
+    <div id="mc-lab-spark" class="mc-chip clip" data-start="27.40" data-duration="1.2" style="background: #ffc41a; color: #1a1400; left: 70px; top: 1090px">ÉTINCELLE !</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/micro.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 46.6, T1 = 75.4;
+      var renderer = HF.makeRenderer($("mc-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 10, 26);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 60);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffd9b0, 0.9); key.position.set(2.5, 4, 4); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.8); rim.position.set(-3, 2.5, -3); scene.add(rim);
+      var pl = new THREE.PointLight(0xfff1c0, 0, 7, 1.5); scene.add(pl);
+      function std(c, o) { return new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.7, metalness: 0.1 }, o || {})); }
+      var rnd = HF.mulberry32(63);
+
+      // ---------- M5 : ice lattice and penetration ----------
+      var gI = new THREE.Group(); scene.add(gI);
+      var ice = [];
+      for (var x = -2; x <= 2; x++) for (var y = -1; y <= 1; y++) for (var z = -1; z <= 1; z++) {
+        var w = HF.makeWater(0.17); w.group.position.set(x * 0.5, y * 0.5, z * 0.4);
+        w.group.rotation.z = ((x + y + z) % 2) * 1.57; w.O.material = w.O.material.clone(); w.O.material.color.set(0x7ac4ff); w.O.material.emissive.set(0x2a78d8); w.O.material.emissiveIntensity = 0.5;
+        gI.add(w.group); ice.push(w);
+      }
+      gI.position.set(0, 1.4, 0);
+      var iceArrow = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.07, 0.07), new THREE.MeshBasicMaterial({ color: 0xb26bff, toneMapped: false })); iceArrow.position.set(0, 2.9, 0); scene.add(iceArrow);
+      var sc = document.createElement("canvas"); sc.width = 480; sc.height = 280;
+      var sg = sc.getContext("2d");
+      var stex = new THREE.CanvasTexture(sc); stex.encoding = THREE.sRGBEncoding;
+      var slice = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 1.5), new THREE.MeshBasicMaterial({ map: stex, toneMapped: false })); slice.position.set(0, -0.5, 0); scene.add(slice);
+      var wavesDown = HF.makeBeads(50, 0xb26bff, 0.09); scene.add(wavesDown);
+      function drawSlice(t) {
+        sg.clearRect(0, 0, 480, 280);
+        sg.fillStyle = "#b98a58"; sg.fillRect(0, 0, 480, 280);
+        sg.fillStyle = "#8f6a40"; sg.fillRect(0, 0, 480, 6);
+        var pen = ease(seg(t, 51.0, 52.0));
+        var gr = sg.createLinearGradient(0, 0, 0, 280);
+        gr.addColorStop(0, "rgba(255,90,20," + (0.95 * pen) + ")"); gr.addColorStop(0.28, "rgba(255,120,40," + (0.55 * pen) + ")"); gr.addColorStop(0.5, "rgba(255,150,60,0)");
+        sg.fillStyle = gr; sg.fillRect(0, 0, 480, 280);
+        var cond = ease(seg(t, 53.2, 55.0));
+        var g2 = sg.createLinearGradient(0, 70, 0, 280);
+        g2.addColorStop(0, "rgba(255,160,70," + (0.45 * cond) + ")"); g2.addColorStop(1, "rgba(255,160,70," + (0.18 * cond) + ")");
+        sg.fillStyle = g2; sg.fillRect(0, 70, 480, 210);
+        sg.strokeStyle = "rgba(255,255,255,0.7)"; sg.lineWidth = 4; sg.strokeRect(2, 2, 476, 276);
+        stex.needsUpdate = true;
+      }
+
+      // ---------- M6 : turntable heat map ----------
+      var hc = document.createElement("canvas"); hc.width = 128; hc.height = 128;
+      var hg = hc.getContext("2d"); var himg = hg.createImageData(128, 128);
+      var htex = new THREE.CanvasTexture(hc); htex.encoding = THREE.sRGBEncoding;
+      var disc = new THREE.Mesh(new THREE.CircleGeometry(1.35, 64), new THREE.MeshBasicMaterial({ map: htex, toneMapped: false })); disc.position.set(0, 0.7, 0); disc.rotation.x = -0.5; scene.add(disc);
+      var notch = new THREE.Mesh(new THREE.SphereGeometry(0.07, 12, 10), new THREE.MeshBasicMaterial({ color: 0xffffff, toneMapped: false })); scene.add(notch);
+      function ramp(v) { v = HF.clamp(v, 0, 1); var r, g, b; if (v < 0.5) { var u = v / 0.5; r = lerp(0.1, 0.35, u); g = lerp(0.2, 0.15, u); b = lerp(0.7, 0.55, u); } else { var u2 = (v - 0.5) / 0.5; r = lerp(0.35, 1.0, u2); g = lerp(0.15, 0.85 * u2 + 0.15, u2); b = lerp(0.55, 0.1, u2); } return [r * 255, g * 255, b * 255]; }
+      function drawHeat(t) {
+        var mix = ease(seg(t, 58.6, 60.6));
+        var th = ease(seg(t, 58.3, 61.1)) * 9.4;
+        for (var j = 0; j < 128; j++) for (var i = 0; i < 128; i++) {
+          var x = (i / 127) * 2 - 1, y = (j / 127) * 2 - 1;
+          var r2 = x * x + y * y;
+          var idx = (j * 128 + i) * 4;
+          if (r2 > 1) { himg.data[idx + 3] = 0; continue; }
+          var c = Math.cos(th), s = Math.sin(th);
+          var xo = x * c - y * s, yo = x * s + y * c;
+          var v = Math.pow(Math.cos(3.1 * xo + 0.7), 2) * Math.pow(Math.cos(2.7 * yo - 0.4), 2);
+          var avg = 0.42 + 0.1 * (1 - r2);
+          var vv = lerp(v, avg, mix);
+          var col = ramp(vv);
+          himg.data[idx] = col[0]; himg.data[idx + 1] = col[1]; himg.data[idx + 2] = col[2]; himg.data[idx + 3] = 255;
+        }
+        hg.putImageData(himg, 0, 0); htex.needsUpdate = true;
+      }
+
+      // ---------- M7 : fork and sparks ----------
+      var gF = new THREE.Group(); scene.add(gF);
+      var fk = HF.makeFork(); fk.group.scale.setScalar(1.8); fk.group.position.set(0, -0.3, 0); gF.add(fk.group);
+      var elec = [];
+      for (var e = 0; e < 40; e++) {
+        var m = new THREE.Mesh(new THREE.SphereGeometry(0.035, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffc41a, toneMapped: false }));
+        var yb = -1.4 + rnd() * 2.0, xb = (rnd() - 0.5) * (yb > -0.15 ? 0.34 : 0.1);
+        m.userData = { yb: yb, xb: xb, ph: rnd() * 6.28, tip: Math.floor(rnd() * 4) };
+        gF.add(m); elec.push(m);
+      }
+      var fieldB = HF.makeBeads(70, 0xb26bff, 0.09); scene.add(fieldB);
+      var airGlow = HF.makeGlow(0xcfe6ff, 2.4); gF.add(airGlow);
+      var sparkL = [0, 1, 2, 3, 4, 5].map(function () { var l = new THREE.Line(new THREE.BufferGeometry().setFromPoints(HF.spark(new THREE.Vector3(), new THREE.Vector3(0, 0.1, 0), 1)), new THREE.LineBasicMaterial({ color: 0xfff1b8, transparent: true, opacity: 0 })); gF.add(l); return l; });
+
+      var labIce = $("mc-lab-ice"), labCm = $("mc-lab-cm"), labStrong = $("mc-lab-strong"), labWeak = $("mc-lab-weak"), labTip = $("mc-lab-tip");
+      var ld = { ice: $("mc-ld-ice"), pen: $("mc-ld-pen"), strong: $("mc-ld-strong"), weak: $("mc-ld-weak"), tip: $("mc-ld-tip") };
+      var tmp = new THREE.Vector3();
+      function pj(v) { return HF.project(camera, v); }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        Object.keys(ld).forEach(function (k) { ld[k].setAttribute("opacity", "0"); });
+        var a = t < 55.1, b = t >= 55.1 && t < 61.16, c = t >= 61.16;
+        gI.visible = a; iceArrow.visible = a; slice.visible = a && t > 50.7; wavesDown.visible = a && t > 50.7;
+        disc.visible = b; notch.visible = b; gF.visible = c; fieldB.visible = c; pl.intensity = 0;
+        if (a) {
+          gI.scale.setScalar(0.94 + 0.06 * easeOut(seg(t, 46.7, 47.2)) );
+          var sq = 1.0 - 0.0;
+          ice.forEach(function (w, i) { w.group.position.x += 0; w.group.rotation.z = ((i % 2) * 1.57) + 0.02 * Math.sin(t * 6 + i); });
+          var dir = Math.sin(t * 3.0) >= 0 ? 1 : -1;
+          iceArrow.scale.x = dir;
+          // the whole block is dimmed once the slice appears
+          gI.position.y = lerp(1.4, 2.0, ease(seg(t, 50.7, 51.5))); gI.scale.setScalar(lerp(1, 0.7, ease(seg(t, 50.7, 51.5))));
+          iceArrow.position.y = lerp(2.9, 3.1, ease(seg(t, 50.7, 51.5)));
+          if (t > 50.7) {
+            slice.position.set(0, -0.7, 0);
+            drawSlice(t);
+            HF.setBeads(wavesDown, new THREE.Vector3(0, 0.55, 0.05), new THREE.Vector3(0, -0.2, 0.05), new THREE.Vector3(1, 0, 0), 0.16, 2.0, 7, t, 1);
+            wavesDown.material.opacity = 0.85 * ease(seg(t, 50.9, 51.4));
+          }
+          camera.position.set(0, 0.5, 8.2);
+          camera.lookAt(0, 0.6, 0);
+          camera.updateMatrixWorld();
+          var pi = pj(gI.localToWorld(new THREE.Vector3(1.0, 0.5, 0.3)));
+          HF.place(labIce, pi.x + 40, pi.y - 150 + (t > 50.7 ? 100 : 0), t > 50.7);
+          HF.leader(camera, "mc-ld-ice", labIce, gI.localToWorld(new THREE.Vector3(1.0, 0.5, 0.3)), 46.9, 55.0, t);
+          var pp = pj(new THREE.Vector3(1.0, -0.45, 0.1));
+          HF.place(labCm, pp.x - 30, pp.y - 30, true);
+          HF.leader(camera, "mc-ld-pen", labCm, new THREE.Vector3(1.2, -0.45, 0.1), 51.2, 55.0, t);
+        }
+        if (b) {
+          disc.scale.setScalar(0.94 + 0.06 * easeOut(seg(t, 55.1, 55.6)));
+          drawHeat(t);
+          var th = ease(seg(t, 58.3, 61.1)) * 9.4;
+          notch.position.set(Math.cos(th) * 1.28, 0.7 + Math.sin(th) * 1.28 * Math.cos(0.5), Math.sin(th) * 1.28 * Math.sin(0.5) * 0.0 + 0.02);
+          camera.position.set(0, 0.9, 7.6);
+          camera.lookAt(0, 0.9, 0);
+          camera.updateMatrixWorld();
+          var p1 = pj(new THREE.Vector3(-0.5, 0.9, 0.1)), p2 = pj(new THREE.Vector3(0.6, 0.35, 0.1));
+          HF.place(labStrong, p1.x - 50, p1.y - 270, true);
+          HF.leader(camera, "mc-ld-strong", labStrong, new THREE.Vector3(-0.5, 0.9, 0.1), 56.0, 61.1, t);
+          HF.place(labWeak, p2.x + 80, p2.y + 200, false);
+          HF.leader(camera, "mc-ld-weak", labWeak, new THREE.Vector3(0.6, 0.35, 0.1), 57.2, 61.1, t);
+        }
+        if (c) {
+          gF.scale.setScalar(0.94 + 0.06 * easeOut(seg(t, 61.2, 61.7)));
+          var om = 3.2, field = Math.sin(om * (t - 61.2));
+          var acc = ease(seg(t, 64.4, 71.0));
+          var tipsW = fk.tips.map(function (v) { return v.clone().multiplyScalar(1.8).add(fk.group.position); });
+          elec.forEach(function (m, i) {
+            var u = m.userData;
+            var ytip = tipsW[u.tip].y - 0.05 + 0.0;
+            var y = lerp(u.yb, ytip - (i % 3) * 0.06, acc * (u.yb > -0.3 ? 1 : 0.6));
+            var x = lerp(u.xb, tipsW[u.tip].x + (i % 2 ? 0.015 : -0.015), acc);
+            m.position.set(x, y + 0.05 * field * (1 - acc) + 0.012 * Math.sin(t * 20 + u.ph), 0.05);
+          });
+          HF.setBeads(fieldB, new THREE.Vector3(-2.2, 0.2, -0.4), new THREE.Vector3(2.2, 0.2, -0.4), new THREE.Vector3(0, 1, 0), 0.25, 2.2, om * 2, t, 1);
+          fieldB.material.opacity = 0.8 * ease(seg(t, 62.0, 62.8));
+          var vv = ease(seg(t, 69.9, 73.5));
+          var air = ease(seg(t, 72.2, 73.9));
+          var on = t > 73.98 && t < 75.5 && (Math.sin(t * 41) + Math.sin(t * 57 + 1) > -0.2);
+          airGlow.position.set(0, tipsW[1].y, 0.1); airGlow.material.opacity = 0.5 * air + (on ? 0.5 : 0);
+          for (var i = 0; i < 6; i++) {
+            var gap = i % 3;
+            var pts = HF.spark(tipsW[gap], tipsW[gap + 1], Math.floor(t * 30) * 7 + i * 13, 6);
+            var pa = sparkL[i].geometry.attributes.position;
+            for (var k = 0; k < pts.length; k++) pa.setXYZ(k, pts[k].x, pts[k].y, pts[k].z);
+            pa.needsUpdate = true;
+            sparkL[i].material.opacity = on ? 1 : 0;
+          }
+          pl.position.set(0, tipsW[1].y, 1.0); pl.intensity = (on ? 2.4 : 0) + air * 0.4;
+          var shake = on ? Math.sin(t * 80) * 0.03 : 0;
+          camera.position.set(shake, 0.5, 6.4);
+          camera.lookAt(0, 0.5, 0);
+          camera.updateMatrixWorld();
+          var pt = pj(tipsW[3]);
+          HF.place(labTip, pt.x - 90, pt.y - 30, true);
+          HF.leader(camera, "mc-ld-tip", labTip, tipsW[3], 66.0, 75.2, t);
+        }
+        renderer.render(scene, camera);
+      }
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, at); };
+      ["#mc-lab-ice|0.30", "#mc-lab-cm|4.60", "#mc-lab-core|6.50", "#mc-lab-strong|9.40", "#mc-lab-weak|10.60", "#mc-lab-turn|11.90", "#mc-lab-even|13.60", "#mc-lab-free|16.40", "#mc-lab-tip|19.40", "#mc-lab-air|26.20", "#mc-lab-spark|27.40"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      tl.fromTo("#mc-volt", { opacity: 0, y: 40 }, { opacity: 1, y: 0, duration: 0.3, ease: "power3.out" }, 23.30);
+      tl.fromTo("#mc-vf", { scaleX: 0.05 }, { scaleX: 1, duration: 3.4, ease: "power2.in" }, 23.40);
+      window.__timelines["stageC"] = tl;
+    })();
+
+  </script>
+</template>

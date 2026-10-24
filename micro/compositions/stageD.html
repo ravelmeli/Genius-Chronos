@@ -1,0 +1,205 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #md-canvas, #md-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #md-leaders { pointer-events: none; }
+    .md-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .md-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .md-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .md-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .md-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .md-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    .md-no { position: absolute; width: 300px; height: 300px; border-radius: 50%; border: 20px solid #ff4a4a; box-shadow: 0 0 40px rgba(255,74,74,0.6); }
+    .md-no::after { content: ""; position: absolute; left: 50%; top: -20px; width: 20px; height: 300px; margin-left: -10px; background: #ff4a4a; transform: rotate(45deg); }
+    #md-end { position: absolute; left: 0; width: 1080px; top: 780px; text-align: center; color: #fff; text-shadow: 0 6px 40px rgba(0,0,0,0.7); }
+    #md-end1 { display: block; font-size: 100px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.1; }
+    #md-end2 { display: block; margin-top: 14px; font-size: 62px; font-weight: 800; color: #ff8a2a; letter-spacing: -0.01em; }
+    #md-bubble { position: absolute; left: 130px; top: 770px; width: 820px; padding: 36px 40px; border-radius: 40px; background: #1c2b52; border: 4px solid #4aa8ff; box-shadow: 0 0 40px rgba(74,168,255,0.5); color: #fff; font-weight: 800; font-size: 60px; line-height: 1.15; text-align: center; }
+    #md-bubble::after { content: ""; position: absolute; left: 90px; bottom: -34px; width: 0; height: 0; border-left: 28px solid transparent; border-right: 28px solid transparent; border-top: 36px solid #4aa8ff; }
+    .md-btn { position: absolute; padding: 20px 40px; border-radius: 999px; font-weight: 800; font-size: 44px; white-space: nowrap; }
+    .md-q { position: absolute; font-size: 150px; font-weight: 800; color: #ffc41a; text-shadow: 0 0 40px rgba(255,196,26,0.8); }
+  </style>
+  <div id="root" data-composition-id="stageD" data-width="1080" data-height="1920">
+    <canvas id="md-canvas" width="1080" height="1920"></canvas>
+    <svg id="md-leaders" viewBox="0 0 1080 1920">
+      <g id="md-ld-wall" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#fff" stroke-width="3"></line><circle r="8" fill="#fff"></circle></g>
+      <g id="md-ld-refl" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#b26bff" stroke-width="3"></line><circle r="8" fill="#b26bff"></circle></g>
+    </svg>
+    <div id="md-tag-a" class="md-mono clip" data-start="0.20" data-duration="10.4" style="left: 60px; top: 200px"><span class="md-dot"></span>MURS ET GRILLE</div>
+    <div id="md-tag-b" class="md-mono clip" data-start="10.90" data-duration="6.5" style="left: 60px; top: 200px"><span class="md-dot"></span>LE CONSEIL</div>
+    <div id="md-tag-c" class="md-mono clip" data-start="17.70" data-duration="8.0" style="left: 60px; top: 200px"><span class="md-dot"></span>LA DANSE</div>
+    <div id="md-tag-d" class="md-mono clip" data-start="25.80" data-duration="7.0" style="left: 60px; top: 200px"><span class="md-dot"></span>ET TOI ?</div>
+    <div id="md-illu" class="md-mono clip" data-start="0.20" data-duration="32.6" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="md-lab-wall" class="md-chip md-neon clip" data-start="0.20" data-duration="4.2" style="--c: #cfd3dc">MURS EN MÉTAL</div>
+    <div id="md-lab-refl" class="md-chip md-neon clip" data-start="1.90" data-duration="2.5" style="--c: #b26bff">ONDES RENVOYÉES</div>
+    <div id="md-lab-nospark" class="md-chip clip" data-start="2.40" data-duration="2.0" style="background: #38d27a; color: #04230f; left: 70px; top: 1010px">SANS ÉTINCELLE</div>
+    <div id="md-lab-big" class="md-chip md-neon clip" data-start="4.60" data-duration="6.1" style="--c: #b26bff; left: 70px; top: 290px">ONDE : GRANDE</div>
+    <div id="md-lab-holes" class="md-chip md-neon clip" data-start="5.80" data-duration="4.9" style="--c: #cfd3dc; left: 70px; top: 370px">TROUS : MINUSCULES</div>
+    <div id="md-lab-in" class="md-chip clip" data-start="7.20" data-duration="3.5" style="left: 70px; top: 1010px">ELLE RESTE DEDANS</div>
+    <div id="md-lab-see" class="md-chip clip" data-start="8.60" data-duration="2.1" style="background: #ffc41a; color: #1a1400; left: 70px; top: 1090px">LUMIÈRE : PASSE</div>
+    <div id="md-no1" class="md-no clip" data-start="11.40" data-duration="6.0" style="left: 170px; top: 380px"></div>
+    <div id="md-no2" class="md-no clip" data-start="11.80" data-duration="5.6" style="left: 610px; top: 380px"></div>
+    <div id="md-lab-sharp" class="md-chip clip" data-start="11.10" data-duration="6.3" style="left: 150px; top: 720px">POINTU</div>
+    <div id="md-lab-crum" class="md-chip clip" data-start="12.00" data-duration="5.4" style="left: 640px; top: 720px">FROISSÉ</div>
+    <div id="md-lab-dmg" class="md-chip clip" data-start="14.30" data-duration="3.1" style="background: #ff4a4a; color: #fff; left: 70px; top: 1010px">ABÎME L'APPAREIL</div>
+    <div id="md-lab-fire" class="md-chip clip" data-start="15.30" data-duration="2.1" style="background: #ff4a4a; color: #fff; left: 70px; top: 1090px">RISQUE D'INCENDIE</div>
+    <div id="md-lab-dance" class="md-chip md-neon clip" data-start="20.10" data-duration="5.5" style="--c: #ff8a2a; left: 70px; top: 330px">MOLÉCULES QUI DANSENT</div>
+    <div id="md-end" class="clip" data-start="22.10" data-duration="3.5"><span id="md-end1">Une danse invisible.</span><span id="md-end2">Des milliards de fois par seconde.</span></div>
+    <div id="md-q1" class="md-q clip" data-start="25.90" data-duration="7.1" style="left: 100px; top: 430px">?</div>
+    <div id="md-q2" class="md-q clip" data-start="26.10" data-duration="6.9" style="left: 850px; top: 560px">?</div>
+    <div id="md-bubble" class="clip" data-start="25.80" data-duration="7.2">Déjà vu des<br>étincelles ?</div>
+    <div id="md-b1" class="md-btn clip" data-start="30.50" data-duration="2.5" style="left: 90px; top: 1040px; background: #fff; color: #0a0f1c; font-size: 40px">COMMENTE</div>
+    <div id="md-b2" class="md-btn clip" data-start="31.20" data-duration="1.8" style="left: 540px; top: 1040px; background: #ff3b3b; color: #fff; font-size: 40px">ABONNE-TOI</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/micro.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 75.4, T1 = 108.48;
+      var renderer = HF.makeRenderer($("md-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 10, 28);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 60);
+      var hemi = new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6); scene.add(hemi);
+      var key = new THREE.DirectionalLight(0xffd9b0, 0.9); key.position.set(2.5, 4, 4); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.8); rim.position.set(-3, 2.5, -3); scene.add(rim);
+      var hl = new THREE.PointLight(0xff7a1a, 0, 7, 1.5); scene.add(hl);
+      function std(c, o) { return new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.7, metalness: 0.1 }, o || {})); }
+      function box(w, h, d, m, x, y, z) { var b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); return b; }
+      var rnd = HF.mulberry32(52);
+
+      // ---------- M8a : walls reflect ----------
+      var gW = new THREE.Group(); scene.add(gW);
+      var steel = std(0x8a93a8, { metalness: 0.4, roughness: 0.5 });
+      gW.add(box(3.4, 0.1, 2.3, std(0x1a2236), 0, -0.05, 0));
+      gW.add(box(3.4, 1.9, 0.08, steel, 0, 0.95, -1.12));
+      gW.add(box(0.08, 1.9, 2.3, steel, -1.68, 0.95, 0));
+      var magn = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.2, 0.34, 20), std(0xc9ccd8, { metalness: 0.5 })); magn.rotation.z = Math.PI / 2; magn.position.set(1.3, 1.45, -0.7); gW.add(magn);
+      var rA = HF.makeBeads(60, 0xb26bff, 0.09); gW.add(rA);
+      var rB = HF.makeBeads(60, 0xcfa8ff, 0.09); gW.add(rB);
+      var rC = HF.makeBeads(60, 0xb26bff, 0.09); gW.add(rC);
+      var hitGlow = HF.makeGlow(0xffffff, 0.9); gW.add(hitGlow);
+      var W1 = new THREE.Vector3(-1.62, 0.9, 0.0);
+      // ---------- M8b : door grid ----------
+      var gG = new THREE.Group(); scene.add(gG);
+      var pc = document.createElement("canvas"); pc.width = 512; pc.height = 512;
+      var pg = pc.getContext("2d"); pg.fillStyle = "#1b2238"; pg.fillRect(0, 0, 512, 512);
+      pg.fillStyle = "#cfe6ff";
+      for (var yy = 8; yy < 512; yy += 12) for (var xx = 8; xx < 512; xx += 12) { pg.beginPath(); pg.arc(xx, yy, 3.2, 0, 6.2832); pg.fill(); }
+      var ptex = new THREE.CanvasTexture(pc); ptex.encoding = THREE.sRGBEncoding;
+      var plate = new THREE.Mesh(new THREE.BoxGeometry(0.06, 2.0, 2.0), [new THREE.MeshBasicMaterial({ map: ptex, toneMapped: false }), new THREE.MeshBasicMaterial({ map: ptex, toneMapped: false }), std(0x8a93a8), std(0x8a93a8), std(0x8a93a8), std(0x8a93a8)]);
+      plate.position.set(0, 0.4, 0); gG.add(plate);
+      var inc = HF.makeBeads(70, 0xb26bff, 0.1); gG.add(inc);
+      var aft = HF.makeBeads(40, 0xb26bff, 0.07); gG.add(aft);
+      var light = HF.makeBeads(90, 0xffe29a, 0.05); gG.add(light);
+      // ---------- M9 : warning ----------
+      var gX = new THREE.Group(); scene.add(gX);
+      var fk = HF.makeFork(); fk.group.scale.setScalar(1.3); fk.group.position.set(-0.9, 0.0, 0); gX.add(fk.group);
+      var foilGeo = new THREE.IcosahedronGeometry(0.62, 2); var fp = foilGeo.attributes.position;
+      for (var v = 0; v < fp.count; v++) { var k = 1 + 0.22 * Math.sin(fp.getX(v) * 9) * Math.cos(fp.getY(v) * 8 + fp.getZ(v) * 6); fp.setXYZ(v, fp.getX(v) * k, fp.getY(v) * k, fp.getZ(v) * k); }
+      foilGeo.computeVertexNormals();
+      var foil = new THREE.Mesh(foilGeo, std(0xdfe4ee, { metalness: 0.4, roughness: 0.35, flatShading: true, emissive: 0x2a3042, emissiveIntensity: 0.5 })); foil.position.set(0.9, 0.3, 0); gX.add(foil);
+      // ---------- M10 : the dance ----------
+      var sg = new THREE.Group(); scene.add(sg);
+      var N = 60, swarm = [];
+      for (var i = 0; i < N; i++) {
+        var w = HF.makeWater(0.2);
+        w.group.userData = { x: (rnd() - 0.5) * 2.4, y: (rnd() - 0.5) * 1.4, z: (rnd() - 0.5) * 0.8, ph: rnd() * 6.28, sp: 4 + rnd() * 6 };
+        w.O.material.color.set(0xffa040); w.O.material.emissive.setRGB(1, 0.35, 0.05); w.O.material.emissiveIntensity = 1.0;
+        sg.add(w.group); swarm.push(w);
+      }
+      sg.position.set(0, 1.45, 0);
+      var sparks = HF.makeParticles(150, 9, 0.1); sparks.position.set(0, 1.0, 0); sg.add(sparks);
+      var sglow = HF.makeGlow(0xff7a1a, 4.6); sglow.position.set(0, 0, -0.4); sglow.material.opacity = 0.35; sg.add(sglow);
+
+      var labWall = $("md-lab-wall"), labRefl = $("md-lab-refl");
+      var no1 = $("md-no1"), no2 = $("md-no2");
+      var ld = { wall: $("md-ld-wall"), refl: $("md-ld-refl") };
+      var tmp = new THREE.Vector3();
+      function pj(v) { return HF.project(camera, v); }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        ld.wall.setAttribute("opacity", "0"); ld.refl.setAttribute("opacity", "0");
+        var a = t < 79.88, b = t >= 79.88 && t < 86.14, c = t >= 86.14 && t < 92.94, d = t >= 92.94;
+        gW.visible = a; gG.visible = b; gX.visible = c; sg.visible = d; hl.intensity = 0;
+        var dim = 1 - 0.5 * ease(seg(t, 101.0, 102.0));
+        hemi.intensity = 0.6 * dim; key.intensity = 0.9 * dim;
+        if (a) {
+          gW.scale.setScalar(0.94 + 0.06 * easeOut(seg(t, 75.4, 75.9)));
+          var A = new THREE.Vector3(1.05, 1.45, -0.7);
+          var perp = new THREE.Vector3(0, 1, 0);
+          var f1 = ease(seg(t, 75.8, 77.2));
+          HF.setBeads(rA, A, W1, new THREE.Vector3(0, 0, 1), 0.1, 4, 7.5, t, f1 > 0 ? 1 : 0.01);
+          rA.material.opacity = 0.85 * ease(seg(t, 75.8, 76.2));
+          var B = new THREE.Vector3(0.7, 0.45, 0.9);
+          var f2 = ease(seg(t, 77.0, 78.6));
+          HF.setBeads(rB, W1, B, new THREE.Vector3(0, 0, 1), 0.1, 4, 7.5, t, Math.max(0.01, f2));
+          rB.material.opacity = 0.85 * ease(seg(t, 77.0, 77.4));
+          var f3 = ease(seg(t, 78.6, 79.6));
+          HF.setBeads(rC, A.clone().add(new THREE.Vector3(0, 0, 0.1)), new THREE.Vector3(-0.4, 0.3, -1.0), new THREE.Vector3(0, 1, 0), 0.1, 3, 7.5, t, Math.max(0.01, f3));
+          rC.material.opacity = 0.8 * ease(seg(t, 78.6, 79.0));
+          hitGlow.position.copy(W1); hitGlow.material.opacity = 0.5 * Math.exp(-((t * 3.1) % 3) * 1.5) * ease(seg(t, 77.0, 77.4));
+          camera.position.set(4.6, 3.0, 7.6);
+          camera.lookAt(0, 0.6, 0);
+          camera.updateMatrixWorld();
+          var pw = pj(new THREE.Vector3(-1.66, 1.5, -0.6));
+          HF.place(labWall, pw.x + 40, pw.y - 130, false);
+          HF.leader(camera, "md-ld-wall", labWall, new THREE.Vector3(-1.66, 1.5, -0.6), 75.6, 79.8, t);
+          var pr = pj(W1);
+          HF.place(labRefl, pr.x + 80, pr.y + 130, false);
+          HF.leader(camera, "md-ld-refl", labRefl, W1, 77.3, 79.8, t);
+        }
+        if (b) {
+          gG.scale.setScalar(0.94 + 0.06 * easeOut(seg(t, 79.88, 80.4)));
+          HF.setBeads(inc, new THREE.Vector3(-3.0, 0.4, 0), new THREE.Vector3(-0.05, 0.4, 0), new THREE.Vector3(0, 1, 0), 0.35, 1.6, 7, t, 1);
+          inc.material.opacity = 0.9 * ease(seg(t, 80.2, 80.8));
+          HF.setBeads(aft, new THREE.Vector3(0.05, 0.4, 0), new THREE.Vector3(2.4, 0.4, 0), new THREE.Vector3(0, 1, 0), 0.004, 1.6, 7, t, 1);
+          aft.material.opacity = 0.7 * ease(seg(t, 80.8, 81.4));
+          HF.setBeads(light, new THREE.Vector3(-3.0, 1.0, 0.5), new THREE.Vector3(2.4, 1.0, 0.5), new THREE.Vector3(0, 1, 0), 0.05, 40, 14, t, 1);
+          light.material.opacity = 0.85 * ease(seg(t, 84.0, 84.6));
+          camera.position.set(3.8, 1.2, 6.4);
+          camera.lookAt(0, 0.4, 0);
+        }
+        if (c) {
+          gX.scale.setScalar(0.94 + 0.06 * easeOut(seg(t, 86.14, 86.6)));
+          fk.group.rotation.y = 0.5 * Math.sin(t * 0.8); foil.rotation.y = t * 0.6; foil.rotation.x = t * 0.3;
+          camera.position.set(0, 0.5, 7.2);
+          camera.lookAt(0, 0.5, 0);
+          camera.updateMatrixWorld();
+          var p1 = pj(new THREE.Vector3(-0.9, 0.5, 0)), p2 = pj(new THREE.Vector3(0.9, 0.35, 0));
+          no1.style.left = (p1.x - 150) + "px"; no1.style.top = (p1.y - 150) + "px";
+          no2.style.left = (p2.x - 150) + "px"; no2.style.top = (p2.y - 150) + "px";
+        }
+        if (d) {
+          var heat = 1.0;
+          sg.scale.setScalar(0.8 * (0.94 + 0.06 * easeOut(seg(t, 92.94, 93.4))));
+          swarm.forEach(function (w) {
+            var u = w.group.userData, amp = 0.17;
+            w.group.position.set(u.x + amp * Math.sin(t * u.sp + u.ph), u.y + amp * Math.cos(t * u.sp * 1.3 + u.ph), u.z);
+            w.group.rotation.z = 1.5 * Math.sin(t * 5 + u.ph);
+          });
+          HF.updateParticles(sparks, t * 1.5, 0.9, 1.0, 5.0);
+          hl.position.set(0, 1.0, 3); hl.intensity = 1.0 * dim;
+          camera.position.set(0, 0.2, 8.2);
+          camera.lookAt(0, 0.1, 0);
+        }
+        renderer.render(scene, camera);
+      }
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#md-lab-wall|0.20", "#md-lab-refl|1.90", "#md-lab-nospark|2.40", "#md-lab-big|4.60", "#md-lab-holes|5.80", "#md-lab-in|7.20", "#md-lab-see|8.60", "#md-no1|11.40", "#md-no2|11.80", "#md-lab-sharp|11.10", "#md-lab-crum|12.00", "#md-lab-dmg|14.30", "#md-lab-fire|15.30", "#md-lab-dance|20.10", "#md-q1|25.90", "#md-q2|26.10", "#md-b1|30.50", "#md-b2|31.20"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      tl.fromTo("#md-end1", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 22.15);
+      tl.fromTo("#md-end2", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 23.80);
+      tl.fromTo("#md-bubble", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 25.80);
+      window.__timelines["stageD"] = tl;
+    })();
+
+  </script>
+</template>
