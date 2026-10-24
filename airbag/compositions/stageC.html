@@ -1,0 +1,196 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #ac-canvas, #ac-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #ac-leaders { pointer-events: none; }
+    .ac-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .ac-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .ac-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .ac-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .ac-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .ac-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #ac-loupe { position: absolute; left: 330px; top: 780px; width: 420px; height: 420px; }
+    #ac-loupe .glass { position: absolute; inset: 0; border-radius: 50%; border: 10px solid rgba(255,255,255,0.92); background: radial-gradient(circle at 50% 40%, #16223d 0%, #0a1020 80%); box-shadow: 0 0 40px rgba(90,160,255,0.35), 0 10px 40px rgba(0,0,0,0.5); overflow: hidden; }
+    #ac-loupe svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+    #ac-loupe .t { position: absolute; left: 0; width: 100%; text-align: center; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.04em; }
+  </style>
+  <div id="root" data-composition-id="stageC" data-width="1080" data-height="1920">
+    <canvas id="ac-canvas" width="1080" height="1920"></canvas>
+    <svg id="ac-leaders" viewBox="0 0 1080 1920">
+      <g id="ac-ld-fold" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#fff" stroke-width="3"></line><circle r="8" fill="#fff"></circle></g>
+      <g id="ac-ld-gas" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#4aa8ff" stroke-width="3"></line><circle r="8" fill="#4aa8ff"></circle></g>
+      <g id="ac-ld-vent" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#4aa8ff" stroke-width="3"></line><circle r="8" fill="#4aa8ff"></circle></g>
+      <g id="ac-ld-amort" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#fff" stroke-width="3"></line><circle r="8" fill="#fff"></circle></g>
+    </svg>
+    <div id="ac-tag-a" class="ac-mono clip" data-start="0.20" data-duration="11.8" style="left: 60px; top: 200px"><span class="ac-dot"></span>LA RÉACTION</div>
+    <div id="ac-tag-b" class="ac-mono clip" data-start="12.40" data-duration="9.5" style="left: 60px; top: 200px"><span class="ac-dot"></span>L'AMORTISSEMENT</div>
+    <div id="ac-tag-c" class="ac-mono clip" data-start="22.30" data-duration="6.4" style="left: 60px; top: 200px"><span class="ac-dot"></span>LA POUDRE</div>
+    <div id="ac-illu" class="ac-mono clip" data-start="0.20" data-duration="28.5" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="ac-lab-fold" class="ac-chip clip" data-start="0.50" data-duration="8.8">COUSSIN PLIÉ</div>
+    <div id="ac-lab-gas" class="ac-chip ac-neon clip" data-start="3.20" data-duration="9.0" style="--c: #4aa8ff">AZOTE (N<sub style="font-size:0.85em">2</sub>)</div>
+    <div id="ac-loupe" class="clip" data-start="5.10" data-duration="3.9">
+      <div class="glass">
+        <svg viewBox="0 0 400 400"><circle id="ac-big" cx="200" cy="200" r="60" fill="#8a93a8"></circle><circle id="ac-d0" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d1" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d2" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d3" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d4" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d5" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d6" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d7" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d8" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d9" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d10" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d11" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d12" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d13" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d14" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d15" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d16" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d17" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d18" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d19" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d20" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d21" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d22" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d23" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d24" cx="200" cy="200" r="0" fill="#7ac4ff"></circle><circle id="ac-d25" cx="200" cy="200" r="0" fill="#7ac4ff"></circle></svg>
+        <div id="ac-t1" class="t" style="top: 86px; color: #9aa6c4">SOLIDE</div>
+        <div id="ac-t2" class="t" style="bottom: 86px; color: #7ac4ff">GAZ</div>
+      </div>
+    </div>
+    <div id="ac-lab-vent" class="ac-chip ac-neon clip" data-start="13.00" data-duration="4.8" style="--c: #4aa8ff">TROUS D'ÉVACUATION</div>
+    <div id="ac-lab-amort" class="ac-chip clip" data-start="18.10" data-duration="3.9">COUSSIN QUI AMORTIT</div>
+    <div id="ac-lab-talc" class="ac-chip clip" data-start="23.40" data-duration="5.3" style="left: 70px; top: 930px">AMIDON OU TALC</div>
+    <div id="ac-lab-glue" class="ac-chip ac-neon clip" data-start="25.80" data-duration="2.9" style="--c: #9aa6c4; left: 70px; top: 1010px">POUR NE PAS COLLER</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/airbag.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 48.4, T1 = 77.3;
+      var renderer = HF.makeRenderer($("ac-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 10, 26);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 60);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.5));
+      var key = new THREE.DirectionalLight(0xffd9b0, 1.0); key.position.set(2.5, 4, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 1.0); rim.position.set(-3, 2.5, -3); scene.add(rim);
+      var hl = new THREE.PointLight(0xff7a1a, 0, 6, 1.5); scene.add(hl);
+      function std(c, o) { return new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.6, metalness: 0.2 }, o || {})); }
+      var rnd = HF.mulberry32(77);
+
+      // ---------- reaction scene ----------
+      var gR = new THREE.Group(); scene.add(gR);
+      var can = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.46, 1.4, 32, 1, true), new THREE.MeshStandardMaterial({ color: 0x9aa6c4, metalness: 0.6, roughness: 0.3, transparent: true, opacity: 0.25, side: THREE.DoubleSide }));
+      can.rotation.z = Math.PI / 2; can.position.set(-1.1, 0.9, 0); gR.add(can);
+      [[-1.8], [-0.4]].forEach(function (c) { var cp = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.46, 0.07, 32), std(0x2b3350, { metalness: 0.6 })); cp.rotation.z = Math.PI / 2; cp.position.set(c[0], 0.9, 0); gR.add(cp); });
+      var pel = [];
+      for (var k = 0; k < 46; k++) {
+        var m = std(0x6b7186, { roughness: 0.8, emissive: 0xff5a00, emissiveIntensity: 1.5 });
+        var pm = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 0.045, 10), m);
+        var x = -1.7 + rnd() * 1.2, ang = rnd() * 6.28, rr = Math.sqrt(rnd()) * 0.36;
+        pm.position.set(x, 0.9 + Math.cos(ang) * rr, Math.sin(ang) * rr); pm.rotation.set(rnd() * 3, rnd() * 3, rnd() * 3);
+        pm.userData = { x: x, die: 49.0 + ((x + 1.7) / 1.2) * 3.4 };
+        gR.add(pm); pel.push(pm);
+      }
+      var canGlow = HF.makeGlow(0xff7a1a, 2.6); canGlow.position.set(-1.1, 0.9, 0.3); gR.add(canGlow);
+      var fold = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.46, 0.42), std(0xe9ecf4, { roughness: 0.9, metalness: 0 }));
+      fold.position.set(0.5, 0.9, 0); gR.add(fold);
+      var ball = new THREE.Mesh(new THREE.SphereGeometry(1, 36, 26), new THREE.MeshStandardMaterial({ color: 0xf1f3fa, roughness: 0.85, transparent: true, opacity: 0.55 }));
+      ball.position.set(0.5, 0.9, 0); ball.visible = false; gR.add(ball);
+      var NG = 260, gas = [];
+      var gGeo = new THREE.BufferGeometry();
+      gGeo.setAttribute("position", new THREE.BufferAttribute(new Float32Array(NG * 3), 3));
+      for (var g = 0; g < NG; g++) gas.push({ tb: 48.9 + rnd() * 6.5, sx: -1.7 + rnd() * 1.2, sy: 0.9 + (rnd() - 0.5) * 0.6, sz: (rnd() - 0.5) * 0.6, a: rnd() * 6.28, b: rnd() * 6.28, r: Math.cbrt(rnd()) * 0.28 });
+      var gMat = new THREE.PointsMaterial({ color: 0x7ac4ff, map: HF.spriteTex, size: 0.12, transparent: true, opacity: 0, blending: THREE.AdditiveBlending, depthWrite: false, toneMapped: false });
+      var gasPts = new THREE.Points(gGeo, gMat); gasPts.frustumCulled = false; gR.add(gasPts);
+
+      // ---------- interior ----------
+      var gI = new THREE.Group(); scene.add(gI);
+      gI.add(HF.makeCabin());
+      var dummy = HF.makeDummy(); dummy.group.position.set(-1.3, 0.05, 0); gI.add(dummy.group);
+      var wheel = HF.makeWheel(); var hub = new THREE.Vector3(-0.35, 0.28, 0); wheel.position.copy(hub); gI.add(wheel);
+      var bag = HF.makeBag(); gI.add(bag);
+      var vent = HF.makeParticles(120, 9, 0.1, 0x9fd0ff); gI.add(vent);
+      var powder = HF.makeParticles(220, 14, 0.07, 0xffffff); gI.add(powder);
+
+      var labFold = $("ac-lab-fold"), labGas = $("ac-lab-gas"), labVent = $("ac-lab-vent"), labAmort = $("ac-lab-amort");
+      var ldFold = $("ac-ld-fold"), ldGas = $("ac-ld-gas"), ldVent = $("ac-ld-vent"), ldAm = $("ac-ld-amort");
+      var tmp = new THREE.Vector3();
+      function proj(g, x, y, z) { tmp.set(x, y, z); g.localToWorld(tmp); return HF.project(camera, tmp); }
+      var big = $("ac-big");
+
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        var inR = t < 60.6;
+        gR.visible = inR; gI.visible = !inR;
+        [ldFold, ldGas, ldVent, ldAm].forEach(function (g) { g.setAttribute("opacity", "0"); });
+        hl.intensity = 0;
+        if (inR) {
+          gR.scale.setScalar(0.94 + 0.06 * easeOut(seg(t, T0, T0 + 0.45)));
+          var burn = 1 - ease(seg(t, 51.5, 55.0));
+          for (var i = 0; i < pel.length; i++) {
+            var pm = pel[i], d = pm.userData;
+            var s = 1 - ease(seg(t, d.die - 0.8, d.die + 0.8));
+            pm.scale.setScalar(Math.max(0.001, s)); pm.visible = s > 0.02;
+            pm.material.emissiveIntensity = 1.8 * s;
+          }
+          canGlow.material.opacity = 0.55 * burn + 0.15 * (t < 49 ? 1 : 0);
+          var arr = gGeo.attributes.position.array, vis = 0;
+          for (var q = 0; q < NG; q++) {
+            var G = gas[q], u = HF.clamp((t - G.tb) / 1.5, 0, 1);
+            var tx = 0.5 + G.r * Math.sin(G.a) * Math.cos(G.b), ty = 0.9 + G.r * Math.sin(G.a) * Math.sin(G.b), tz = G.r * Math.cos(G.a);
+            var e = ease(u);
+            var jit = u >= 1 ? 0.02 * Math.sin(t * 9 + q) : 0;
+            arr[q * 3] = lerp(G.sx, tx, e) + jit; arr[q * 3 + 1] = lerp(G.sy, ty, e) + (u > 0 && u < 1 ? 0.05 * Math.sin(u * 9 + q) : jit); arr[q * 3 + 2] = lerp(G.sz, tz, e) + jit;
+            if (u <= 0) { arr[q * 3] = -9; arr[q * 3 + 1] = -9; }
+          }
+          gGeo.attributes.position.needsUpdate = true;
+          gMat.opacity = ease(seg(t, 49.0, 49.6)) * 0.9;
+          var inflate = ease(seg(t, 57.7, 59.2));
+          fold.visible = t < 57.9;
+          fold.scale.setScalar(lerp(1, 0.8, ease(seg(t, 48.4, 57.7))));
+          ball.visible = t >= 57.7; ball.scale.setScalar(0.05 + 0.62 * inflate);
+          ball.material.opacity = 0.35 + 0.55 * inflate;
+          camera.position.set(-0.35 + Math.sin(t * 0.3) * 0.12, -0.4, 9.2);
+          camera.lookAt(-0.35, -0.4, 0);
+          camera.updateMatrixWorld();
+          var pf = proj(gR, 0.5, 1.15, 0.2);
+          HF.place(labFold, pf.x + 40, pf.y - 150, false);
+          HF.leader(camera, "ac-ld-fold", labFold, tmp.set(0.5, 1.15, 0.2).applyMatrix4(gR.matrixWorld), 48.9, 57.7, t);
+          var pg = proj(gR, 0.5, 0.75, 0.2);
+          HF.place(labGas, pg.x - 120, pg.y + 190, true);
+          HF.leader(camera, "ac-ld-gas", labGas, tmp.set(0.5, 0.75, 0.2).applyMatrix4(gR.matrixWorld), 51.6, 60.6, t);
+          // loupe: one solid piece becomes many gas molecules
+          var sp = ease(seg(t, 54.0, 55.6));
+          big.setAttribute("r", (60 * (1 - sp)).toFixed(1));
+          for (var m = 0; m < 26; m++) {
+            var an = m * 2.399, dist = 30 + 110 * Math.sqrt((m + 1) / 26) * sp + 14 * Math.sin(t * 3 + m) * sp;
+            var d2 = $("ac-d" + m);
+            d2.setAttribute("cx", (200 + Math.cos(an) * dist).toFixed(1));
+            d2.setAttribute("cy", (200 + Math.sin(an) * dist).toFixed(1));
+            d2.setAttribute("r", (sp > 0.02 ? 9 * Math.min(1, sp * 2) : 0).toFixed(1));
+          }
+        } else {
+          var lt = t - 60.6;
+          var lean = 0.55 * ease(seg(t, 61.8, 65.2));
+          var press = 1 - 0.45 * ease(seg(t, 62.4, 65.4));
+          var defl = 1 - 0.5 * ease(seg(t, 63.0, 69.0));
+          HF.setBag(bag, defl, hub);
+          bag.scale.x *= press;
+          dummy.group.position.set(-1.3 + 0.3 + lean * 0.6, 0.05 - 0.05 * lean, 0);
+          dummy.group.rotation.z = -0.25 - 0.3 * ease(seg(t, 61.8, 65.2));
+          var vi = ease(seg(t, 62.0, 63.0)) * (1 - ease(seg(t, 68.0, 70.0)));
+          vent.position.set(bag.position.x, bag.position.y + 0.1, 0.2);
+          HF.updateParticles(vent, t, vi, 0.9, 1.6);
+          var pw = ease(seg(t, 70.6, 72.8)) * (1 - 0.4 * ease(seg(t, 75.5, 77.3)));
+          powder.position.set(bag.position.x - 0.1, bag.position.y - 0.2, 0.1);
+          HF.updateParticles(powder, t * 0.7, pw * 0.8, 1.3, 1.4);
+          camera.position.set(lerp(0.7, 0.5, seg(t, 60.6, 77.3)), 0.7, lerp(4.1, 3.7, seg(t, 60.6, 77.3)));
+          camera.lookAt(-0.75, 0.15, 0);
+          camera.updateMatrixWorld();
+          var pv = proj(gI, bag.position.x, bag.position.y + 0.3, 0.1);
+          HF.place(labVent, pv.x - 150, pv.y - 190, true);
+          HF.leader(camera, "ac-ld-vent", labVent, tmp.set(bag.position.x, bag.position.y + 0.3, 0.1).applyMatrix4(gI.matrixWorld), 61.4, 66.2, t);
+          var pa = proj(gI, bag.position.x - 0.05, bag.position.y - 0.1, 0.3);
+          HF.place(labAmort, pa.x + 110, pa.y - 220, false);
+          HF.leader(camera, "ac-ld-amort", labAmort, tmp.set(bag.position.x - 0.05, bag.position.y - 0.1, 0.3).applyMatrix4(gI.matrixWorld), 66.5, 70.4, t);
+        }
+        renderer.render(scene, camera);
+      }
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, d) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: d || 0.25, ease: "back.out(2)" }, at); };
+      popd("#ac-lab-fold", 0.50); popd("#ac-lab-gas", 3.20);
+      tl.fromTo("#ac-loupe", { opacity: 0, scale: 0.4 }, { opacity: 1, scale: 1, duration: 0.4, ease: "back.out(1.6)" }, 5.10);
+      tl.to("#ac-loupe", { opacity: 0, scale: 0.6, duration: 0.25, ease: "power2.in" }, 8.70);
+      popd("#ac-lab-vent", 13.00); popd("#ac-lab-amort", 18.10); popd("#ac-lab-talc", 23.40); popd("#ac-lab-glue", 25.80);
+      window.__timelines["stageC"] = tl;
+    })();
+
+  </script>
+</template>

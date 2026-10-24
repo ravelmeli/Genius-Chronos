@@ -1,0 +1,241 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #ab-canvas, #ab-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #ab-leaders { pointer-events: none; }
+    .ab-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .ab-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .ab-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .ab-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .ab-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .ab-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    .ab-sig { position: absolute; padding: 10px 22px; border-radius: 999px; font-weight: 700; font-size: 30px; white-space: nowrap; background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 22px var(--c); }
+  </style>
+  <div id="root" data-composition-id="stageB" data-width="1080" data-height="1920">
+    <canvas id="ab-canvas" width="1080" height="1920"></canvas>
+    <svg id="ab-leaders" viewBox="0 0 1080 1920">
+      <g id="ab-ld-ecu" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#fff" stroke-width="3"></line><circle r="8" fill="#fff"></circle></g>
+      <g id="ab-ld-squib" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#ffc41a" stroke-width="3"></line><circle r="8" fill="#ffc41a"></circle></g>
+      <g id="ab-ld-det" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#fff" stroke-width="3"></line><circle r="8" fill="#fff"></circle></g>
+      <g id="ab-ld-charge" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#9aa6c4" stroke-width="3"></line><circle r="8" fill="#9aa6c4"></circle></g>
+    </svg>
+    <div id="ab-tag-a" class="ab-mono clip" data-start="0.20" data-duration="12.0" style="left: 60px; top: 200px"><span class="ab-dot"></span>LE CALCULATEUR</div>
+    <div id="ab-tag-b" class="ab-mono clip" data-start="12.50" data-duration="8.0" style="left: 60px; top: 200px"><span class="ab-dot"></span>LE DÉTONATEUR</div>
+    <div id="ab-illu" class="ab-mono clip" data-start="0.20" data-duration="20.3" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="ab-lab-ecu" class="ab-chip clip" data-start="0.40" data-duration="11.9">CALCULATEUR</div>
+    <div id="ab-s1" class="ab-sig clip" data-start="5.50" data-duration="1.9" style="--c: #9aa6c4">NID-DE-POULE</div>
+    <div id="ab-s2" class="ab-sig clip" data-start="6.90" data-duration="1.9" style="--c: #9aa6c4">FREINAGE BRUSQUE</div>
+    <div id="ab-s3" class="ab-sig clip" data-start="8.70" data-duration="3.4" style="--c: #ff4a4a">CHOC VIOLENT</div>
+    <div id="ab-no" class="ab-chip clip" data-start="6.30" data-duration="2.6" style="background: #ff4a4a; color: #fff; left: 70px; top: 1010px">NON</div>
+    <div id="ab-yes" class="ab-chip clip" data-start="9.40" data-duration="2.9" style="background: #38d27a; color: #04230f; left: 70px; top: 1010px">OUI : GONFLER !</div>
+    <div id="ab-lab-sig" class="ab-chip ab-neon clip" data-start="12.60" data-duration="2.6" style="--c: #ffc41a">SIGNAL ÉLECTRIQUE</div>
+    <div id="ab-lab-det" class="ab-chip clip" data-start="15.50" data-duration="5.2">DÉTONATEUR</div>
+    <div id="ab-lab-chg" class="ab-chip ab-neon clip" data-start="17.90" data-duration="2.8" style="--c: #9aa6c4">CHARGE SOLIDE</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/airbag.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 27.7, T1 = 48.4;
+      var renderer = HF.makeRenderer($("ab-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 10, 26);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 60);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.5));
+      var key = new THREE.DirectionalLight(0xffd9b0, 1.0);
+      key.position.set(2.5, 4, 3);
+      scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 1.0);
+      rim.position.set(-3, 2.5, -3);
+      scene.add(rim);
+      var hl = new THREE.PointLight(0xff7a1a, 0, 6, 1.5);
+      scene.add(hl);
+      function std(c, o) { o = o || {}; return new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.6, metalness: 0.2 }, o)); }
+
+      // ---------- ECU scene ----------
+      var gE = new THREE.Group();
+      scene.add(gE);
+      var sensor = new THREE.Mesh(HF.roundedBox(0.7, 0.5, 0.18, 0.05, 0.015), std(0x1b2238));
+      sensor.position.set(0, 2.0, 0);
+      gE.add(sensor);
+      var chipS = new THREE.Mesh(new THREE.BoxGeometry(0.28, 0.2, 0.06), std(0xc9ccd8, { metalness: 0.7 }));
+      chipS.position.set(0, 2.0, 0.12);
+      gE.add(chipS);
+      var board = new THREE.Mesh(HF.roundedBox(1.9, 1.3, 0.1, 0.07, 0.02), std(0x143a2e, { roughness: 0.5 }));
+      board.position.set(0, 0.55, 0);
+      gE.add(board);
+      var chipE = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.62, 0.1), std(0x151822, { metalness: 0.6 }));
+      chipE.position.set(0, 0.55, 0.1);
+      gE.add(chipE);
+      for (var i = 0; i < 8; i++) {
+        var pin1 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.02, 0.02), std(0xd0d4de, { metalness: 0.8 })); pin1.position.set(-0.36, 0.34 + i * 0.08, 0.1); gE.add(pin1);
+        var pin2 = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.02, 0.02), std(0xd0d4de, { metalness: 0.8 })); pin2.position.set(0.36, 0.34 + i * 0.08, 0.1); gE.add(pin2);
+      }
+      for (var c = 0; c < 6; c++) { var cap = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.06, 0.06), std(0xd9a05a)); cap.position.set(-0.7 + c * 0.28, 0.08, 0.07); gE.add(cap); }
+      var ledMat = new THREE.MeshBasicMaterial({ color: 0x38d27a, toneMapped: false });
+      var led = new THREE.Mesh(new THREE.SphereGeometry(0.07, 14, 14), ledMat);
+      led.position.set(0.72, 0.98, 0.12);
+      gE.add(led);
+      var ledGlow = HF.makeGlow(0x38d27a, 0.7);
+      ledGlow.position.copy(led.position);
+      gE.add(ledGlow);
+      var infl = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.9, 32), std(0x8a93a8, { metalness: 0.6, roughness: 0.4, emissive: 0xff5a00, emissiveIntensity: 0 }));
+      infl.position.set(0, -1.15, 0);
+      gE.add(infl);
+      var inflCap = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.06, 32), std(0x2b3350, { metalness: 0.6 }));
+      inflCap.position.set(0, -0.7, 0);
+      gE.add(inflCap);
+      function wire(a, b, col) {
+        var c = new THREE.CatmullRomCurve3([a, new THREE.Vector3(a.x, (a.y + b.y) / 2 + 0.01, a.z), b]);
+        var m = new THREE.Mesh(new THREE.TubeGeometry(c, 20, 0.022, 8, false), new THREE.MeshBasicMaterial({ color: col, toneMapped: false }));
+        gE.add(m); return { mesh: m, curve: c };
+      }
+      var w1 = wire(new THREE.Vector3(0, 1.75, 0.06), new THREE.Vector3(0, 0.95, 0.1), 0x4a5578);
+      var w2 = wire(new THREE.Vector3(0, 0.12, 0.06), new THREE.Vector3(0, -0.68, 0.06), 0x4a5578);
+      var blobMat = [new THREE.MeshBasicMaterial({ color: 0xcfd3dc, toneMapped: false }), new THREE.MeshBasicMaterial({ color: 0xcfd3dc, toneMapped: false }), new THREE.MeshBasicMaterial({ color: 0xff4a4a, toneMapped: false })];
+      var blobs = blobMat.map(function (m) { var b = new THREE.Mesh(new THREE.SphereGeometry(0.1, 14, 14), m); gE.add(b); return b; });
+      var blobGlow = HF.makeGlow(0xff4a4a, 0.9);
+      gE.add(blobGlow);
+      var orderBlob = new THREE.Mesh(new THREE.SphereGeometry(0.12, 14, 14), new THREE.MeshBasicMaterial({ color: 0x38d27a, toneMapped: false }));
+      gE.add(orderBlob);
+
+      // ---------- squib scene ----------
+      var gS = new THREE.Group();
+      scene.add(gS);
+      var can = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.62, 1.7, 36, 1, true), new THREE.MeshStandardMaterial({ color: 0x9aa6c4, metalness: 0.6, roughness: 0.3, transparent: true, opacity: 0.22, side: THREE.DoubleSide }));
+      can.position.set(0, -0.1, 0);
+      gS.add(can);
+      var capTop = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.62, 0.08, 36), std(0x2b3350, { metalness: 0.6 }));
+      capTop.position.set(0, 0.79, 0); gS.add(capTop);
+      var capBot = new THREE.Mesh(new THREE.CylinderGeometry(0.62, 0.62, 0.08, 36), std(0x2b3350, { metalness: 0.6 }));
+      capBot.position.set(0, -0.99, 0); gS.add(capBot);
+      var rnd = HF.mulberry32(21);
+      var pel = [];
+      var pelMat = [];
+      for (var k = 0; k < 70; k++) {
+        var mt = std(0x6b7186, { roughness: 0.8, emissive: 0xff5a00, emissiveIntensity: 0 });
+        var pm = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.05, 10), mt);
+        var ang = rnd() * 6.28, rad = Math.sqrt(rnd()) * 0.5, y = -0.9 + rnd() * 1.6;
+        pm.position.set(Math.cos(ang) * rad, y, Math.sin(ang) * rad);
+        pm.rotation.set(rnd() * 3, rnd() * 3, rnd() * 3);
+        pm.userData = { y: y, ph: rnd() };
+        gS.add(pm); pel.push(pm);
+      }
+      var igniter = new THREE.Mesh(new THREE.CylinderGeometry(0.1, 0.12, 0.3, 16), std(0xe8e8f0, { metalness: 0.5 }));
+      igniter.position.set(0, 0.95, 0); gS.add(igniter);
+      var fil = new THREE.Mesh(new THREE.TorusGeometry(0.05, 0.012, 8, 18), new THREE.MeshStandardMaterial({ color: 0x884400, emissive: 0xff6a00, emissiveIntensity: 0 }));
+      fil.position.set(0, 0.8, 0); fil.rotation.x = Math.PI / 2; gS.add(fil);
+      var wireTop = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 1.6, 8), new THREE.MeshBasicMaterial({ color: 0x4a5578, toneMapped: false }));
+      wireTop.position.set(0, 1.9, 0); gS.add(wireTop);
+      var pulse = new THREE.Mesh(new THREE.SphereGeometry(0.1, 14, 14), new THREE.MeshBasicMaterial({ color: 0xffc41a, toneMapped: false }));
+      gS.add(pulse);
+      var glowF = HF.makeGlow(0xff7a1a, 1.6);
+      glowF.position.set(0, 0.8, 0.1); gS.add(glowF);
+      var sparks = HF.makeParticles(80, 3, 0.1);
+      sparks.position.set(0, 0.78, 0); gS.add(sparks);
+      var glowAll = HF.makeGlow(0xff7a1a, 4.0);
+      glowAll.position.set(0, -0.1, 0.3); gS.add(glowAll);
+
+      var $c = function (id) { return $(id); };
+      var labEcu = $("ab-lab-ecu"), s1 = $("ab-s1"), s2 = $("ab-s2"), s3 = $("ab-s3"), labSig = $("ab-lab-sig"), labDet = $("ab-lab-det"), labChg = $("ab-lab-chg");
+      var ldEcu = $("ab-ld-ecu"), ldSq = $("ab-ld-squib"), ldDet = $("ab-ld-det"), ldChg = $("ab-ld-charge");
+      var tmp = new THREE.Vector3();
+      function wp(g, x, y, z) { tmp.set(x, y, z); g.localToWorld(tmp); return HF.project(camera, tmp); }
+      function blobPos(i, t) {
+        // returns y position along the first wire (1.75 -> 0.95) ; i: 0,1 rejected, 2 accepted
+        var arrive = [34.0, 35.4, 37.3][i];
+        var u = HF.clamp(1 - (arrive - t) / 1.0, 0, 1);
+        if (i < 2 && t > arrive) { u = 1 - HF.clamp((t - arrive - 0.25) / 0.7, 0, 1); }
+        return { u: u, vis: (arrive - 1.0 < t) && !(i < 2 && t > arrive + 1.0) };
+      }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        var inE = t < 40.0;
+        gE.visible = inE; gS.visible = !inE;
+        hl.intensity = 0;
+        [ldEcu, ldSq, ldDet, ldChg].forEach(function (g) { g.setAttribute("opacity", "0"); });
+        if (inE) {
+          gE.scale.setScalar(0.94 + 0.06 * easeOut(seg(t, T0, T0 + 0.45)));
+          var lc = 0x38d27a;
+          var rej = (t > 34.0 && t < 34.7) || (t > 35.4 && t < 36.1);
+          var acc = t > 37.3;
+          led.material.color.setHex(rej ? 0xff4a4a : (acc ? 0x38d27a : 0x38d27a));
+          ledGlow.material.color.setHex(rej ? 0xff4a4a : 0x38d27a);
+          ledGlow.material.opacity = rej || acc ? 0.9 : 0.4;
+          for (var i = 0; i < 3; i++) {
+            var bp = blobPos(i, t);
+            blobs[i].visible = bp.vis;
+            blobs[i].position.set(0, lerp(1.75, 0.95, bp.u), 0.1);
+          }
+          blobGlow.position.copy(blobs[2].position); blobGlow.material.opacity = blobs[2].visible ? 0.7 : 0;
+          // order travels down the second wire
+          var ou = HF.clamp((t - 37.9) / 1.2, 0, 1);
+          orderBlob.visible = t > 37.9 && t < 39.2;
+          orderBlob.position.set(0, lerp(0.12, -0.68, ou), 0.08);
+          infl.material.emissiveIntensity = ease(seg(t, 39.2, 39.9)) * 0.5;
+          w2.mesh.material.color.setHex(t > 37.9 ? 0x38d27a : 0x4a5578);
+          camera.position.set(0.2 * Math.sin(t * 0.5), 0.55, 6.6);
+          camera.lookAt(0, 0.45, 0);
+          camera.updateMatrixWorld();
+          var pe = wp(gE, 0.9, 0.7, 0.1);
+          HF.place(labEcu, pe.x + 90, pe.y - 60, false);
+          HF.leader(camera, "ab-ld-ecu", labEcu, tmp.set(0.9, 0.7, 0.1).applyMatrix4(gE.matrixWorld), 28.1, 40.0, t);
+          // signal pills follow the blobs
+          [[s1, 0], [s2, 1], [s3, 2]].forEach(function (pr) {
+            var pb = wp(gE, 0, lerp(1.75, 0.95, blobPos(pr[1], t).u), 0.1);
+            pr[0].style.left = (pb.x + 70).toFixed(1) + "px"; pr[0].style.top = (pb.y - 22).toFixed(1) + "px";
+          });
+        } else {
+          gS.scale.setScalar(0.94 + 0.06 * easeOut(seg(t, 40.0, 40.45)));
+          // electric pulse down the wire
+          var pu = HF.clamp((t - 40.15) / 1.2, 0, 1);
+          pulse.visible = t > 40.15 && t < 41.6;
+          pulse.position.set(0, lerp(2.7, 1.1, pu), 0);
+          var fh = ease(seg(t, 43.2, 45.2));
+          fil.material.emissiveIntensity = fh * 3;
+          glowF.material.opacity = fh * 0.8;
+          var ig = 0;
+          for (var q = 0; q < pel.length; q++) {
+            var p0 = pel[q];
+            var start = 45.6 + (0.9 - p0.userData.y) / 1.7 * 2.0;
+            var e = HF.clamp((t - start) / 0.5, 0, 1);
+            p0.material.emissiveIntensity = e * 2.2;
+            p0.material.color.setRGB(lerp(0.42, 1, e), lerp(0.44, 0.45, e), lerp(0.53, 0.1, e));
+            ig += e;
+          }
+          glowAll.material.opacity = 0.5 * (ig / pel.length);
+          HF.updateParticles(sparks, t, fh > 0.6 ? 1 : 0, 0.8, 0.7);
+          hl.position.set(0.8, 0.2, 2.4); hl.intensity = (ig / pel.length) * 2.2;
+          camera.position.set(0.9, 0.5, 5.4);
+          camera.lookAt(0, 0.35, 0);
+          camera.updateMatrixWorld();
+          var pg = wp(gS, 0.0, 1.9, 0);
+          HF.place(labSig, pg.x + 80, pg.y - 20, false);
+          HF.leader(camera, "ab-ld-squib", labSig, tmp.set(0, 1.9, 0).applyMatrix4(gS.matrixWorld), 40.3, 42.9, t);
+          var pd = wp(gS, 0.12, 0.88, 0);
+          HF.place(labDet, pd.x + 120, pd.y - 70, false);
+          HF.leader(camera, "ab-ld-det", labDet, tmp.set(0.12, 0.88, 0).applyMatrix4(gS.matrixWorld), 43.2, 48.4, t);
+          var pc = wp(gS, -0.45, -0.2, 0.3);
+          HF.place(labChg, pc.x - 70, pc.y + 60, true);
+          HF.leader(camera, "ab-ld-charge", labChg, tmp.set(-0.45, -0.2, 0.3).applyMatrix4(gS.matrixWorld), 45.6, 48.4, t);
+        }
+        renderer.render(scene, camera);
+      }
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: 0.25, ease: "back.out(2)" }, at); };
+      popd("#ab-lab-ecu", 0.40); popd("#ab-s1", 5.50); popd("#ab-s2", 6.90); popd("#ab-s3", 8.70);
+      popd("#ab-no", 6.30); popd("#ab-yes", 9.40);
+      popd("#ab-lab-sig", 12.60); popd("#ab-lab-det", 15.50); popd("#ab-lab-chg", 17.90);
+      window.__timelines["stageB"] = tl;
+    })();
+
+  </script>
+</template>

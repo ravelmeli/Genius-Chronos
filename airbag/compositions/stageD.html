@@ -1,0 +1,129 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #ad-canvas, #ad-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #ad-leaders { pointer-events: none; }
+    .ad-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .ad-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .ad-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .ad-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .ad-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .ad-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #ad-div { position: absolute; left: 0; top: 958px; width: 1080px; height: 4px; background: rgba(255,255,255,0.85); }
+    #ad-grid { position: absolute; left: 90px; top: 780px; width: 900px; height: 320px; }
+    .ad-cell { position: absolute; width: 430px; height: 140px; border-radius: 24px; background: rgba(10,16,32,0.9); border: 3px solid var(--c); box-shadow: 0 0 28px var(--c); color: #fff; }
+    .ad-cell b { position: absolute; left: 28px; top: 28px; width: 84px; height: 84px; border-radius: 50%; background: var(--c); color: #0a0f1c; font-size: 52px; font-weight: 800; text-align: center; line-height: 84px; }
+    .ad-cell span { position: absolute; left: 134px; top: 40px; font-weight: 800; font-size: 44px; }
+    #ad-title { position: absolute; left: 0; width: 1080px; top: 800px; text-align: center; font-size: 84px; font-weight: 800; letter-spacing: -0.02em; line-height: 1.12; color: #ff8a2a; text-shadow: 0 6px 40px rgba(0,0,0,0.7); }
+    #ad-bubble { position: absolute; left: 160px; top: 770px; width: 760px; padding: 36px 40px; border-radius: 40px; background: #1c2b52; border: 4px solid #4aa8ff; box-shadow: 0 0 40px rgba(74,168,255,0.5); color: #fff; font-weight: 800; font-size: 60px; line-height: 1.15; text-align: center; }
+    #ad-bubble::after { content: ""; position: absolute; left: 90px; bottom: -34px; width: 0; height: 0; border-left: 28px solid transparent; border-right: 28px solid transparent; border-top: 36px solid #4aa8ff; }
+    .ad-btn { position: absolute; padding: 20px 40px; border-radius: 999px; font-weight: 800; font-size: 44px; white-space: nowrap; }
+    .ad-q { position: absolute; font-size: 150px; font-weight: 800; color: #ff8a2a; text-shadow: 0 0 40px rgba(255,138,42,0.8); }
+  </style>
+  <div id="root" data-composition-id="stageD" data-width="1080" data-height="1920">
+    <canvas id="ad-canvas" width="1080" height="1920"></canvas>
+    <div id="ad-tag-a" class="ad-mono clip" data-start="0.30" data-duration="6.2" style="left: 60px; top: 200px"><span class="ad-dot"></span>LA CEINTURE</div>
+    <div id="ad-tag-b" class="ad-mono clip" data-start="6.80" data-duration="8.2" style="left: 60px; top: 200px"><span class="ad-dot"></span>EN UN CLIN D'ŒIL</div>
+    <div id="ad-tag-c" class="ad-mono clip" data-start="15.40" data-duration="5.7" style="left: 60px; top: 200px"><span class="ad-dot"></span>ET TOI ?</div>
+    <div id="ad-illu" class="ad-mono clip" data-start="0.30" data-duration="20.6" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="ad-div" class="clip" data-start="0.30" data-duration="6.2"></div>
+    <div id="ad-lab-no" class="ad-chip clip" data-start="0.50" data-duration="6.0" style="background: #ff4a4a; color: #fff; left: 60px; top: 260px">SANS CEINTURE</div>
+    <div id="ad-lab-yes" class="ad-chip clip" data-start="2.60" data-duration="3.9" style="background: #38d27a; color: #04230f; left: 60px; top: 1010px">AVEC CEINTURE</div>
+    <div id="ad-ms" class="clip" data-start="6.70" data-duration="2.4" style="position: absolute; left: 60px; top: 290px; padding: 10px 28px 10px 24px; border-left: 6px solid #ff8a2a; border-radius: 0 18px 18px 0; background: rgba(10,16,32,0.62); color: #fff; font-weight: 800; font-size: 96px; line-height: 1">30 ms</div>
+    <div id="ad-grid" class="clip" data-start="9.10" data-duration="3.9">
+      <div id="ad-c1" class="ad-cell" style="--c: #ffc41a; left: 0px; top: 0px"><b>1</b><span>CAPTEUR</span></div>
+      <div id="ad-c2" class="ad-cell" style="--c: #4de1ff; left: 470px; top: 0px"><b>2</b><span>CALCUL</span></div>
+      <div id="ad-c3" class="ad-cell" style="--c: #ff8a2a; left: 0px; top: 170px"><b>3</b><span>ÉTINCELLE</span></div>
+      <div id="ad-c4" class="ad-cell" style="--c: #4aa8ff; left: 470px; top: 170px"><b>4</b><span>GAZ</span></div>
+    </div>
+    <div id="ad-title" class="clip" data-start="13.00" data-duration="2.2">C'est de la chimie,<br>à toute vitesse.</div>
+    <div id="ad-q1" class="ad-q clip" data-start="15.80" data-duration="5.3" style="left: 110px; top: 420px">?</div>
+    <div id="ad-q2" class="ad-q clip" data-start="16.00" data-duration="5.1" style="left: 850px; top: 560px">?</div>
+    <div id="ad-bubble" class="clip" data-start="15.80" data-duration="5.3">Quel objet veux-tu comprendre ?</div>
+    <div id="ad-b1" class="ad-btn clip" data-start="18.70" data-duration="2.4" style="left: 130px; top: 1060px; background: #fff; color: #0a0f1c">COMMENTE</div>
+    <div id="ad-b2" class="ad-btn clip" data-start="19.60" data-duration="1.5" style="left: 560px; top: 1060px; background: #ff3b3b; color: #fff">ABONNE-TOI</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/airbag.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 77.3, T1 = 98.48;
+      var renderer = HF.makeRenderer($("ad-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 10, 26);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 60);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.5));
+      var key = new THREE.DirectionalLight(0xffd9b0, 1.0); key.position.set(2.5, 4, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 1.0); rim.position.set(-3, 2.5, -3); scene.add(rim);
+      var gI = new THREE.Group(); scene.add(gI);
+      gI.add(HF.makeCabin());
+      var dummy = HF.makeDummy(); gI.add(dummy.group);
+      var belt = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.95, 0.46), new THREE.MeshStandardMaterial({ color: 0x151822, roughness: 0.8 }));
+      belt.position.set(0.12, 0.02, 0); belt.rotation.z = 0.55; dummy.group.add(belt);
+      var wheel = HF.makeWheel(); var hub = new THREE.Vector3(-0.35, 0.28, 0); wheel.position.copy(hub); gI.add(wheel);
+      var bag = HF.makeBag(); gI.add(bag);
+
+      function pose(kind, t) {
+        var e = ease(seg(t, 77.6, 79.4));
+        if (kind === "no") {
+          dummy.group.position.set(-1.0 + 0.75 * e, 0.05 - 0.3 * e, 0);
+          dummy.group.rotation.z = -0.25 - 0.85 * e;
+          belt.visible = false;
+        } else {
+          dummy.group.position.set(-1.0 + 0.12 * e, 0.05 - 0.02 * e, 0);
+          dummy.group.rotation.z = -0.25 - 0.12 * e;
+          belt.visible = true;
+        }
+        HF.setBag(bag, 0.7, hub);
+      }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        if (t < 83.9) {
+          camera.aspect = HF.W / (HF.H / 2); camera.updateProjectionMatrix();
+          camera.position.set(0.7, 0.7, 4.3);
+          camera.lookAt(-0.55, 0.12, 0);
+          renderer.setScissorTest(true);
+          renderer.setViewport(0, HF.H / 2, HF.W, HF.H / 2); renderer.setScissor(0, HF.H / 2, HF.W, HF.H / 2);
+          pose("no", t); renderer.render(scene, camera);
+          renderer.setViewport(0, 0, HF.W, HF.H / 2); renderer.setScissor(0, 0, HF.W, HF.H / 2);
+          pose("yes", t); renderer.render(scene, camera);
+          renderer.setScissorTest(false);
+        } else {
+          camera.aspect = HF.W / HF.H; camera.updateProjectionMatrix();
+          renderer.setViewport(0, 0, HF.W, HF.H);
+          pose("yes", 99);
+          dummy.group.position.set(-1.0 + 0.12, 0.03, 0);
+          belt.visible = true;
+          var fade = 1 - 0.55 * ease(seg(t, 92.4, 93.4));
+          var k = seg(t, 83.9, 98.48);
+          camera.position.set(lerp(0.9, 0.5, k) + Math.sin(t * 0.4) * 0.1, -0.9, lerp(7.4, 6.8, k));
+          camera.lookAt(-0.7, -1.1, 0);
+          hemiFade(fade);
+          renderer.render(scene, camera);
+        }
+      }
+      var hemi = scene.children[0];
+      function hemiFade(f) { hemi.intensity = 0.5 * f; key.intensity = 1.0 * f; }
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, d) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: d || 0.25, ease: "back.out(2)" }, at); };
+      popd("#ad-lab-no", 0.50); popd("#ad-lab-yes", 2.60);
+      tl.fromTo("#ad-ms", { opacity: 0, x: -30 }, { opacity: 1, x: 0, duration: 0.3, ease: "power3.out" }, 6.70);
+      popd("#ad-c1", 9.66); popd("#ad-c2", 10.30); popd("#ad-c3", 11.10); popd("#ad-c4", 12.10);
+      tl.to("#ad-grid", { opacity: 0, duration: 0.25 }, 12.70);
+      tl.fromTo("#ad-title", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 13.04);
+      popd("#ad-q1", 15.80, 0.3); popd("#ad-q2", 16.00, 0.3);
+      tl.fromTo("#ad-bubble", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)", transformOrigin: "20% 100%" }, 15.80);
+      popd("#ad-b1", 18.70, 0.3); popd("#ad-b2", 19.60, 0.3);
+      window.__timelines["stageD"] = tl;
+    })();
+
+  </script>
+</template>
