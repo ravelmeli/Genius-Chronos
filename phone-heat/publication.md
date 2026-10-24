@@ -14,7 +14,32 @@ Le secret de la chaleur de ta batterie
 
 ## ➤ Description de la video : 
 
-Tu branches ton téléphone et, une heure plus tard, il est brûlant. Ce n'est pas un défaut : c'est de la physique. Entre le chargeur qui perd une partie de l'énergie en chaleur, la résistance du câble qui grimpe au carré avec le courant, et les ions lithium qui se frayent un passage dans le graphite de la batterie, la chaleur s'additionne à chaque instant. Cette chaleur use la batterie plus vite, et c'est pour ça que ton téléphone ralentit la charge pour se protéger. Regarde jusqu'au bout pour comprendre ce qui se passe vraiment à l'intérieur. Commente ton avis ! Abonne-toi pour plus d'histoires de science et technologie. 
+Pourquoi ton téléphone chauffe quand tu charges ? Chargeur, câble et batterie lithium : la vraie raison, expliquée en 85 secondes.
+
+Ton smartphone devient brûlant en charge ? Ce n'est pas un défaut, c'est de la physique. Voici les 3 sources de chaleur :
+
+🔌 Le chargeur : il convertit le courant de la prise, et une partie de l'énergie s'échappe en chaleur.
+⚡ Le câble : la résistance électrique fait vibrer les atomes, et la chaleur grimpe au carré avec le courant (doubler le courant = 4 fois plus de chaleur). C'est pour ça que la charge rapide chauffe davantage.
+🔋 La batterie lithium : les ions lithium se frayent un passage entre les couches de graphite, et chaque frottement libère un peu de chaleur.
+
+Conséquence : une batterie qui reste chaude vieillit plus vite et perd de la capacité. C'est aussi pour ça que ton téléphone ralentit la charge pour se protéger.
+
+👉 Et toi, tu charges plutôt en charge rapide ou en charge lente ? Dis-le en commentaire !
+🔔 Abonne-toi pour plus d'histoires de science et technologie.
+
+#batterie #smartphone #sciencetechnologie #shorts
+
+### Version vidéo longue (chapitres, à utiliser seulement si publiée hors Shorts)
+
+0:00 Pourquoi ton téléphone chauffe  
+0:13 Le chargeur  
+0:25 La résistance du câble  
+0:38 La charge rapide  
+0:42 À l'intérieur de la batterie  
+0:55 Le frottement des ions  
+1:05 La carte de chaleur  
+1:12 Le vieillissement  
+1:18 La protection du téléphone  
 
 ## ➤ Tag : 
 
