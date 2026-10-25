@@ -1,0 +1,71 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #sc-canvas, #sc-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #sc-leaders { pointer-events: none; }
+    .sc-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .sc-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .sc-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .sc-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .sc-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .sc-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+  </style>
+  <div id="root" data-composition-id="stageC" data-width="1080" data-height="1920">
+    <canvas id="sc-canvas" width="1080" height="1920"></canvas>
+    <div id="sc-tag-a" class="sc-mono clip" data-start="0.20" data-duration="9.7" style="left: 60px; top: 200px"><span class="sc-dot"></span>LA BONNE CLÉ</div>
+    <div id="sc-illu" class="sc-mono clip" data-start="0.20" data-duration="9.8" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="sc-lab-good" class="sc-chip sc-neon clip" data-start="0.10" data-duration="9.9" style="left: 70px; top: 290px; --c: #38d27a;">BONNE CLÉ</div>
+    <div id="sc-lab-cuts" class="sc-chip  clip" data-start="1.50" data-duration="3.6" style="left: 70px; top: 370px;">CREUX ET BOSSES</div>
+    <div id="sc-lab-high" class="sc-chip  clip" data-start="3.80" data-duration="6.2" style="left: 70px; top: 450px; background: #38d27a; color: #04230f;">BONNE HAUTEUR</div>
+    <div id="sc-lab-aligned" class="sc-chip sc-neon clip" data-start="5.90" data-duration="4.1" style="left: 70px; top: 1010px; --c: #38d6ff;">SÉPARATIONS ALIGNÉES</div>
+    <div id="sc-lab-free" class="sc-chip  clip" data-start="8.40" data-duration="1.6" style="left: 70px; top: 1090px; background: #38d27a; color: #04230f;">BARILLET : LIBRE</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/lock.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 33.8, T1 = 43.9;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+
+      var renderer = HF.makeRenderer($("sc-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.6, 50); fl.position.set(0, 5, 10); scene.add(fl);
+      var lock = HF.makeLock(); scene.add(lock.group);
+      var NP = 5;
+      function pins() { var a = []; for (var i = 0; i < NP; i++) a.push({ s: 0, set: 0, bind: 0 }); return a; }
+      var keys = [{ t: 0, p: [-1.6, 1.9, 16.2], l: [0, -0.75, 0] }];
+
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        var st = { t: t, pin: pins() };
+        st.keyDx = t < 33.9 ? null : lerp(-7.6, 0, ease(seg(t, 34.2, 38.9)));
+        st.shear = 0.55;
+        st.plugAng = ease(seg(t, 42.2, 43.4)) * 1.4;
+        st.hlHouse = 0;
+        HF.updateLock(lock, st);
+        HF.camKeys(camera, keys, t, 0.05);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#sc-lab-good|0.10", "#sc-lab-cuts|1.50", "#sc-lab-high|3.80", "#sc-lab-aligned|5.90", "#sc-lab-free|8.40"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageC"] = tl;
+    })();
+
+  </script>
+</template>

@@ -1,0 +1,126 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #sd-canvas, #sd-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #sd-leaders { pointer-events: none; }
+    .sd-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .sd-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .sd-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .sd-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .sd-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .sd-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #sd-bubble { position: absolute; left: 130px; top: 700px; width: 820px; padding: 36px 40px; border-radius: 40px; background: #1c2b52; border: 4px solid #4aa8ff; box-shadow: 0 0 40px rgba(74,168,255,0.5); color: #fff; font-weight: 800; font-size: 60px; line-height: 1.15; text-align: center; }
+    #sd-bubble::after { content: ""; position: absolute; left: 90px; bottom: -34px; width: 0; height: 0; border-left: 28px solid transparent; border-right: 28px solid transparent; border-top: 36px solid #4aa8ff; }
+    .sd-btn { position: absolute; padding: 20px 40px; border-radius: 999px; font-weight: 800; font-size: 40px; white-space: nowrap; }
+    .sd-big { position: absolute; left: 0; width: 1080px; text-align: center; color: #fff; font-weight: 800; letter-spacing: -0.02em; text-shadow: 0 6px 40px rgba(0,0,0,0.7); }
+
+    #sd-dim { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: rgba(7,11,22,0.55); }
+    .sd-q { position: absolute; font-size: 150px; font-weight: 800; color: #ffc41a; text-shadow: 0 0 40px rgba(255,196,26,0.8); }
+  </style>
+  <div id="root" data-composition-id="stageD" data-width="1080" data-height="1920">
+    <canvas id="sd-canvas" width="1080" height="1920"></canvas>
+    <div id="sd-tag-a" class="sd-mono clip" data-start="0.10" data-duration="8.4" style="left: 60px; top: 200px"><span class="sd-dot"></span>LE CROCHETAGE</div>
+    <div id="sd-tag-b" class="sd-mono clip" data-start="12.90" data-duration="15.6" style="left: 60px; top: 200px"><span class="sd-dot"></span>LE CROCHET</div>
+    <div id="sd-tag-c" class="sd-mono clip" data-start="28.80" data-duration="4.1" style="left: 60px; top: 200px"><span class="sd-dot"></span>LE RÉSUMÉ</div>
+    <div id="sd-tag-d" class="sd-mono clip" data-start="33.10" data-duration="5.1" style="left: 60px; top: 200px"><span class="sd-dot"></span>ET TOI ?</div>
+    <div id="sd-illu" class="sd-mono clip" data-start="0.10" data-duration="38.1" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="sd-lab-how" class="sd-chip  clip" data-start="1.20" data-duration="1.9" style="left: 70px; top: 290px;">CROCHETAGE : GOUPILLE PAR GOUPILLE</div>
+    <div id="sd-lab-tens" class="sd-chip sd-neon clip" data-start="3.40" data-duration="5.1" style="left: 70px; top: 290px; --c: #38d6ff;">LA TENSION</div>
+    <div id="sd-lab-flat" class="sd-chip  clip" data-start="4.60" data-duration="3.9" style="left: 70px; top: 370px;">PETITE CLÉ PLATE</div>
+    <div id="sd-lab-lite" class="sd-chip  clip" data-start="6.20" data-duration="2.3" style="left: 70px; top: 450px; background: #38d6ff; color: #03242c;">LÉGÈRE FORCE DE ROTATION</div>
+    <div id="sd-lab-defect" class="sd-chip  clip" data-start="8.90" data-duration="3.1" style="left: 70px; top: 290px; background: #ffc41a; color: #1a1400;">DÉFAUTS DE FABRICATION</div>
+    <div id="sd-lab-jam" class="sd-chip  clip" data-start="10.50" data-duration="2.6" style="left: 70px; top: 370px; background: #ff8a2a; color: #1a0c00;">UNE GOUPILLE SE COINCE</div>
+    <div id="sd-lab-pick" class="sd-chip sd-neon clip" data-start="13.70" data-duration="14.7" style="left: 70px; top: 290px; --c: #cfd6e6;">CROCHET</div>
+    <div id="sd-lab-lift" class="sd-chip  clip" data-start="14.60" data-duration="3.5" style="left: 70px; top: 370px;">SOULÈVE LA GOUPILLE</div>
+    <div id="sd-lab-sep" class="sd-chip sd-neon clip" data-start="16.10" data-duration="2.1" style="left: 70px; top: 450px; --c: #38d6ff;">SÉPARATION = LIGNE</div>
+    <div id="sd-lab-turn" class="sd-chip  clip" data-start="18.60" data-duration="3.4" style="left: 70px; top: 370px; background: #38d6ff; color: #03242c;">BARILLET : TOURNE UN PEU</div>
+    <div id="sd-lab-hooked" class="sd-chip  clip" data-start="21.10" data-duration="7.3" style="left: 70px; top: 450px; background: #38d27a; color: #04230f;">GOUPILLE : ACCROCHÉE</div>
+    <div id="sd-lab-again" class="sd-chip  clip" data-start="22.30" data-duration="2.8" style="left: 70px; top: 1010px;">ON RECOMMENCE</div>
+    <div id="sd-lab-all" class="sd-chip  clip" data-start="25.10" data-duration="2.3" style="left: 70px; top: 1010px; background: #38d27a; color: #04230f;">TOUTES EN PLACE</div>
+    <div id="sd-lab-open" class="sd-chip  clip" data-start="27.50" data-duration="1.0" style="left: 70px; top: 1010px; background: #38d27a; color: #04230f;">SERRURE : OUVERTE</div>
+    <div id="sd-lab-turns" class="sd-chip  clip" data-start="26.40" data-duration="2.1" style="left: 70px; top: 1090px; background: #38d27a; color: #04230f;">BARILLET : TOURNE</div>
+    <div id="sd-lab-t2" class="sd-chip sd-neon clip" data-start="28.90" data-duration="4.0" style="left: 70px; top: 290px; --c: #38d6ff;">TENSION LÉGÈRE</div>
+    <div id="sd-lab-one" class="sd-chip  clip" data-start="30.50" data-duration="2.4" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">GOUPILLES : UNE À UNE</div>
+    <div id="sd-big" class="sd-big clip" data-start="32.00" data-duration="1.1" style="top: 500px; font-size: 96px">Voilà le secret.</div>
+    <div id="sd-dim" class="clip" data-start="33.00" data-duration="5.3"></div>
+    <div id="sd-q1" class="sd-q clip" data-start="33.90" data-duration="4.4" style="left: 100px; top: 470px">?</div>
+    <div id="sd-q2" class="sd-q clip" data-start="34.10" data-duration="4.2" style="left: 850px; top: 580px">?</div>
+    <div id="sd-bubble" class="clip" data-start="33.10" data-duration="5.2" style="top: 720px">Déjà crocheté<br>une serrure ?</div>
+    <div id="sd-b1" class="sd-btn clip" data-start="35.70" data-duration="2.6" style="left: 90px; top: 1040px; background: #fff; color: #0a0f1c">COMMENTE</div>
+    <div id="sd-b2" class="sd-btn clip" data-start="36.40" data-duration="1.9" style="left: 540px; top: 1040px; background: #ff3b3b; color: #fff">ABONNE-TOI</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/lock.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 43.9, T1 = 82.2;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+
+      var renderer = HF.makeRenderer($("sd-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.6, 50); fl.position.set(0, 5, 10); scene.add(fl);
+      var lock = HF.makeLock(); scene.add(lock.group);
+      var NP = 5;
+      function pins() { var a = []; for (var i = 0; i < NP; i++) a.push({ s: 0, set: 0, bind: 0 }); return a; }
+      var keys = [{ t: 0, p: [-1.6, 1.9, 16.2], l: [0, -0.75, 0] }];
+
+      // pick sequence: pin index, reach start, lift start, lift end, plug rotate start/end, set start/end, retract end
+      var ORDER = [
+        { i: 2, a: 57.6, l0: 58.4, l1: 61.4, r0: 62.4, r1: 63.9, s0: 64.8, s1: 65.4, e: 66.0, ang: 0.06 },
+        { i: 0, a: 65.9, l0: 66.3, l1: 66.9, r0: 66.9, r1: 67.2, s0: 67.2, s1: 67.5, e: 67.6, ang: 0.12 },
+        { i: 3, a: 67.4, l0: 67.6, l1: 68.0, r0: 68.0, r1: 68.2, s0: 68.1, s1: 68.4, e: 68.5, ang: 0.18 },
+        { i: 1, a: 68.3, l0: 68.5, l1: 68.8, r0: 68.8, r1: 68.95, s0: 68.9, s1: 69.15, e: 69.25, ang: 0.24 },
+        { i: 4, a: 69.1, l0: 69.2, l1: 69.45, r0: 69.45, r1: 69.6, s0: 69.5, s1: 69.7, e: 69.8, ang: 0.3 }
+      ];
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        var st = { t: t, pin: pins() };
+        st.wrenchOn = t > 47.4 && t < 76.9; st.arrowOn = Math.max(w(t, 49.0, 52.4), w(t, 62.2, 72.0) * 0.8);
+        var ang = ease(seg(t, 50.1, 51.4)) * 0.02;
+        var pickX = -2.0, pickY = -1.1, pickOn = false, jam = ease(seg(t, 54.4, 55.2));
+        ORDER.forEach(function (o) {
+          var q = st.pin[o.i], r = HF.LOCK.r[o.i];
+          q.s = r * ease(seg(t, o.l0, o.l1)) * (1 - ease(seg(t, o.s0, o.s1)));
+          if (t >= o.s0) q.s = r * ease(seg(t, o.l0, o.l1)) * (1 - ease(seg(t, o.s0, o.s1)));
+          q.set = ease(seg(t, o.s0, o.s1));
+          ang += (o.ang - (o === ORDER[0] ? 0 : ORDER[ORDER.indexOf(o) - 1].ang)) * ease(seg(t, o.r0, o.r1));
+          if (t >= o.a - 0.6 && t < o.e + 0.4) { pickOn = true; pickX = HF.LOCK.xs[o.i]; pickY = -0.93 + q.s * 0.99 - 0.0 - 0.14 * (1 - ease(seg(t, o.a, o.l0))) - 0.14 * ease(seg(t, o.s1, o.e)); }
+        });
+        // pick slides in under the first pin
+        if (t >= 57.0 && t < 57.6) pickX = lerp(-4.2, HF.LOCK.xs[2], ease(seg(t, 57.0, 57.6)));
+        st.pickOn = pickOn || (t >= 57.0 && t < 57.6); st.pickX = pickX; st.pickY = pickY;
+        st.pin[2].bind = (1 - ease(seg(t, 64.8, 65.3))) * ease(seg(t, 54.4, 55.0)) * (t < 65.3 ? 1 : 0);
+        var allSet = ease(seg(t, 69.8, 70.3));
+        st.plugAng = ang + ease(seg(t, 70.3, 71.8)) * 1.4;
+        st.shear = 0.4;
+        HF.updateLock(lock, st);
+        HF.camKeys(camera, keys, t, 0.05);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#sd-lab-how|1.20", "#sd-lab-tens|3.40", "#sd-lab-flat|4.60", "#sd-lab-lite|6.20", "#sd-lab-defect|8.90", "#sd-lab-jam|10.50", "#sd-lab-pick|13.70", "#sd-lab-lift|14.60", "#sd-lab-sep|16.10", "#sd-lab-turn|18.60", "#sd-lab-hooked|21.10", "#sd-lab-again|22.30", "#sd-lab-all|25.10", "#sd-lab-open|27.50", "#sd-lab-turns|26.40", "#sd-lab-t2|28.90", "#sd-lab-one|30.50", "#sd-q1|33.90", "#sd-q2|34.10", "#sd-b1|35.70", "#sd-b2|36.40"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      tl.fromTo("#sd-big", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 32.00);
+      tl.fromTo("#sd-dim", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 33.00);
+      tl.fromTo("#sd-bubble", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 33.10);
+      window.__timelines["stageD"] = tl;
+    })();
+
+  </script>
+</template>

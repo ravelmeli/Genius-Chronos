@@ -1,0 +1,81 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #sb-canvas, #sb-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #sb-leaders { pointer-events: none; }
+    .sb-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .sb-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .sb-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .sb-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .sb-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .sb-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+  </style>
+  <div id="root" data-composition-id="stageB" data-width="1080" data-height="1920">
+    <canvas id="sb-canvas" width="1080" height="1920"></canvas>
+    <div id="sb-tag-a" class="sb-mono clip" data-start="0.20" data-duration="14.0" style="left: 60px; top: 200px"><span class="sb-dot"></span>LA SERRURE</div>
+    <div id="sb-tag-b" class="sb-mono clip" data-start="14.60" data-duration="9.0" style="left: 60px; top: 200px"><span class="sb-dot"></span>LA LIGNE</div>
+    <div id="sb-illu" class="sb-mono clip" data-start="0.20" data-duration="23.5" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="sb-lab-lock" class="sb-chip sb-neon clip" data-start="0.60" data-duration="3.3" style="left: 70px; top: 290px; --c: #4aa8ff;">SERRURE À GOUPILLES</div>
+    <div id="sb-lab-plug" class="sb-chip sb-neon clip" data-start="3.20" data-duration="6.2" style="left: 70px; top: 370px; --c: #ff8a2a;">BARILLET</div>
+    <div id="sb-lab-house" class="sb-chip sb-neon clip" data-start="4.70" data-duration="4.7" style="left: 70px; top: 450px; --c: #4aa8ff;">BLOC FIXE</div>
+    <div id="sb-lab-cols" class="sb-chip  clip" data-start="7.30" data-duration="2.6" style="left: 70px; top: 290px; background: #cfd6e6; color: #0a1020;">COLONNES DE MÉTAL</div>
+    <div id="sb-lab-two" class="sb-chip  clip" data-start="10.00" data-duration="4.3" style="left: 70px; top: 1090px;">DEUX GOUPILLES / COLONNE</div>
+    <div id="sb-lab-top" class="sb-chip  clip" data-start="11.60" data-duration="2.7" style="left: 70px; top: 290px; background: #ffc41a; color: #1a1400;">GOUPILLE DU HAUT</div>
+    <div id="sb-lab-bot" class="sb-chip  clip" data-start="12.30" data-duration="2.0" style="left: 70px; top: 370px; background: #cfd6e6; color: #0a1020;">GOUPILLE DU BAS</div>
+    <div id="sb-lab-spr" class="sb-chip sb-neon clip" data-start="13.10" data-duration="1.7" style="left: 70px; top: 450px; --c: #b26bff;">RESSORT</div>
+    <div id="sb-lab-ride" class="sb-chip  clip" data-start="17.00" data-duration="2.8" style="left: 70px; top: 1010px; background: #ffc41a; color: #1a1400;">GOUPILLES : À CHEVAL</div>
+    <div id="sb-lab-shear" class="sb-chip sb-neon clip" data-start="20.00" data-duration="3.7" style="left: 70px; top: 1010px; --c: #38d6ff;">LIGNE DE CISAILLEMENT</div>
+    <div id="sb-lab-blk" class="sb-chip  clip" data-start="22.20" data-duration="1.5" style="left: 70px; top: 1090px; background: #ff4a4a; color: #fff;">BARILLET : BLOQUÉ</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/lock.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 10.0, T1 = 33.8;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+
+      var renderer = HF.makeRenderer($("sb-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.6, 50); fl.position.set(0, 5, 10); scene.add(fl);
+      var lock = HF.makeLock(); scene.add(lock.group);
+      var NP = 5;
+      function pins() { var a = []; for (var i = 0; i < NP; i++) a.push({ s: 0, set: 0, bind: 0 }); return a; }
+      var keys = [{ t: 0, p: [-1.6, 1.9, 16.2], l: [0, -0.75, 0] }];
+
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        var st = { t: t, pin: pins() };
+        st.hlPlug = Math.max(w(t, 12.0, 14.2), w(t, 28.6, 29.0));
+        st.hlHouse = w(t, 14.0, 15.8);
+        var cols = w(t, 17.0, 19.8);
+        st.hlDrv = Math.max(cols * 0.5, w(t, 21.4, 22.4), w(t, 26.9, 29.8) * 0.8);
+        st.hlKey = Math.max(cols * 0.5, w(t, 22.2, 23.1));
+        st.hlSpring = Math.max(cols * 0.5, w(t, 23.0, 24.8));
+        st.shear = ease(seg(t, 29.9, 30.5));
+        HF.updateLock(lock, st);
+        HF.camKeys(camera, keys, t, 0.05);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#sb-lab-lock|0.60", "#sb-lab-plug|3.20", "#sb-lab-house|4.70", "#sb-lab-cols|7.30", "#sb-lab-two|10.00", "#sb-lab-top|11.60", "#sb-lab-bot|12.30", "#sb-lab-spr|13.10", "#sb-lab-ride|17.00", "#sb-lab-shear|20.00", "#sb-lab-blk|22.20"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageB"] = tl;
+    })();
+
+  </script>
+</template>
