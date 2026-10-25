@@ -1,0 +1,93 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #ic-canvas, #ic-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #ic-leaders { pointer-events: none; }
+    .ic-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .ic-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .ic-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .ic-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .ic-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .ic-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #ic-card { position: absolute; left: 90px; top: 300px; width: 900px; height: 230px; border-radius: 28px; background: rgba(10,16,32,0.82); border: 3px solid rgba(255,255,255,0.22); box-shadow: 0 10px 40px rgba(0,0,0,0.5); overflow: hidden; }
+    #ic-card canvas { position: absolute; left: 0; top: 0; }
+    #ic-card .ttl { position: absolute; left: 28px; top: 14px; font-family: "Space Mono", monospace; font-size: 26px; letter-spacing: 0.12em; color: rgba(255,255,255,0.85); }
+    .ic-q { position: absolute; font-size: 150px; font-weight: 800; color: #ffc41a; text-shadow: 0 0 40px rgba(255,196,26,0.8); }
+  </style>
+  <div id="root" data-composition-id="stageC" data-width="1080" data-height="1920">
+    <canvas id="ic-canvas" width="1080" height="1920"></canvas>
+    <div id="ic-tag-a" class="ic-mono clip" data-start="0.20" data-duration="10.0" style="left: 60px; top: 200px"><span class="ic-dot"></span>LA CASSEROLE</div>
+    <div id="ic-tag-b" class="ic-mono clip" data-start="10.30" data-duration="11.2" style="left: 60px; top: 200px"><span class="ic-dot"></span>LA CHALEUR</div>
+    <div id="ic-illu" class="ic-mono clip" data-start="0.20" data-duration="21.5" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="ic-lab-metal" class="ic-chip ic-neon clip" data-start="1.20" data-duration="3.3" style="left: 70px; top: 290px; --c: #cfd3dc;">CASSEROLE EN MÉTAL</div>
+    <div id="ic-lab-thru" class="ic-chip ic-neon clip" data-start="2.90" data-duration="7.2" style="left: 70px; top: 370px; --c: #b26bff;">LE CHAMP TRAVERSE LE FOND</div>
+    <div id="ic-lab-cur" class="ic-chip ic-neon clip" data-start="6.50" data-duration="15.0" style="left: 70px; top: 290px; --c: #ffa23a;">COURANTS ÉLECTRIQUES</div>
+    <div id="ic-lab-foucault" class="ic-chip  clip" data-start="8.70" data-duration="12.8" style="left: 70px; top: 450px; background: #ffc41a; color: #1a1400;">COURANTS DE FOUCAULT</div>
+    <div id="ic-lab-circle" class="ic-chip  clip" data-start="11.00" data-duration="1.7" style="left: 70px; top: 1010px;">ILS TOURNENT EN CERCLE</div>
+    <div id="ic-lab-res" class="ic-chip  clip" data-start="13.50" data-duration="4.5" style="left: 70px; top: 1010px;">LE MÉTAL RÉSISTE</div>
+    <div id="ic-lab-heat" class="ic-chip  clip" data-start="15.10" data-duration="6.4" style="left: 70px; top: 1090px; background: #ff8a2a; color: #1a0c00;">RÉSISTANCE = CHALEUR</div>
+    <div id="ic-lab-inpan" class="ic-chip  clip" data-start="18.90" data-duration="2.6" style="left: 70px; top: 1010px; background: #ff8a2a; color: #1a0c00;">CHALEUR : DANS LA CASSEROLE</div>
+    <div id="ic-lab-notplate" class="ic-chip  clip" data-start="20.70" data-duration="0.8" style="left: 70px; top: 1090px; background: #4aa8ff; color: #04152a;">PAS DANS LA PLAQUE</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/induction.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 32.5, T1 = 54.2;
+
+      var renderer = HF.makeRenderer($("ic-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var hob = HF.makeHob(); scene.add(hob.group);
+      var pan = HF.makePan(); scene.add(pan.group); pan.group.position.y = 0.06;
+      var field = HF.makeField(1.0); scene.add(field.group);
+      var eddy = HF.makeEddy(); eddy.group.position.y = 0.12; scene.add(eddy.group);
+      var fl = new THREE.PointLight(0xffffff, 0.5, 40); fl.position.set(0, 6, 6); scene.add(fl);
+      var heatGlow = HF.makeGlow(0xff7a1a, 2.6); heatGlow.position.set(0, 0.15, 0); scene.add(heatGlow);
+      function panHeat(h) { pan.baseMat.emissiveIntensity = 1.6 * h; heatGlow.material.opacity = 0.55 * h; }
+
+      var keys = [{ t: 0, p: [3.6, 3.3, 5.4], l: [0, -0.1, 0] }, { t: 37.0, p: [2.9, 2.6, 4.2], l: [0, 0.1, 0] }];
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        hob.glassMat.opacity = 0.26;
+        var drop = ease(seg(t, 32.8, 33.7));
+        pan.group.position.y = 0.06 + 1.6 * (1 - drop);
+        pan.group.visible = t >= 32.8;
+        pan.wallMat.opacity = lerp(1, 0.3, ease(seg(t, 36.0, 37.0)));
+        pan.water.visible = false; pan.bubbles.visible = false;
+        var fv = 0.75 + 0.25 * ease(seg(t, 35.0, 35.6));
+        field.group.visible = true; HF.updateField(field, t, fv);
+        var ev = ease(seg(t, 38.8, 39.8));
+        eddy.group.visible = ev > 0; eddy.group.position.y = pan.group.position.y + 0.06; HF.updateEddy(eddy, t, ev);
+        HF.updateCoil(hob, t, 0.9);
+        var h = ease(seg(t, 47.4, 50.6));
+        panHeat(h);
+        var cool = ease(seg(t, 52.8, 53.6));
+        hob.glassMat.emissiveIntensity = 0.35 * cool;
+        HF.updateParticles(pan.steam, t, 0, 1, 1); 
+        HF.camKeys(camera, keys, t, 0.05);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#ic-lab-metal|1.20", "#ic-lab-thru|2.90", "#ic-lab-cur|6.50", "#ic-lab-foucault|8.70", "#ic-lab-circle|11.00", "#ic-lab-res|13.50", "#ic-lab-heat|15.10", "#ic-lab-inpan|18.90", "#ic-lab-notplate|20.70"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageC"] = tl;
+    })();
+
+  </script>
+</template>

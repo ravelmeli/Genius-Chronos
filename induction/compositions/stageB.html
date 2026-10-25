@@ -1,0 +1,109 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #ib-canvas, #ib-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #ib-leaders { pointer-events: none; }
+    .ib-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .ib-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .ib-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .ib-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .ib-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .ib-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #ib-card { position: absolute; left: 90px; top: 300px; width: 900px; height: 230px; border-radius: 28px; background: rgba(10,16,32,0.82); border: 3px solid rgba(255,255,255,0.22); box-shadow: 0 10px 40px rgba(0,0,0,0.5); overflow: hidden; }
+    #ib-card canvas { position: absolute; left: 0; top: 0; }
+    #ib-card .ttl { position: absolute; left: 28px; top: 14px; font-family: "Space Mono", monospace; font-size: 26px; letter-spacing: 0.12em; color: rgba(255,255,255,0.85); }
+    .ib-q { position: absolute; font-size: 150px; font-weight: 800; color: #ffc41a; text-shadow: 0 0 40px rgba(255,196,26,0.8); }
+  </style>
+  <div id="root" data-composition-id="stageB" data-width="1080" data-height="1920">
+    <canvas id="ib-canvas" width="1080" height="1920"></canvas>
+    <svg id="ib-leaders" viewBox="0 0 1080 1920">
+      <g id="ib-ld-coil" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#ffa23a" stroke-width="3"></line><circle r="8" fill="#ffa23a"></circle></g>
+      <g id="ib-ld-field" opacity="0"><line x1="0" y1="0" x2="0" y2="0" stroke="#b26bff" stroke-width="3"></line><circle r="8" fill="#b26bff"></circle></g>
+    </svg>
+    <div id="ib-tag-a" class="ib-mono clip" data-start="0.20" data-duration="5.0" style="left: 60px; top: 200px"><span class="ib-dot"></span>SOUS LA VITRE</div>
+    <div id="ib-tag-b" class="ib-mono clip" data-start="5.40" data-duration="4.0" style="left: 60px; top: 200px"><span class="ib-dot"></span>LE COURANT</div>
+    <div id="ib-tag-c" class="ib-mono clip" data-start="9.60" data-duration="9.7" style="left: 60px; top: 200px"><span class="ib-dot"></span>LE CHAMP</div>
+    <div id="ib-illu" class="ib-mono clip" data-start="0.20" data-duration="19.0" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="ib-card" class="clip" data-start="5.20" data-duration="4.3"><canvas id="ib-cc" width="900" height="230"></canvas><div class="ttl">COURANT ALTERNATIF · ILLUSTRATIF</div></div>
+    <div id="ib-lab-glass" class="ib-chip  clip" data-start="0.40" data-duration="4.6" style="left: 70px; top: 290px;">VITRE</div>
+    <div id="ib-lab-coil" class="ib-chip ib-neon clip" data-start="1.30" data-duration="8.1" style="left: 70px; top: 580px; --c: #ffa23a;">BOBINE DE CUIVRE</div>
+    <div id="ib-lab-spiral" class="ib-chip  clip" data-start="2.90" data-duration="2.1" style="left: 70px; top: 660px;">FIL ENROULÉ EN SPIRALE</div>
+    <div id="ib-lab-cur" class="ib-chip ib-neon clip" data-start="6.80" data-duration="2.6" style="left: 70px; top: 1010px; --c: #ffc41a;">COURANT : CHANGE DE SENS</div>
+    <div id="ib-lab-mag" class="ib-chip ib-neon clip" data-start="10.50" data-duration="8.9" style="left: 70px; top: 290px; --c: #b26bff;">CHAMP MAGNÉTIQUE</div>
+    <div id="ib-lab-rev" class="ib-chip  clip" data-start="11.50" data-duration="7.9" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">IL CHANGE DE SENS AUSSI</div>
+    <div id="ib-lab-thou" class="ib-chip  clip" data-start="12.60" data-duration="6.8" style="left: 70px; top: 1010px; background: #ffc41a; color: #1a1400;">DES MILLIERS DE FOIS / SECONDE</div>
+    <div id="ib-lab-nowarm" class="ib-chip  clip" data-start="16.70" data-duration="2.7" style="left: 70px; top: 1090px; background: #4aa8ff; color: #04152a;">VERRE : RIEN NE CHAUFFE</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/induction.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 13.0, T1 = 32.5;
+
+      var renderer = HF.makeRenderer($("ib-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var hob = HF.makeHob(); scene.add(hob.group);
+      var pan = HF.makePan(); scene.add(pan.group); pan.group.position.y = 0.06;
+      var field = HF.makeField(1.0); scene.add(field.group);
+      var eddy = HF.makeEddy(); eddy.group.position.y = 0.12; scene.add(eddy.group);
+      var fl = new THREE.PointLight(0xffffff, 0.5, 40); fl.position.set(0, 6, 6); scene.add(fl);
+      var heatGlow = HF.makeGlow(0xff7a1a, 2.6); heatGlow.position.set(0, 0.15, 0); scene.add(heatGlow);
+      function panHeat(h) { pan.baseMat.emissiveIntensity = 1.6 * h; heatGlow.material.opacity = 0.55 * h; }
+
+      pan.group.visible = false; heatGlow.visible = false;
+      var keys = [{ t: 0, p: [3.6, 3.2, 5.6], l: [0, -0.2, 0] }];
+      var labC = $("ib-lab-coil"), cctx = $("ib-cc").getContext("2d");
+      function card(t) {
+        var c = cctx; c.clearRect(0, 0, 900, 230);
+        c.strokeStyle = "rgba(255,255,255,0.15)"; c.lineWidth = 2; c.beginPath(); c.moveTo(24, 140); c.lineTo(876, 140); c.stroke();
+        c.strokeStyle = "#ffc41a"; c.lineWidth = 6; c.shadowColor = "#ffc41a"; c.shadowBlur = 14; c.beginPath();
+        for (var x = 0; x <= 852; x += 4) { var y = 140 - 62 * Math.sin((t - 3.0 * (1 - x / 852)) * 6.0); if (x === 0) c.moveTo(24, y); else c.lineTo(24 + x, y); }
+        c.stroke(); c.shadowBlur = 0;
+        c.fillStyle = "#fff"; c.beginPath(); c.arc(876, 140 - 62 * Math.sin(t * 6.0), 9, 0, 6.2832); c.fill();
+      }
+      var spiral = hob.coil.curve, nb = 44, beads = HF.makeBeads(nb, 0xffe08a, 0.14); hob.group.add(beads); beads.position.y = -0.16;
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        hob.glassMat.opacity = lerp(0.97, 0.26, ease(seg(t, 13.0, 14.2)));
+        var cur = ease(seg(t, 17.3, 18.4));
+        HF.updateCoil(hob, t, 0.9 * cur);
+        var arr = beads.geometry.attributes.position.array, ph = 0.18 * Math.sin(t * 6.0);
+        for (var i = 0; i < nb; i++) {
+          var u = (((i / nb) + ph) % 1 + 1) % 1, v = spiral.getPointAt(u);
+          arr[i * 3] = v.x; arr[i * 3 + 1] = v.y; arr[i * 3 + 2] = v.z;
+        }
+        beads.geometry.attributes.position.needsUpdate = true; beads.material.opacity = 0.95 * cur;
+        var fv = ease(seg(t, 22.5, 23.5));
+        field.group.visible = fv > 0; eddy.group.visible = false;
+        HF.updateField(field, t, fv);
+        HF.camKeys(camera, keys, t, 0.05);
+        HF.leader(camera, "ib-ld-coil", labC, new THREE.Vector3(0.9, -0.16, 0.5), 14.3, 22.3, t);
+        HF.setLeader($("ib-ld-field"), 0, 0, 0, 0, 0);
+        card(t);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#ib-lab-glass|0.40", "#ib-lab-coil|1.30", "#ib-lab-spiral|2.90", "#ib-lab-cur|6.80", "#ib-lab-mag|10.50", "#ib-lab-rev|11.50", "#ib-lab-thou|12.60", "#ib-lab-nowarm|16.70"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      tl.fromTo("#ib-card", { opacity: 0, y: -20 }, { opacity: 1, y: 0, duration: 0.4, ease: "power3.out" }, 5.20);
+      window.__timelines["stageB"] = tl;
+    })();
+
+  </script>
+</template>
