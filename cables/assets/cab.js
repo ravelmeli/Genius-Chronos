@@ -61,3 +61,56 @@
     g.userData.mat = m; return g;
   };
 })();
+(function () {
+  var HF = window.HF, std = HF.std;
+  HF.makeSeabed = function () {
+    var g = new THREE.Group(), o = { group: g, cables: [] };
+    var geo = new THREE.PlaneGeometry(11, 15, 22, 30); geo.rotateX(-Math.PI / 2);
+    var rnd = HF.mulberry32(7), pa = geo.attributes.position;
+    for (var i = 0; i < pa.count; i++) pa.setY(i, (rnd() - 0.5) * 0.14);
+    geo.computeVertexNormals();
+    var floor = new THREE.Mesh(geo, std(0x06232f, { flatShading: true, roughness: 0.95 })); floor.position.y = -0.05; g.add(floor);
+    [6.0, -6.0].forEach(function (z) { var l = new THREE.Mesh(new THREE.BoxGeometry(11, 0.5, 3.2), std(0x1c3558, { roughness: 0.9, flatShading: true })); l.position.set(0, 0.1, z); g.add(l); });
+    var cols = [0x38d6ff, 0xffc41a, 0xb26bff, 0x38d27a];
+    for (var c = 0; c < 4; c++) {
+      var pts = [], x0 = -2.0 + 1.35 * c;
+      for (var k = 0; k <= 30; k++) { var z = -4.5 + (9.0 * k) / 30; pts.push(new THREE.Vector3(x0 + 0.3 * Math.sin(z * 0.8 + c * 1.3), 0.05, z)); }
+      var curve = new THREE.CatmullRomCurve3(pts);
+      var mat = new THREE.MeshStandardMaterial({ color: cols[c], emissive: cols[c], emissiveIntensity: 0.35, roughness: 0.5 });
+      var tube = new THREE.Mesh(new THREE.TubeGeometry(curve, 90, 0.055, 8), mat); g.add(tube);
+      o.cables.push({ curve: curve, pts: curve.getPoints(90), tube: tube, mat: mat, color: cols[c] });
+    }
+    var sm = std(0xd0d6e6, { metalness: 0.5, roughness: 0.4 });
+    o.stTop = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.4, 0.6), sm); o.stTop.position.set(o.cables[1].pts[90].x, 0.5, 5.0); g.add(o.stTop);
+    o.stBot = new THREE.Mesh(new THREE.BoxGeometry(0.8, 0.4, 0.6), sm); o.stBot.position.set(o.cables[1].pts[0].x, 0.5, -5.0); g.add(o.stBot);
+    return o;
+  };
+  HF.makeShip = function (color) {
+    var g = new THREE.Group();
+    var hull = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.22, 1.7), std(color || 0xe0443a, { roughness: 0.5 })); hull.position.y = 0.12; g.add(hull);
+    var bow = new THREE.Mesh(new THREE.ConeGeometry(0.35, 0.5, 4), std(color || 0xe0443a, { roughness: 0.5 })); bow.rotation.x = Math.PI / 2; bow.rotation.z = Math.PI / 4; bow.position.set(0, 0.12, 1.1); g.add(bow);
+    var cab = new THREE.Mesh(new THREE.BoxGeometry(0.42, 0.34, 0.45), std(0xeef1f8)); cab.position.set(0, 0.4, -0.45); g.add(cab);
+    var cr = new THREE.Mesh(new THREE.BoxGeometry(0.06, 0.06, 0.7), std(0xffc41a)); cr.position.set(0, 0.62, 0.3); g.add(cr);
+    return g;
+  };
+  HF.makeRepeater = function () {
+    var g = new THREE.Group(), mat = std(0x9aa3b8, { metalness: 0.8, roughness: 0.35, emissive: 0x38d27a, emissiveIntensity: 0 });
+    var b = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.8, 24), mat); b.rotation.z = Math.PI / 2; g.add(b);
+    var r1 = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 0.08, 24), std(0x5a6278, { metalness: 0.7 })); r1.rotation.z = Math.PI / 2; r1.position.x = -0.3; g.add(r1);
+    var r2 = r1.clone(); r2.position.x = 0.3; g.add(r2);
+    var glow = HF.makeGlow(0x38d27a, 1.8); g.add(glow);
+    return { group: g, mat: mat, glow: glow };
+  };
+  HF.digitSprite = function (ch, color) {
+    var c = document.createElement("canvas"); c.width = c.height = 64;
+    var g = c.getContext("2d"); g.fillStyle = color || "#38d27a"; g.font = "700 52px 'Space Mono', monospace"; g.textAlign = "center"; g.textBaseline = "middle"; g.fillText(ch, 32, 34);
+    var t = new THREE.CanvasTexture(c);
+    var s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, transparent: true, opacity: 0, depthTest: false })); s.scale.set(0.4, 0.4, 1); return s;
+  };
+  HF.makeRing = function (rOut, rIn, depth, color, o) {
+    var sh = new THREE.Shape(); sh.absarc(0, 0, rOut, 0, 6.2832, false);
+    var hole = new THREE.Path(); hole.absarc(0, 0, rIn, 0, 6.2832, true); sh.holes.push(hole);
+    var m = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: depth, bevelEnabled: false, curveSegments: 40 }), std(color, Object.assign({ roughness: 0.55 }, o || {})));
+    m.position.z = -depth / 2; var g = new THREE.Group(); g.add(m); return g;
+  };
+})();

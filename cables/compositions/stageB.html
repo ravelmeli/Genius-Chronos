@@ -1,0 +1,78 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #mb-canvas, #mb-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #mb-leaders { pointer-events: none; }
+    .mb-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .mb-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .mb-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .mb-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .mb-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .mb-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+  </style>
+  <div id="root" data-composition-id="stageB" data-width="1080" data-height="1920">
+    <canvas id="mb-canvas" width="1080" height="1920"></canvas>
+    <div id="mb-tag-a" class="mb-mono clip" data-start="0.20" data-duration="11.5" style="left: 60px; top: 200px"><span class="mb-dot"></span>LES CÂBLES</div>
+    <div id="mb-illu" class="mb-mono clip" data-start="0.20" data-duration="11.6" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="mb-lab-cab" class="mb-chip mb-neon clip" data-start="1.20" data-duration="10.6" style="left: 70px; top: 290px; --c: #38d6ff;">CÂBLES SOUS-MARINS</div>
+    <div id="mb-lab-link" class="mb-chip  clip" data-start="2.20" data-duration="1.2" style="left: 70px; top: 370px;">ILS RELIENT LES CONTINENTS</div>
+    <div id="mb-lab-most" class="mb-chip  clip" data-start="3.50" data-duration="8.3" style="left: 70px; top: 370px; background: #38d27a; color: #04230f;">GRANDE MAJORITÉ DU TRAFIC</div>
+    <div id="mb-lab-noel" class="mb-chip  clip" data-start="7.60" data-duration="2.3" style="left: 70px; top: 1010px; background: #ff4a4a; color: #fff;">PAS D'ÉLECTRICITÉ POUR TON MESSAGE</div>
+    <div id="mb-lab-light" class="mb-chip mb-neon clip" data-start="10.00" data-duration="1.8" style="left: 70px; top: 1010px; --c: #ffc41a;">DE LA LUMIÈRE</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 11.7, T1 = 23.6;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+
+      var renderer = HF.makeRenderer($("mb-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.3, 50); fl.position.set(2, 8, 4); scene.add(fl);
+
+      var sea = HF.makeSeabed(); scene.add(sea.group);
+      var cBeads = sea.cables.map(function (c) { var b = HF.makeBeads(14, c.color, 0.14); scene.add(b); return b; });
+      var seaKeys = [{ t: 0, p: [0, 13.6, -7.6], l: [0, 0, 0.5] }];
+      function seaBeads(t, vis, speed, broken) {
+        sea.cables.forEach(function (c, i) {
+          HF.setBeadsOn(cBeads[i], c.pts, t, speed * (i % 2 ? 1 : 0.8), i * 0.21, 1);
+          cBeads[i].material.opacity = 0.95 * vis * (i === 2 ? (1 - 0.8 * broken) : 1);
+        });
+      }
+
+      var xcross = HF.makeCross(0xff3a3a); xcross.scale.setScalar(2.4); xcross.position.set(0, 0.5, 0.5); xcross.rotation.x = -Math.PI / 2; scene.add(xcross);
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        sea.cables.forEach(function (c, i) { c.mat.emissiveIntensity = 0.1 + 0.6 * ease(seg(t, 13.1 + 0.25 * i, 13.9 + 0.25 * i)); });
+        var vis = ease(seg(t, 13.6, 14.4));
+        seaBeads(t, vis, 0.35, 0);
+        var lightOn = ease(seg(t, 21.7, 22.4));
+        cBeads.forEach(function (b) { b.material.color.setHex(lightOn > 0.5 ? 0xffffff : 0x9fe8ff); b.material.size = 0.14 + 0.1 * lightOn; });
+        xcross.visible = t >= 19.3 && t < 21.7; xcross.userData.mat.opacity = ease(seg(t, 19.3, 19.7)) * (1 - ease(seg(t, 21.3, 21.7)));
+        HF.camKeys(camera, seaKeys, t, 0.05);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#mb-lab-cab|1.20", "#mb-lab-link|2.20", "#mb-lab-most|3.50", "#mb-lab-noel|7.60", "#mb-lab-light|10.00"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageB"] = tl;
+    })();
+
+  </script>
+</template>

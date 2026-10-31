@@ -13,12 +13,12 @@
   <div id="root" data-composition-id="stageA" data-width="1080" data-height="1920">
     <canvas id="ma-canvas" width="1080" height="1920"></canvas>
     <div id="ma-tag-a" class="ma-mono clip" data-start="0.3" data-duration="11.0" style="left: 60px; top: 200px"><span class="ma-dot"></span>UN MESSAGE</div>
-    <div id="ma-illu" class="ma-mono clip" data-start="0.3" data-duration="11.1" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
-    <div id="ma-lab-msg" class="ma-chip ma-neon clip" data-start="0.6" data-duration="10.8" style="left: 70px; top: 290px; --c: #ffffff;">TON MESSAGE</div>
-    <div id="ma-lab-fast" class="ma-chip  clip" data-start="4.5" data-duration="6.9" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">UNE FRACTION DE SECONDE</div>
-    <div id="ma-lab-sat" class="ma-chip ma-neon clip" data-start="6.4" data-duration="2.2" style="left: 70px; top: 1010px; --c: #ffc41a;">UN SATELLITE ?</div>
-    <div id="ma-lab-almost" class="ma-chip  clip" data-start="9.0" data-duration="2.4" style="left: 70px; top: 1010px; background: #fff; color: #0a1020;">PRESQUE TOUJOURS</div>
-    <div id="ma-lab-sea" class="ma-chip ma-neon clip" data-start="9.9" data-duration="1.5" style="left: 70px; top: 1090px; --c: #4aa8ff;">PAR LE FOND DE LA MER</div>
+    <div id="ma-illu" class="ma-mono clip" data-start="0.3" data-duration="11.2" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="ma-lab-msg" class="ma-chip ma-neon clip" data-start="0.6" data-duration="11.0" style="left: 70px; top: 290px; --c: #ffffff;">TON MESSAGE</div>
+    <div id="ma-lab-fast" class="ma-chip  clip" data-start="4.0" data-duration="7.6" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">UNE FRACTION DE SECONDE</div>
+    <div id="ma-lab-sat" class="ma-chip ma-neon clip" data-start="6.0" data-duration="2.2" style="left: 70px; top: 1010px; --c: #ffc41a;">UN SATELLITE ?</div>
+    <div id="ma-lab-almost" class="ma-chip  clip" data-start="8.8" data-duration="2.8" style="left: 70px; top: 1010px; background: #fff; color: #0a1020;">PRESQUE TOUJOURS</div>
+    <div id="ma-lab-sea" class="ma-chip ma-neon clip" data-start="9.8" data-duration="1.8" style="left: 70px; top: 1090px; --c: #4aa8ff;">PAR LE FOND DE LA MER</div>
   </div>
   <script src="assets/vendor/three.min.js"></script>
   <script src="assets/common.js"></script>
@@ -29,7 +29,7 @@
 
     (function () {
       var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
-      var T0 = 0, T1 = 11.5;
+      var T0 = 0, T1 = 11.7;
       function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
 
       var renderer = HF.makeRenderer($("ma-canvas"));
@@ -64,15 +64,15 @@
         if (t > T1 + 0.05) return;
         globe.rotation.y = 0.63 - 0.04 * Math.min(t, 11) / 11 * 0 + 0.0;
         globe.rotation.x = 0.0;
-        var viaSat = t >= 5.9 && t < 8.3, seaOn = ease(seg(t, 8.5, 9.4));
-        bDirect.visible = t < 5.9; bUp.visible = viaSat; bDown.visible = viaSat;
-        HF.setBeadsOn(bDirect, direct, t, 0.8, 0, 1); bDirect.material.opacity = 0.95 * (t < 5.9 ? ease(seg(t, 0.4, 0.9)) : 0);
-        arcLine.material.opacity = 0.35 * (t < 5.9 ? ease(seg(t, 0.4, 0.9)) : 0);
+        var viaSat = t >= 5.5 && t < 7.8, seaOn = ease(seg(t, 8.2, 9.2));
+        bDirect.visible = t < 5.5; bUp.visible = viaSat; bDown.visible = viaSat;
+        HF.setBeadsOn(bDirect, direct, t, 0.8, 0, 1); bDirect.material.opacity = 0.95 * (t < 5.5 ? ease(seg(t, 0.4, 0.9)) : 0);
+        arcLine.material.opacity = 0.35 * (t < 5.5 ? ease(seg(t, 0.4, 0.9)) : 0);
         HF.setBeadsOn(bUp, up, t, 0.6, 0, 1); HF.setBeadsOn(bDown, down, t, 0.6, 0.0, 1);
         bUp.material.opacity = 0.95 * (viaSat ? 1 : 0); bDown.material.opacity = 0.95 * (viaSat ? 1 : 0);
-        sat.visible = t >= 5.9 && t < 9.2; sat.scale.setScalar(ease(seg(t, 6.1, 6.6)) * (1 - ease(seg(t, 8.8, 9.2))) + 0.001);
+        sat.visible = t >= 5.5 && t < 8.9; sat.scale.setScalar(ease(seg(t, 5.7, 6.2)) * (1 - ease(seg(t, 8.5, 8.9))) + 0.001);
         sat.rotation.y = t * 0.8;
-        cross.visible = t >= 7.4 && t < 9.2; cross.lookAt(camera.position); cross.userData.mat.opacity = ease(seg(t, 7.4, 7.7)) * (1 - ease(seg(t, 8.8, 9.2)));
+        cross.visible = t >= 7.0 && t < 8.9; cross.lookAt(camera.position); cross.userData.mat.opacity = ease(seg(t, 7.0, 7.3)) * (1 - ease(seg(t, 8.5, 8.9)));
         seaLine.material.opacity = 0.9 * seaOn; HF.setBeadsOn(bSea, seaPts, t, 0.5, 0, 1); bSea.material.opacity = 0.95 * seaOn;
         halo.material.opacity = 0.28;
         HF.camKeys(camera, keys, t, 0.04);
@@ -83,7 +83,7 @@
       renderAt(T0);
       var tl = gsap.timeline({ paused: true });
       var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
-      ["#ma-lab-msg|0.6", "#ma-lab-fast|4.5", "#ma-lab-sat|6.4", "#ma-lab-almost|9.0", "#ma-lab-sea|9.9"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      ["#ma-lab-msg|0.6", "#ma-lab-fast|4.0", "#ma-lab-sat|6.0", "#ma-lab-almost|8.8", "#ma-lab-sea|9.8"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
       window.__timelines["stageA"] = tl;
     })();
 

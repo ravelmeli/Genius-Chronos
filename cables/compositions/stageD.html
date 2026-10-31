@@ -1,0 +1,168 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #md-canvas, #md-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #md-leaders { pointer-events: none; }
+    .md-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .md-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .md-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .md-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .md-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .md-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+    .md-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageD" data-width="1080" data-height="1920">
+    <canvas id="md-canvas" width="1080" height="1920"></canvas>
+    <div id="md-tag-a" class="md-mono clip" data-start="0.10" data-duration="5.3" style="left: 60px; top: 200px"><span class="md-dot"></span>LES RÉPÉTEURS</div>
+    <div id="md-tag-b" class="md-mono clip" data-start="5.80" data-duration="6.2" style="left: 60px; top: 200px"><span class="md-dot"></span>LES COUCHES</div>
+    <div id="md-tag-c" class="md-mono clip" data-start="12.20" data-duration="3.4" style="left: 60px; top: 200px"><span class="md-dot"></span>LES RISQUES</div>
+    <div id="md-tag-d" class="md-mono clip" data-start="15.80" data-duration="4.3" style="left: 60px; top: 200px"><span class="md-dot"></span>LA RÉPARATION</div>
+    <div id="md-tag-e" class="md-mono clip" data-start="20.20" data-duration="2.9" style="left: 60px; top: 200px"><span class="md-dot"></span>LA SOLUTION</div>
+    <div id="md-illu" class="md-mono clip" data-start="0.10" data-duration="23.0" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="md-lab-copper" class="md-chip md-neon clip" data-start="0.40" data-duration="5.1" style="left: 70px; top: 290px; --c: #ff8a2a;">FIL DE CUIVRE</div>
+    <div id="md-lab-feeds" class="md-chip  clip" data-start="1.40" data-duration="4.1" style="left: 70px; top: 370px;">ALIMENTE LES RÉPÉTEURS</div>
+    <div id="md-lab-shore" class="md-chip  clip" data-start="3.40" data-duration="2.1" style="left: 70px; top: 450px; background: #ffc41a; color: #1a1400;">COURANT : DEPUIS LA TERRE</div>
+    <div id="md-lab-layers" class="md-chip md-neon clip" data-start="6.20" data-duration="5.8" style="left: 70px; top: 290px; --c: #cfd6e6;">PLUSIEURS COUCHES</div>
+    <div id="md-lab-plast" class="md-chip  clip" data-start="7.60" data-duration="4.4" style="left: 70px; top: 370px;">PLASTIQUE</div>
+    <div id="md-lab-metal" class="md-chip  clip" data-start="8.90" data-duration="3.1" style="left: 70px; top: 450px; background: #ff8a2a; color: #1a0c00;">MÉTAL</div>
+    <div id="md-lab-steel" class="md-chip  clip" data-start="9.90" data-duration="2.1" style="left: 70px; top: 1010px; background: #cfd6e6; color: #0a1020;">ACIER</div>
+    <div id="md-lab-coast" class="md-chip md-neon clip" data-start="11.10" data-duration="0.9" style="left: 70px; top: 1090px; --c: #ffc41a;">SURTOUT PRÈS DES CÔTES</div>
+    <div id="md-lab-anchor" class="md-chip  clip" data-start="12.60" data-duration="3.0" style="left: 70px; top: 290px; background: #ff4a4a; color: #fff;">ANCRES DE BATEAUX</div>
+    <div id="md-lab-net" class="md-chip  clip" data-start="13.90" data-duration="1.7" style="left: 70px; top: 370px; background: #ff4a4a; color: #fff;">FILETS DE PÊCHE</div>
+    <div id="md-lab-broken" class="md-chip  clip" data-start="15.80" data-duration="4.3" style="left: 70px; top: 290px; background: #ff4a4a; color: #fff;">CÂBLE CASSÉ</div>
+    <div id="md-lab-ship" class="md-chip md-neon clip" data-start="17.00" data-duration="3.1" style="left: 70px; top: 370px; --c: #38d6ff;">NAVIRE SPÉCIALISÉ</div>
+    <div id="md-lab-fix" class="md-chip  clip" data-start="18.70" data-duration="1.4" style="left: 70px; top: 450px; background: #38d27a; color: #04230f;">IL LE RÉPARE</div>
+    <div id="md-lab-other" class="md-chip  clip" data-start="20.50" data-duration="2.6" style="left: 70px; top: 290px; background: #38d27a; color: #04230f;">INTERNET PASSE PAR D'AUTRES CÂBLES</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 46.8, T1 = 70.0;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+
+      var renderer = HF.makeRenderer($("md-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.3, 50); fl.position.set(2, 8, 4); scene.add(fl);
+
+      var fib = new THREE.Group(); scene.add(fib);
+      function rotX(m) { m.rotation.z = Math.PI / 2; return m; }
+      var sheath = rotX(new THREE.Mesh(new THREE.CylinderGeometry(0.75, 0.75, 9, 32, 1, true), HF.std(0x2a3a5a, { transparent: true, opacity: 0.25, side: THREE.DoubleSide, depthWrite: false }))); fib.add(sheath);
+      var coreG = new THREE.Group(); fib.add(coreG);
+      var core = rotX(new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.14, 9, 16), HF.std(0xbfeaff, { transparent: true, opacity: 0.9, emissive: 0x38d6ff, emissiveIntensity: 0.9, roughness: 0.1 }))); coreG.add(core);
+      var copper = rotX(new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 9, 28, 1, true), HF.std(0xff8a2a, { transparent: true, opacity: 0, side: THREE.DoubleSide, metalness: 0.8, emissive: 0xff5a00, emissiveIntensity: 0.3, depthWrite: false }))); fib.add(copper);
+      var hair = rotX(new THREE.Mesh(new THREE.CylinderGeometry(0.4, 0.4, 5, 14), HF.std(0x24120a, { roughness: 0.9, transparent: true, opacity: 0, emissive: 0x1a0c06, emissiveIntensity: 0.6 }))); hair.position.set(0, 1.15, 0); fib.add(hair);
+      var pulses = []; for (var pi = 0; pi < 12; pi++) { var pm = new THREE.Mesh(new THREE.SphereGeometry(0.1, 12, 10), new THREE.MeshBasicMaterial({ color: 0xffe08a, transparent: true, opacity: 0 })); coreG.add(pm); pulses.push(pm); }
+      var BITS = [1, 1, 0, 1, 0, 0, 1, 1, 1, 0, 1, 0];
+      var digits = []; for (var di = 0; di < 12; di++) { var ds = HF.digitSprite(di % 3 ? "1" : "0", di % 2 ? "#38d27a" : "#9fe8ff"); fib.add(ds); digits.push(ds); }
+      var station = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.9, 0.9), HF.std(0xd0d6e6, { metalness: 0.5, roughness: 0.4, emissive: 0xffc41a, emissiveIntensity: 0 })); station.position.set(-3.75, 0, 0); fib.add(station);
+      var reps = [-0.8, 1.7].map(function (x) { var r = HF.makeRepeater(); r.group.position.x = x; r.group.scale.setScalar(0.001); fib.add(r.group); return r; });
+      var pbeads = HF.makeBeads(18, 0xffc41a, 0.16); fib.add(pbeads);
+      function pulseUpdate(t, on, bounce, attn, scaleK) {
+        pulses.forEach(function (m, i) {
+          var x = ((i * 0.6 + t * 1.5) % 7.0) - 3.5;
+          m.position.set(x, bounce * 0.9 * (Math.abs(((x * 2.2) % 2) - 1) - 0.5) , 0);
+          m.material.opacity = (BITS[i] ? 1 : 0) * on * attn(x); m.scale.set(coreG.scale.y, 1, 1);
+        });
+      }
+
+      var sea = HF.makeSeabed(); scene.add(sea.group);
+      var cBeads = sea.cables.map(function (c) { var b = HF.makeBeads(14, c.color, 0.14); scene.add(b); return b; });
+      var seaKeys = [{ t: 0, p: [0, 13.6, -7.6], l: [0, 0, 0.5] }];
+      function seaBeads(t, vis, speed, broken) {
+        sea.cables.forEach(function (c, i) {
+          HF.setBeadsOn(cBeads[i], c.pts, t, speed * (i % 2 ? 1 : 0.8), i * 0.21, 1);
+          cBeads[i].material.opacity = 0.95 * vis * (i === 2 ? (1 - 0.8 * broken) : 1);
+        });
+      }
+
+      // layers (cross-section) set
+      var lay = new THREE.Group(); scene.add(lay);
+      var L_fib = new THREE.Group(); lay.add(L_fib);
+      [[0, 0.07], [0.14, -0.08], [-0.14, -0.08]].forEach(function (q) { var f = new THREE.Mesh(new THREE.CylinderGeometry(0.075, 0.075, 0.6, 16), new THREE.MeshBasicMaterial({ color: 0x9fe8ff })); f.rotation.x = Math.PI / 2; f.position.set(q[0], q[1], 0); L_fib.add(f); });
+      var L_in = HF.makeRing(0.52, 0.22, 0.5, 0xe8eaf2); lay.add(L_in);
+      var L_met = HF.makeRing(0.74, 0.54, 0.5, 0xd98a4a, { metalness: 0.8, roughness: 0.35 }); lay.add(L_met);
+      var L_steel = new THREE.Group(); lay.add(L_steel);
+      for (var si = 0; si < 22; si++) { var a = (si / 22) * 6.2832, sw = new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 0.5, 10), HF.std(0xc9cfdd, { metalness: 0.9, roughness: 0.3 })); sw.rotation.x = Math.PI / 2; sw.position.set(0.88 * Math.cos(a), 0.88 * Math.sin(a), 0); L_steel.add(sw); }
+      var L_out = HF.makeRing(1.2, 0.97, 0.5, 0x2a2f3a); lay.add(L_out);
+      // sea set extras: ships, anchor, break glow
+      var ship1 = HF.makeShip(0x7a8aa8), ship2 = HF.makeShip(0xe0443a); scene.add(ship1); scene.add(ship2);
+      var anchorLine = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.05, 1.0), HF.std(0xcfd6e6)); scene.add(anchorLine);
+      var anchor = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.1, 0.1), HF.std(0x8a93a8, { metalness: 0.8 })); scene.add(anchor);
+      var brk = HF.makeGlow(0xff3a2a, 1.8); scene.add(brk);
+      var kF = [{ t: 0, p: [0, 1.6, 17.0], l: [0.1, 0, 0] }];
+      var kSea = [{ t: 0, p: [0, 13.6, -7.6], l: [0, 0, 0.5] }];
+      var C2 = sea.cables[2].pts, brkIdx = 48;
+      function attn(x) { var segs = [-3.6, -0.8, 1.7, 3.6], f = 1; for (var q = 0; q < 3; q++) if (x >= segs[q] && x < segs[q + 1]) f = 1 - 0.8 * (x - segs[q]) / (segs[q + 1] - segs[q]); return Math.max(0.35, f); }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        var sF = t < 52.4, sL = t >= 52.4 && t < 58.9, sS = t >= 58.9;
+        fib.visible = sF; lay.visible = sL; sea.group.visible = sS; cBeads.forEach(function (b) { b.visible = sS; });
+        ship1.visible = sS; ship2.visible = sS; anchorLine.visible = sS; anchor.visible = sS; brk.visible = sS;
+        if (sF) {
+          coreG.scale.set(1, 2.0, 2.0); hair.material.opacity = 0; digits.forEach(function (d) { d.material.opacity = 0; });
+          pulseUpdate(t, 1, 0.25, attn);
+          reps.forEach(function (r, i) { r.group.scale.setScalar(0.7); r.mat.emissiveIntensity = 0.1; r.glow.material.opacity = 0.1; });
+          copper.material.opacity = 0.5 * ease(seg(t, 47.3, 48.0));
+          station.visible = true; station.material.emissiveIntensity = 0.6 * ease(seg(t, 50.0, 50.8)) * (0.7 + 0.3 * Math.sin(t * 7));
+          var pv = ease(seg(t, 50.3, 50.9)), arr = pbeads.geometry.attributes.position.array;
+          for (var i = 0; i < 18; i++) { var u = ((i / 18) + t * 0.35) % 1; arr[i * 3] = -3.3 + u * 6.8; arr[i * 3 + 1] = 0; arr[i * 3 + 2] = 0.4; }
+          pbeads.geometry.attributes.position.needsUpdate = true; pbeads.material.opacity = 0.95 * pv;
+          reps.forEach(function (r, i) { var g = ease(seg(t, 51.0 + 0.5 * i, 51.6 + 0.5 * i)); r.mat.emissiveIntensity = 0.1 + 0.7 * g; r.glow.material.opacity = 0.1 + 0.4 * g; });
+          HF.camKeys(camera, kF, t, 0.05);
+        } else if (sL) {
+          var u0 = t - 52.4;
+          lay.rotation.y = -0.3 + 0.06 * u0; lay.rotation.x = 0.2;
+          L_fib.scale.setScalar(0.001 + ease(seg(t, 52.7, 53.3)));
+          var pp = ease(seg(t, 54.4, 55.2)), pm = ease(seg(t, 55.7, 56.4)), ps = ease(seg(t, 56.7, 57.4));
+          L_in.scale.setScalar(0.001 + pp); L_met.scale.setScalar(0.001 + pm); L_steel.scale.setScalar(0.001 + ps); L_out.scale.setScalar(0.001 + ease(seg(t, 57.9, 58.6)));
+          lay.scale.setScalar(1.35);
+          camera.position.set(0, 0.6, 9.5); camera.lookAt(0, -0.3, 0); camera.updateMatrixWorld();
+        } else {
+          sea.cables.forEach(function (c, i) { c.mat.emissiveIntensity = 0.7; c.mat.color.setHex(c.color); c.mat.emissive.setHex(c.color); });
+          // anchoring ship drags an anchor across cable 2
+          var a0 = ease(seg(t, 59.2, 61.6));
+          ship1.position.set(2.6 - 0.5 * a0, 0.1, lerp(5.2, 0.2, a0)); ship1.rotation.y = Math.PI;
+          var bp = C2[brkIdx];
+          anchor.position.set(bp.x + 1.4 - 1.4 * a0, 0.08, ship1.position.z - 1.0); anchorLine.position.set((ship1.position.x + anchor.position.x) / 2, 0.1, ship1.position.z - 0.6);
+          anchorLine.rotation.y = 0;
+          var hit = ease(seg(t, 61.5, 61.9));
+          var broken = ease(seg(t, 62.6, 63.0)) * (1 - ease(seg(t, 66.0, 66.9)));
+          var fixed = ease(seg(t, 65.6, 66.4));
+          brk.position.set(bp.x, 0.3, bp.z); brk.material.color.setHex(fixed > 0.5 ? 0x38d27a : 0xff3a2a);
+          brk.material.opacity = 0.9 * Math.max(hit * (1 - ease(seg(t, 62.0, 62.4))) + broken, 0) * (0.7 + 0.3 * Math.sin(t * 12)) * (t < 66.9 ? 1 : 0);
+          var rc = sea.cables[2]; rc.mat.color.setHex(broken > 0.5 && fixed < 0.5 ? 0xff3a2a : rc.color); rc.mat.emissive.setHex(broken > 0.5 && fixed < 0.5 ? 0xff3a2a : rc.color);
+          var r0 = ease(seg(t, 63.8, 65.4));
+          ship2.position.set(bp.x - 2.8 + 2.2 * r0, 0.1, bp.z + 1.0 - 0.0); ship2.rotation.y = -Math.PI / 2;
+          ship2.visible = t >= 63.6 && t < 68.0;
+          var outAnchor = ease(seg(t, 61.8, 62.6));
+          ship1.position.x += 3.0 * outAnchor; anchor.visible = t < 62.6; anchorLine.visible = t < 62.6;
+          var vis = 1, brokenBeads = (t >= 62.6 && t < 66.4) ? 1 : 0;
+          seaBeads(t, vis, 0.35, brokenBeads);
+          HF.camKeys(camera, kSea, t, 0.05);
+        }
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#md-lab-copper|0.40", "#md-lab-feeds|1.40", "#md-lab-shore|3.40", "#md-lab-layers|6.20", "#md-lab-plast|7.60", "#md-lab-metal|8.90", "#md-lab-steel|9.90", "#md-lab-coast|11.10", "#md-lab-anchor|12.60", "#md-lab-net|13.90", "#md-lab-broken|15.80", "#md-lab-ship|17.00", "#md-lab-fix|18.70", "#md-lab-other|20.50"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageD"] = tl;
+    })();
+
+  </script>
+</template>
