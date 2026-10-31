@@ -1,0 +1,91 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #ma-canvas, #ma-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #ma-leaders { pointer-events: none; }
+    .ma-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .ma-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .ma-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .ma-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .ma-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .ma-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+  </style>
+  <div id="root" data-composition-id="stageA" data-width="1080" data-height="1920">
+    <canvas id="ma-canvas" width="1080" height="1920"></canvas>
+    <div id="ma-tag-a" class="ma-mono clip" data-start="0.3" data-duration="11.0" style="left: 60px; top: 200px"><span class="ma-dot"></span>UN MESSAGE</div>
+    <div id="ma-illu" class="ma-mono clip" data-start="0.3" data-duration="11.1" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="ma-lab-msg" class="ma-chip ma-neon clip" data-start="0.6" data-duration="10.8" style="left: 70px; top: 290px; --c: #ffffff;">TON MESSAGE</div>
+    <div id="ma-lab-fast" class="ma-chip  clip" data-start="4.5" data-duration="6.9" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">UNE FRACTION DE SECONDE</div>
+    <div id="ma-lab-sat" class="ma-chip ma-neon clip" data-start="6.4" data-duration="2.2" style="left: 70px; top: 1010px; --c: #ffc41a;">UN SATELLITE ?</div>
+    <div id="ma-lab-almost" class="ma-chip  clip" data-start="9.0" data-duration="2.4" style="left: 70px; top: 1010px; background: #fff; color: #0a1020;">PRESQUE TOUJOURS</div>
+    <div id="ma-lab-sea" class="ma-chip ma-neon clip" data-start="9.9" data-duration="1.5" style="left: 70px; top: 1090px; --c: #4aa8ff;">PAR LE FOND DE LA MER</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 0, T1 = 11.5;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+
+      var renderer = HF.makeRenderer($("ma-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 40); fl.position.set(3, 4, 8); scene.add(fl);
+      var globe = new THREE.Group(); scene.add(globe);
+      var earth = new THREE.Mesh(new THREE.SphereGeometry(1.1, 48, 32), new THREE.MeshStandardMaterial({ map: HF.earthTexture(), roughness: 0.8, metalness: 0.1 })); globe.add(earth);
+      var halo = HF.makeGlow(0x4aa8ff, 3.2); halo.material.opacity = 0.35; scene.add(halo);
+      var NY = HF.llToVec(40.7, -74, 1.1), PA = HF.llToVec(48.8, 2.3, 1.1);
+      var pNY = HF.makePhone2(0xffc41a), pPA = HF.makePhone2(0x38d27a);
+      [[pNY, NY], [pPA, PA]].forEach(function (x) { x[0].position.copy(x[1].clone().multiplyScalar(1.05)); x[0].lookAt(x[1].clone().multiplyScalar(3)); globe.add(x[0]); });
+      var SAT_POS = NY.clone().add(PA).normalize().multiplyScalar(1.85);
+      var sat = HF.makeSatellite(); sat.position.copy(SAT_POS); globe.add(sat);
+      var cross = HF.makeCross(); cross.position.copy(SAT_POS.clone().multiplyScalar(1.12)); globe.add(cross);
+      var direct = HF.arcPts(NY, PA, 1.1, 0.3, 60), leg1 = HF.arcPts(NY, SAT_POS, 1.1, 0.0, 40), leg2 = HF.arcPts(SAT_POS, PA, 1.1, 0.0, 40);
+      function straight(a, b, n) { var p = []; for (var i = 0; i <= n; i++) p.push(a.clone().lerp(b, i / n)); return p; }
+      var up = straight(NY.clone().multiplyScalar(1.05), SAT_POS, 30), down = straight(SAT_POS, PA.clone().multiplyScalar(1.05), 30);
+      var seaPts = HF.arcPts(NY, PA, 1.1, 0.02, 80);
+      var seaLine = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(seaPts), 80, 0.018, 6), new THREE.MeshBasicMaterial({ color: 0x38d6ff, transparent: true, opacity: 0 })); globe.add(seaLine);
+      var bDirect = HF.makeBeads(10, 0xffffff, 0.14), bUp = HF.makeBeads(8, 0xffc41a, 0.14), bDown = HF.makeBeads(8, 0xffc41a, 0.14), bSea = HF.makeBeads(16, 0x9fe8ff, 0.14);
+      [bDirect, bUp, bDown, bSea].forEach(function (b) { globe.add(b); });
+      var arcLine = new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(direct), 60, 0.008, 6), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 })); globe.add(arcLine);
+      var keys = [{ t: 0, p: [0.0, 0.5, 9.4], l: [0, -0.42, 0] }];
+      function renderAt(t) {
+        if (t > T1 + 0.05) return;
+        globe.rotation.y = 0.63 - 0.04 * Math.min(t, 11) / 11 * 0 + 0.0;
+        globe.rotation.x = 0.0;
+        var viaSat = t >= 5.9 && t < 8.3, seaOn = ease(seg(t, 8.5, 9.4));
+        bDirect.visible = t < 5.9; bUp.visible = viaSat; bDown.visible = viaSat;
+        HF.setBeadsOn(bDirect, direct, t, 0.8, 0, 1); bDirect.material.opacity = 0.95 * (t < 5.9 ? ease(seg(t, 0.4, 0.9)) : 0);
+        arcLine.material.opacity = 0.35 * (t < 5.9 ? ease(seg(t, 0.4, 0.9)) : 0);
+        HF.setBeadsOn(bUp, up, t, 0.6, 0, 1); HF.setBeadsOn(bDown, down, t, 0.6, 0.0, 1);
+        bUp.material.opacity = 0.95 * (viaSat ? 1 : 0); bDown.material.opacity = 0.95 * (viaSat ? 1 : 0);
+        sat.visible = t >= 5.9 && t < 9.2; sat.scale.setScalar(ease(seg(t, 6.1, 6.6)) * (1 - ease(seg(t, 8.8, 9.2))) + 0.001);
+        sat.rotation.y = t * 0.8;
+        cross.visible = t >= 7.4 && t < 9.2; cross.lookAt(camera.position); cross.userData.mat.opacity = ease(seg(t, 7.4, 7.7)) * (1 - ease(seg(t, 8.8, 9.2)));
+        seaLine.material.opacity = 0.9 * seaOn; HF.setBeadsOn(bSea, seaPts, t, 0.5, 0, 1); bSea.material.opacity = 0.95 * seaOn;
+        halo.material.opacity = 0.28;
+        HF.camKeys(camera, keys, t, 0.04);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#ma-lab-msg|0.6", "#ma-lab-fast|4.5", "#ma-lab-sat|6.4", "#ma-lab-almost|9.0", "#ma-lab-sea|9.9"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageA"] = tl;
+    })();
+
+  </script>
+</template>
