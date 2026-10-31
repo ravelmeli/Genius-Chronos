@@ -1,0 +1,97 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #rd-canvas, #rd-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #rd-leaders { pointer-events: none; }
+    .rd-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .rd-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .rd-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .rd-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .rd-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .rd-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+  </style>
+  <div id="root" data-composition-id="stageD" data-width="1080" data-height="1920">
+    <canvas id="rd-canvas" width="1080" height="1920"></canvas>
+    <div id="rd-tag-a" class="rd-mono clip" data-start="0.20" data-duration="6.0" style="left: 60px; top: 200px"><span class="rd-dot"></span>TON ŒIL</div>
+    <div id="rd-tag-b" class="rd-mono clip" data-start="6.50" data-duration="4.7" style="left: 60px; top: 200px"><span class="rd-dot"></span>L'ARC</div>
+    <div id="rd-illu" class="rd-mono clip" data-start="0.20" data-duration="11.0" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="rd-lab-eye" class="rd-chip rd-neon clip" data-start="0.40" data-duration="2.2" style="left: 70px; top: 290px; --c: #4aa8ff;">TON ŒIL</div>
+    <div id="rd-lab-one" class="rd-chip  clip" data-start="1.00" data-duration="1.7" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">UNE COULEUR PAR GOUTTE</div>
+    <div id="rd-lab-high" class="rd-chip  clip" data-start="2.80" data-duration="3.5" style="left: 70px; top: 290px; background: #ff4a4a; color: #fff;">GOUTTES HAUTES : ROUGE</div>
+    <div id="rd-lab-low" class="rd-chip  clip" data-start="5.00" data-duration="1.3" style="left: 70px; top: 370px; background: #9a5aff; color: #fff;">GOUTTES BASSES : VIOLET</div>
+    <div id="rd-lab-arc" class="rd-chip rd-neon clip" data-start="6.60" data-duration="4.6" style="left: 70px; top: 290px; --c: #ffffff;">TOUS CES POINTS = L'ARC</div>
+    <div id="rd-lab-out" class="rd-chip  clip" data-start="8.30" data-duration="2.9" style="left: 70px; top: 370px; background: #ff4a4a; color: #fff;">ROUGE À L'EXTÉRIEUR</div>
+    <div id="rd-lab-in" class="rd-chip  clip" data-start="9.60" data-duration="1.6" style="left: 70px; top: 450px; background: #9a5aff; color: #fff;">VIOLET À L'INTÉRIEUR</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/rb.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 52.0, T1 = 63.3;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+
+      var renderer = HF.makeRenderer($("rd-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.2, 50); fl.position.set(0, 6, 8); scene.add(fl);
+
+      var land = HF.makeLandscape(5); scene.add(land.group);
+      var kL = [{ t: 0, p: [0, 1.2, 11], l: [0, 0.2, -3] }];
+
+      var diag = new THREE.Group(); scene.add(diag);
+      var eye = HF.makeEye(); eye.position.set(-2.5, 0.2, 0); diag.add(eye);
+      var dr = [], bm = [], dg = [];
+      for (var i = 0; i < 9; i++) {
+        var col = HF.RB[Math.round(i / 8 * 6)];
+        var d = new THREE.Mesh(new THREE.SphereGeometry(0.17, 16, 12), HF.std(0x9fd0ff, { transparent: true, opacity: 0.7, emissive: 0x2a5aa0, emissiveIntensity: 0.4 })); d.position.set(1.7, 2.6 - i * 0.62, 0); diag.add(d); dr.push(d);
+        var b = HF.makeBeam(col); diag.add(b); bm.push(b);
+        var g = HF.makeGlow(col, 0.9); g.position.copy(d.position); diag.add(g); dg.push(g);
+      }
+      var arc = HF.makeArc(0, 2.4, 0.12, 0.05, -3); scene.add(arc.group);
+      var kD = [{ t: 0, p: [-0.4, 0.3, 15.5], l: [-0.4, 0.15, 0] }];
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        var sD = t < 58.4;
+        diag.visible = sD; land.group.visible = !sD; arc.group.visible = !sD;
+        eye.scale.setScalar(ease(seg(t, 52.3, 52.9)) + 0.001);
+        if (sD) {
+          var E = new THREE.Vector3(-2.2, 0.2, 0);
+          bm.forEach(function (b, i) {
+            var at = i === 2 ? 53.4 : 54.8 + i * 0.35, pr = ease(seg(t, at, at + 0.5));
+            var A = dr[i].position.clone();
+            HF.setBeam(b, A, A.clone().lerp(E, pr), 0.025, 0.95);
+            dg[i].material.opacity = 0.8 * pr;
+          });
+          HF.camKeys(camera, kD, t, 0.04);
+        } else {
+          HF.setRain(land.rain, t);
+          var ops = [0.9, 0.9, 0.9, 0.9, 0.9, 0.9, 0.9];
+          var ro = ease(seg(t, 60.3, 60.7)) * (1 - ease(seg(t, 61.5, 61.8))), vo = ease(seg(t, 61.6, 62.0));
+          ops = ops.map(function (o, k) { var em = k === 0 ? ro : (k === 6 ? vo : 0); var dim = Math.max(ro, vo); return lerp(o, em > 0 ? 1.0 : 0.3, dim); });
+          HF.setArc(arc, ease(seg(t, 58.6, 60.2)), ops);
+          HF.camKeys(camera, kL, t, 0.04);
+        }
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#rd-lab-eye|0.40", "#rd-lab-one|1.00", "#rd-lab-high|2.80", "#rd-lab-low|5.00", "#rd-lab-arc|6.60", "#rd-lab-out|8.30", "#rd-lab-in|9.60"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageD"] = tl;
+    })();
+
+  </script>
+</template>
