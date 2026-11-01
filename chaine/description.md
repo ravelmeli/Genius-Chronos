@@ -16,9 +16,11 @@ Pourquoi ton téléphone chauffe en charge ? Comment un airbag se gonfle ? Comme
 
 #sciencetechnologie #shorts #commentcamarche #vulgarisation
 
-## Mots-clés de la chaîne (Paramètres → Chaîne → Informations de base → Mots-clés)
+## Mots-clés de la chaîne (Paramètres → Chaîne → Informations de base → Mots-clés, 500 caractères maximum)
 
-science et technologie, vulgarisation scientifique, comment ça marche, objets du quotidien, physique, chimie, électronique, shorts science, explications 3D, culture générale, technologie expliquée, Genius Chronos
+science et technologie, vulgarisation scientifique, comment ça marche, objets du quotidien, technologie, science, physique, chimie, électronique, shorts science, explications 3D, technologie expliquée, culture générale, découvertes, inventions, Genius Chronos
+
+À retirer si la chaîne ne parle plus d'histoire : archéologie, ingénierie antique, mécanismes anciens, secrets de l'histoire, chronologie, science fiction.
 
 ## Version courte (bio TikTok / Instagram, 80 caractères)
 
