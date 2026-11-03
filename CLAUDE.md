@@ -14,6 +14,12 @@ Chaque script se termine par une invitation à laisser un commentaire et à s'ab
 - Valide la voix automatiquement : transcris-la, compare avec le script, puis enchaîne sur le montage sans attendre l'utilisateur. Joins le WAV à la livraison, et signale les mots mal prononcés. S'il en refuse la voix, régénère.
 - Dans `publication.md`, la voix est « Koda, style Promote (Gemini TTS) ».
 
+## Sous-titres
+
+- Les sous-titres sont plus bas qu'avant, à `top: 1430px` (sur 1920). Demande de l'utilisateur : il les veut à cet endroit sur toutes les prochaines vidéos.
+- Génère-les avec `templates/gen_captions.py <durée>` depuis le dossier de la vidéo. La position est la constante `CAPTION_TOP`.
+- Les puces de texte restent dans les zones haute (290 à 520 px) et basse (1010 à 1160 px), sans toucher aux sous-titres.
+
 ## Texte de publication (à livrer avec chaque vidéo)
 
 Pour chaque nouvelle vidéo, génère toujours, au complet et dans cet ordre, en suivant `templates/publication-template.md` :
