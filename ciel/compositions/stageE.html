@@ -1,0 +1,106 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #ke-canvas, #ke-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #ke-leaders { pointer-events: none; }
+    .ke-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .ke-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .ke-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .ke-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .ke-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .ke-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+  </style>
+  <div id="root" data-composition-id="stageE" data-width="1080" data-height="1920">
+    <canvas id="ke-canvas" width="1080" height="1920"></canvas>
+    <div id="ke-tag-a" class="ke-mono clip" data-start="0.10" data-duration="22.0" style="left: 60px; top: 200px"><span class="ke-dot"></span>LA TRAVERSÉE</div>
+    <div id="ke-illu" class="ke-mono clip" data-start="0.10" data-duration="22.1" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="ke-lab-eve" class="ke-chip ke-neon clip" data-start="0.20" data-duration="22.0" style="left: 70px; top: 290px; --c: #ff8a2a;">LE SOIR</div>
+    <div id="ke-lab-low" class="ke-chip  clip" data-start="1.90" data-duration="5.1" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">SOLEIL BAS : BEAUCOUP PLUS D'ATMOSPHÈRE</div>
+    <div id="ke-lab-out" class="ke-chip  clip" data-start="7.40" data-duration="5.4" style="left: 70px; top: 370px; background: #4aa8ff; color: #04152a;">LE BLEU EST DIFFUSÉ HORS DU FAISCEAU</div>
+    <div id="ke-lab-rest" class="ke-chip  clip" data-start="13.20" data-duration="3.3" style="left: 70px; top: 370px; background: #ff8a2a; color: #1a0c00;">IL RESTE ROUGE ET ORANGE</div>
+    <div id="ke-lab-eyes" class="ke-chip ke-neon clip" data-start="16.60" data-duration="5.6" style="left: 70px; top: 370px; --c: #ffffff;">LA LUMIÈRE ARRIVE À TES YEUX</div>
+    <div id="ke-lab-color" class="ke-chip  clip" data-start="19.10" data-duration="3.1" style="left: 70px; top: 450px; background: #ff8a2a; color: #1a0c00;">ELLE COLORE LE SOLEIL ET L'HORIZON</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/sk.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 55.5, T1 = 77.8;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("ke-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      var earth = new THREE.Mesh(new THREE.SphereGeometry(3, 48, 32), HF.std(0x0a241c, { roughness: 1, flatShading: true })); earth.position.set(0, -3, 0); scene.add(earth);
+      var shell = new THREE.Mesh(new THREE.SphereGeometry(3.6, 48, 32), new THREE.MeshBasicMaterial({ color: 0x4aa8ff, transparent: true, opacity: 0.3, depthWrite: false })); shell.position.set(0, -3, 0); scene.add(shell);
+      var obs = new THREE.Mesh(new THREE.SphereGeometry(0.1, 14, 10), new THREE.MeshBasicMaterial({ color: 0xffc41a })); obs.position.set(0, 0.1, 0.3); scene.add(obs);
+      var NSEG = 24;
+      function mkPath() { var a = []; for (var i = 0; i < NSEG; i++) { var b = HF.makeBeam(0xffffff); scene.add(b); a.push(b); } return a; }
+      var pNoon = mkPath(), pSet = mkPath();
+      var O = new THREE.Vector3(0, 0, 0.3), a0 = 0.04, D = new THREE.Vector3(Math.cos(a0), Math.sin(a0), 0), C0 = new THREE.Vector3(0, -3, 0), oc = O.clone().sub(C0).setZ(0), dd = oc.dot(D);
+      var sLen = -dd + Math.sqrt(dd * dd - 9 + 3.6 * 3.6), EXIT = O.clone().add(D.clone().multiplyScalar(sLen)), SUNS = EXIT.clone().add(D.clone().multiplyScalar(0.45));
+      var NOON_EXIT = new THREE.Vector3(0, 0.6, 0.3), NOON_SUN = new THREE.Vector3(0, 2.7, 0.3);
+      function colAt(s) { var q = Math.pow(s, 1.5); return new THREE.Color(1, Math.exp(-0.7 * q), Math.exp(-1.9 * q)); }
+      function drawPath(arr, from, to, outer, prog, op) {
+        // outer: white segment from sun to atmosphere entry, then inside-atmosphere gradient to the observer
+        var tot = from.distanceTo(to), L = outer.distanceTo(from);
+        for (var i = 0; i < NSEG; i++) {
+          var u0 = i / NSEG, u1 = (i + 1) / NSEG, a = outer.clone().lerp(to, u0), b = outer.clone().lerp(to, u1);
+          var inside = i >= 3, s = inside ? (to.clone().sub(from).length() * (u0 - 0.1) / 0.9) : 0;
+          var u = Math.max(0, Math.min(1, (prog - u0) * NSEG));
+          var bb = a.clone().lerp(b, u);
+          if (u <= 0) { arr[i].visible = false; continue; }
+          HF.setBeam(arr[i], a, bb, 0.08, op);
+          arr[i].material.color.copy(inside ? colAt(Math.max(0, s)) : new THREE.Color(1, 1, 1));
+        }
+      }
+      var sunDot = new THREE.Mesh(new THREE.SphereGeometry(0.2, 18, 14), new THREE.MeshBasicMaterial({ color: 0xffe9a8, toneMapped: false })); scene.add(sunDot);
+      var sunGl = HF.makeGlow(0xffd27a, 1.6); scene.add(sunGl);
+      var hor = HF.makeGlow(0xff7a2a, 3.6); hor.position.set(2.0, 0.15, -0.2); scene.add(hor);
+      var bl = []; for (var i = 0; i < 14; i++) { var b = HF.makeBeam(0x4aa8ff); scene.add(b); bl.push(b); }
+      var kE = [{ t: 0, p: [0, 0.3, 13.5], l: [0, -0.11, 0] }];
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        var noon = t < 57.4, setp = t >= 57.4;
+        var pn = ease(seg(t, 55.8, 57.0)) * (noon ? 1 : 0), ps = ease(seg(t, 57.6, 60.6));
+        // noon path: sun at top, short path through the atmosphere
+        drawPath(pNoon, NOON_EXIT, O, NOON_SUN.clone(), pn, noon ? 1 : 0);
+        drawPath(pSet, EXIT, O, SUNS.clone(), ps, setp ? 1 : 0);
+        sunDot.position.copy(noon ? NOON_SUN : SUNS); sunGl.position.copy(sunDot.position);
+        var red = ease(seg(t, 68.7, 70.0)); sunDot.material.color.setRGB(1, lerp(0.9, 0.45, red * (setp ? 1 : 0)), lerp(0.66, 0.15, red * (setp ? 1 : 0)));
+        sunGl.material.color.setRGB(1, lerp(0.82, 0.45, red), lerp(0.5, 0.1, red)); sunGl.material.opacity = 0.8;
+        for (var i = 0; i < 14; i++) {
+          var u = (i + 0.5) / 14, base = O.clone().lerp(EXIT, u), ang = 0.9 + 1.5 * rnd(i, 41), len = 0.35 + 0.3 * rnd(i, 42);
+          var vis = ease(seg(t, 62.9 + 0.3 * i, 63.5 + 0.3 * i)) * (1 - ease(seg(t, 67.8, 68.4))) * (setp ? 1 : 0);
+          HF.setBeam(bl[i], base, base.clone().add(new THREE.Vector3(Math.cos(ang) * len, Math.sin(ang) * len, 0)), 0.018, 0.9 * vis);
+        }
+        hor.material.opacity = 0.55 * ease(seg(t, 72.1, 74.0)); obs.material.color.setHex(0xffc41a);
+        HF.camKeys(camera, kE, t, 0.04);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#ke-lab-eve|0.20", "#ke-lab-low|1.90", "#ke-lab-out|7.40", "#ke-lab-rest|13.20", "#ke-lab-eyes|16.60", "#ke-lab-color|19.10"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageE"] = tl;
+    })();
+
+  </script>
+</template>
