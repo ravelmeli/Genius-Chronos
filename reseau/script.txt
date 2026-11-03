@@ -1,0 +1,17 @@
+Tu branches un appareil, et l'électricité est là, instantanément. Pourtant, elle vient parfois de très loin. Voici son voyage.
+
+Tout commence dans une centrale : une turbine fait tourner un alternateur, qui produit de l'électricité. Ensuite, il faut l'envoyer vers les villes, parfois sur des centaines de kilomètres.
+
+Problème : dans un long fil, une partie de l'énergie se perd en chaleur. Et cette perte grandit avec l'intensité du courant. Plus le courant est fort, plus le fil chauffe.
+
+La solution, c'est la haute tension. Pour une même puissance, si on augmente la tension, l'intensité du courant diminue. Moins de courant, moins de chaleur, moins de pertes. C'est pour ça que les lignes à haute tension, portées par de grands pylônes, transportent l'électricité sur de longues distances.
+
+Pour monter la tension, on utilise un transformateur. À l'intérieur, deux bobines sont enroulées autour d'un noyau de fer. Le courant alternatif dans la première bobine crée un champ magnétique qui change sans cesse. Ce champ fait naître une tension dans la deuxième bobine. Si la deuxième bobine a plus de tours, la tension monte. Si elle en a moins, elle baisse.
+
+Un transformateur ne fonctionne qu'avec du courant alternatif, et c'est l'une des raisons pour lesquelles le réseau l'utilise.
+
+Près des villes, d'autres transformateurs abaissent la tension, étape par étape, dans des postes électriques. Enfin, un dernier transformateur, souvent dans ta rue, la ramène à environ 230 volts, la tension de ta prise.
+
+Une centrale, une tension très haute pour voyager, des transformateurs pour redescendre : voilà le secret.
+
+Tu sais où se trouve le transformateur de ton quartier ? Dis-le en commentaire, et abonne-toi pour comprendre l'objet suivant.
