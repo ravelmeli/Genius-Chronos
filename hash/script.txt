@@ -1,0 +1,17 @@
+Quand tu crées un compte, tu tapes un mot de passe. Mais un site bien conçu ne le garde pas tel quel. Il garde autre chose : une empreinte.
+
+Cette empreinte s'appelle un hash. C'est le résultat d'une fonction de hachage, une machine à broyer les données. Tu lui donnes ton mot de passe, elle te rend une longue suite de caractères, qui paraît aléatoire.
+
+Cette fonction a trois propriétés. D'abord, avec le même mot de passe, elle donne toujours la même empreinte. Ensuite, si tu changes une seule lettre, l'empreinte change complètement. Enfin, elle ne marche que dans un sens : à partir de l'empreinte, on ne peut pas retrouver le mot de passe en refaisant le calcul à l'envers.
+
+Alors comment le site te reconnaît-il ? Quand tu te connectes, il calcule l'empreinte de ce que tu tapes, et il la compare à celle qu'il a gardée. Si elles sont identiques, c'est bon. Le site n'a jamais besoin de lire ton mot de passe.
+
+Et si la base de données est volée ? Les pirates obtiennent des empreintes, pas des mots de passe. Mais ils peuvent essayer des mots de passe courants, et comparer. C'est pour ça qu'un mot de passe faible reste en danger.
+
+Pour se protéger, les sites ajoutent un sel : une valeur aléatoire, différente pour chaque utilisateur, mélangée au mot de passe avant le calcul. Ainsi, deux personnes avec le même mot de passe ont des empreintes différentes.
+
+Ils utilisent aussi des fonctions volontairement lentes, pour que chaque essai coûte du temps.
+
+Un mot de passe, une fonction à sens unique, un sel pour chaque utilisateur : voilà le secret.
+
+Ton mot de passe est-il long et unique ? Dis-le en commentaire, et abonne-toi pour comprendre l'objet suivant.

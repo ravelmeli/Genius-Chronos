@@ -1,0 +1,83 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #hb-canvas, #hb-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #hb-leaders { pointer-events: none; }
+    .hb-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .hb-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .hb-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .hb-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .hb-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .hb-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #hb-card { position: absolute; left: 90px; top: 540px; width: 900px; height: 200px; border-radius: 28px; background: rgba(10,16,32,0.94); border: 3px solid rgba(255,255,255,0.22); box-shadow: 0 10px 40px rgba(0,0,0,0.5); overflow: hidden; }
+    #hb-card canvas { position: absolute; left: 0; top: 0; }
+    #hb-card .ttl { position: absolute; right: 24px; bottom: 8px; font-family: "Space Mono", monospace; font-size: 20px; letter-spacing: 0.12em; color: rgba(255,255,255,0.65); }
+    .hb-pill { position: absolute; padding: 16px 30px; border-radius: 999px; background: rgba(10,16,32,0.94); border: 3px solid #4aa8ff; color: #fff; font-family: "Space Mono", monospace; font-weight: 700; font-size: 34px; white-space: nowrap; }
+  </style>
+  <div id="root" data-composition-id="stageB" data-width="1080" data-height="1920">
+    <canvas id="hb-canvas" width="1080" height="1920"></canvas>
+    <div id="hb-tag-a" class="hb-mono clip" data-start="0.10" data-duration="11.9" style="left: 60px; top: 200px"><span class="hb-dot"></span>LE HASH</div>
+    <div id="hb-illu" class="hb-mono clip" data-start="0.10" data-duration="12.0" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="hb-card" class="clip" data-start="2.40" data-duration="9.6"><canvas id="hb-cc" width="900" height="200"></canvas><div class="ttl">ILLUSTRATIF</div></div>
+    <div id="hb-lab-hash" class="hb-chip hb-neon clip" data-start="0.20" data-duration="11.8" style="left: 70px; top: 290px; --c: #b26bff;">EMPREINTE = HASH</div>
+    <div id="hb-lab-fn" class="hb-chip  clip" data-start="2.20" data-duration="3.9" style="left: 70px; top: 370px;">FONCTION DE HACHAGE</div>
+    <div id="hb-lab-mill" class="hb-chip  clip" data-start="4.30" data-duration="1.8" style="left: 70px; top: 450px; background: #ffc41a; color: #1a1400;">MACHINE À BROYER LES DONNÉES</div>
+    <div id="hb-lab-chars" class="hb-chip  clip" data-start="8.30" data-duration="3.7" style="left: 70px; top: 370px;">LONGUE SUITE DE CARACTÈRES</div>
+    <div id="hb-lab-rand" class="hb-chip  clip" data-start="9.90" data-duration="2.1" style="left: 70px; top: 450px; background: #ffc41a; color: #1a1400;">EN APPARENCE ALÉATOIRE</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/hs.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 8.5, T1 = 20.6;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+
+      var renderer = HF.makeRenderer($("hb-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 6, 8); scene.add(fl);
+
+      var grd = HF.makeGrinder(); scene.add(grd.group);
+      function spin(t, k) { var a = t * k; grd.gears[0].rotation.z = a; grd.gears[1].rotation.z = -a + 0.3; }
+
+      var kB = [{ t: 0, p: [0, 1.6, 16.5], l: [0, 1.15, 0] }];
+      var cctx = $("hb-cc").getContext("2d");
+      function drawCard(t) {
+        var c = cctx; c.clearRect(0, 0, 900, 200);
+        HF.diffRow(c, "ENTRÉE", "motdepasse1", 28, 70, "#ffffff", null, 34);
+        var h = HF.hx("motdepasse1"), n = Math.floor(32 * ease(seg(t, 15.8, 17.6))), s = "";
+        for (var i = 0; i < 32; i++) s += (i < n || t > 17.7) ? h[i] : "0123456789abcdef"[Math.floor(Math.abs(Math.sin(t * 40 + i * 7.3)) * 16) % 16];
+        if (t < 15.8) s = "";
+        HF.diffRow(c, "HASH  ", s, 28, 140, "#7dff9a", null, 34);
+      }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        var sp = 0.3 + 6 * ease(seg(t, 12.8, 14.0)) * (t < 18 ? 1 : 0.7); spin(t, sp);
+        grd.glow.material.opacity = 0.9 * ease(seg(t, 14.4, 15.4)) * (0.7 + 0.3 * Math.sin(t * 9));
+        HF.camKeys(camera, kB, t, 0.04);
+        drawCard(t);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#hb-lab-hash|0.20", "#hb-lab-fn|2.20", "#hb-lab-mill|4.30", "#hb-lab-chars|8.30", "#hb-lab-rand|9.90"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageB"] = tl;
+    })();
+
+  </script>
+</template>

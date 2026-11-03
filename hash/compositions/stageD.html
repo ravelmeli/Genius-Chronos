@@ -1,0 +1,91 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #hd-canvas, #hd-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #hd-leaders { pointer-events: none; }
+    .hd-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .hd-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .hd-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .hd-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .hd-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .hd-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #hd-card { position: absolute; left: 90px; top: 540px; width: 900px; height: 340px; border-radius: 28px; background: rgba(10,16,32,0.94); border: 3px solid rgba(255,255,255,0.22); box-shadow: 0 10px 40px rgba(0,0,0,0.5); overflow: hidden; }
+    #hd-card canvas { position: absolute; left: 0; top: 0; }
+    #hd-card .ttl { position: absolute; right: 24px; bottom: 8px; font-family: "Space Mono", monospace; font-size: 20px; letter-spacing: 0.12em; color: rgba(255,255,255,0.65); }
+    .hd-pill { position: absolute; padding: 16px 30px; border-radius: 999px; background: rgba(10,16,32,0.94); border: 3px solid #4aa8ff; color: #fff; font-family: "Space Mono", monospace; font-weight: 700; font-size: 34px; white-space: nowrap; }
+  </style>
+  <div id="root" data-composition-id="stageD" data-width="1080" data-height="1920">
+    <canvas id="hd-canvas" width="1080" height="1920"></canvas>
+    <div id="hd-tag-a" class="hd-mono clip" data-start="0.20" data-duration="12.0" style="left: 60px; top: 200px"><span class="hd-dot"></span>LA CONNEXION</div>
+    <div id="hd-illu" class="hd-mono clip" data-start="0.20" data-duration="12.1" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="hd-card" class="clip" data-start="0.50" data-duration="11.7"><canvas id="hd-cc" width="900" height="340"></canvas><div class="ttl">ILLUSTRATIF</div></div>
+    <div id="hd-lab-login" class="hd-chip hd-neon clip" data-start="0.30" data-duration="11.9" style="left: 70px; top: 290px; --c: #4aa8ff;">CONNEXION</div>
+    <div id="hd-lab-calc" class="hd-chip  clip" data-start="2.50" data-duration="3.1" style="left: 70px; top: 370px;">EMPREINTE DE CE QUE TU TAPES</div>
+    <div id="hd-lab-cmp" class="hd-chip  clip" data-start="5.70" data-duration="3.7" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">COMPARÉE À CELLE GARDÉE</div>
+    <div id="hd-lab-same" class="hd-chip  clip" data-start="7.80" data-duration="1.7" style="left: 70px; top: 450px; background: #38d27a; color: #04230f;">IDENTIQUES : C'EST BON</div>
+    <div id="hd-lab-never" class="hd-chip  clip" data-start="9.60" data-duration="2.6" style="left: 70px; top: 370px; background: #38d27a; color: #04230f;">JAMAIS BESOIN DE LIRE TON MOT DE PASSE</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/hs.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 38.5, T1 = 50.8;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+
+      var renderer = HF.makeRenderer($("hd-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 6, 8); scene.add(fl);
+
+      var grd = HF.makeGrinder(); scene.add(grd.group);
+      function spin(t, k) { var a = t * k; grd.gears[0].rotation.z = a; grd.gears[1].rotation.z = -a + 0.3; }
+
+      grd.group.scale.setScalar(0.62); grd.group.position.x = -1.7;
+      var vault = HF.makeVault(); vault.group.scale.setScalar(0.52); vault.group.position.set(1.9, 0, 0); scene.add(vault.group);
+      var kD = [{ t: 0, p: [0, 1.3, 18.5], l: [0, 1.2, 0] }];
+      var cctx = $("hd-cc").getContext("2d");
+      function drawCard(t) {
+        var c = cctx; c.clearRect(0, 0, 900, 340);
+        var h = HF.hx("motdepasse1").slice(0, 24);
+        HF.diffRow(c, "TU TAPES  ", "motdepasse1", 28, 60, "#ffffff", null, 30);
+        if (t >= 41.0) HF.diffRow(c, "CALCULÉE  ", h, 28, 130, "#7dff9a", null, 30);
+        if (t >= 44.2) HF.diffRow(c, "GARDÉE    ", h, 28, 200, "#ffc41a", null, 30);
+        if (t >= 46.3) { c.fillStyle = "#38d27a"; c.font = "700 40px 'Space Mono', monospace"; c.fillText("= IDENTIQUES", 28, 276); }
+        if (t >= 48.1) {
+          var k = ease(seg(t, 48.1, 48.7)); c.globalAlpha = k;
+          c.strokeStyle = "#fff"; c.lineWidth = 6; c.beginPath(); c.ellipse(790, 240, 56, 30, 0, 0, 6.2832); c.stroke();
+          c.fillStyle = "#fff"; c.beginPath(); c.arc(790, 240, 15, 0, 6.2832); c.fill();
+          c.strokeStyle = "#ff4a4a"; c.lineWidth = 12; c.beginPath(); c.moveTo(730, 285); c.lineTo(850, 195); c.stroke(); c.globalAlpha = 1;
+        }
+      }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        spin(t, t > 41 && t < 44.5 ? 3.0 : 0.6); grd.glow.material.opacity = 0.6 * w(t, 41.0, 44.5);
+        var ok = ease(seg(t, 46.3, 46.8)); vault.glow.material.opacity = 0.8 * ok; vault.doorMat.emissiveIntensity = 0.6 * ok; vault.fp.material.opacity = 0.3 + 0.7 * ok;
+        HF.camKeys(camera, kD, t, 0.04);
+        drawCard(t);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#hd-lab-login|0.30", "#hd-lab-calc|2.50", "#hd-lab-cmp|5.70", "#hd-lab-same|7.80", "#hd-lab-never|9.60"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageD"] = tl;
+    })();
+
+  </script>
+</template>
