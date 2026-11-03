@@ -1,0 +1,94 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #pf-canvas, #pf-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #pf-leaders { pointer-events: none; }
+    .pf-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .pf-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .pf-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .pf-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .pf-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .pf-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #pf-bubble { position: absolute; left: 130px; top: 700px; width: 820px; padding: 36px 40px; border-radius: 40px; background: #1c2b52; border: 4px solid #4aa8ff; box-shadow: 0 0 40px rgba(74,168,255,0.5); color: #fff; font-weight: 800; font-size: 60px; line-height: 1.15; text-align: center; }
+    #pf-bubble::after { content: ""; position: absolute; left: 90px; bottom: -34px; width: 0; height: 0; border-left: 28px solid transparent; border-right: 28px solid transparent; border-top: 36px solid #4aa8ff; }
+    .pf-btn { position: absolute; padding: 20px 40px; border-radius: 999px; font-weight: 800; font-size: 40px; white-space: nowrap; }
+    .pf-big { position: absolute; left: 0; width: 1080px; text-align: center; color: #fff; font-weight: 800; letter-spacing: -0.02em; text-shadow: 0 6px 40px rgba(0,0,0,0.7); }
+
+    #pf-dim { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: rgba(7,11,22,0.55); }
+    .pf-q { position: absolute; font-size: 150px; font-weight: 800; color: #ffc41a; text-shadow: 0 0 40px rgba(255,196,26,0.8); }
+  </style>
+  <div id="root" data-composition-id="stageF" data-width="1080" data-height="1920">
+    <canvas id="pf-canvas" width="1080" height="1920"></canvas>
+    <div id="pf-tag-a" class="pf-mono clip" data-start="0.50" data-duration="8.2" style="left: 60px; top: 200px"><span class="pf-dot"></span>LE RÉSUMÉ</div>
+    <div id="pf-tag-b" class="pf-mono clip" data-start="14.60" data-duration="5.9" style="left: 60px; top: 200px"><span class="pf-dot"></span>ET TOI ?</div>
+    <div id="pf-illu" class="pf-mono clip" data-start="0.50" data-duration="20.0" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="pf-lab-sys" class="pf-chip pf-neon clip" data-start="0.90" data-duration="7.6" style="left: 70px; top: 290px; --c: #ffc41a;">UN PETIT SYSTÈME DE PRÉCISION</div>
+    <div id="pf-lab-r1" class="pf-chip  clip" data-start="4.10" data-duration="4.4" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">UNE BILLE QUI ROULE</div>
+    <div id="pf-lab-r2" class="pf-chip  clip" data-start="5.20" data-duration="3.3" style="left: 70px; top: 450px; background: #cfd6e6; color: #0a1020;">UNE CAGE QUI LA RETIENT</div>
+    <div id="pf-lab-r3" class="pf-chip  clip" data-start="6.60" data-duration="1.9" style="left: 70px; top: 1010px; background: #38d27a; color: #04230f;">UNE ENCRE ÉPAISSE EN PLACE</div>
+    <div id="pf-lab-f1" class="pf-chip pf-neon clip" data-start="9.30" data-duration="3.7" style="left: 70px; top: 290px; --c: #ffc41a;">UNE BILLE, UNE ENCRE VISQUEUSE</div>
+    <div id="pf-lab-f2" class="pf-chip  clip" data-start="11.20" data-duration="1.8" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">UN PAPIER QUI LA FAIT ROULER</div>
+    <div id="pf-big" class="pf-big clip" data-start="13.00" data-duration="1.5" style="top: 560px; font-size: 96px">Voilà le secret.</div>
+    <div id="pf-dim" class="clip" data-start="14.50" data-duration="6.2"></div>
+    <div id="pf-q1" class="pf-q clip" data-start="15.30" data-duration="5.4" style="left: 100px; top: 470px">?</div>
+    <div id="pf-q2" class="pf-q clip" data-start="15.50" data-duration="5.2" style="left: 850px; top: 580px">?</div>
+    <div id="pf-bubble" class="clip" data-start="14.70" data-duration="6.0" style="top: 720px">Stylo bille<br>ou stylo plume ?</div>
+    <div id="pf-b1" class="pf-btn clip" data-start="17.90" data-duration="2.8" style="left: 90px; top: 1040px; background: #fff; color: #0a0f1c">COMMENTE</div>
+    <div id="pf-b2" class="pf-btn clip" data-start="18.90" data-duration="1.8" style="left: 540px; top: 1040px; background: #ff3b3b; color: #fff">ABONNE-TOI</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/bp.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 61.0, T1 = 81.68;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+
+      var renderer = HF.makeRenderer($("pf-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 6, 8); scene.add(fl);
+
+      var tip = HF.makeTip(); scene.add(tip.group);
+      var paper = HF.makePaper(9, 2.4); scene.add(paper);
+      var trail = HF.makeTrail(); scene.add(trail.mesh);
+      var kCut = [{ t: 0, p: [0, 2.2, 17.5], l: [0, 0.1, 0] }];
+
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        var frac = ((t - 61.0) / 7.0) % 1, x = -1.6 + 3.2 * frac;
+        tip.group.position.x = x; tip.ballG.rotation.set(0, 0, -x / 0.5);
+        HF.setTrail(trail, -1.6, x, 0);
+        tip.inkMat.opacity = 0.85; tip.inkMat.emissiveIntensity = 0.5 + 0.4 * w(t, 67.5, 69.5) + 0.4 * w(t, 70.3, 74.0); tip.beads.visible = true; HF.updateInkBeads(tip, t, 0.05, 1);
+        tip.ballMat.emissiveIntensity = 0.6 * Math.max(w(t, 65.0, 69.5), w(t, 70.3, 74.0));
+        tip.sockMat.emissiveIntensity = 0.7 * Math.max(w(t, 66.1, 69.5), w(t, 72.2, 74.0));
+        tip.coat.material.opacity = 0.3;
+        HF.camKeys(camera, kCut, t, 0.05);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#pf-lab-sys|0.90", "#pf-lab-r1|4.10", "#pf-lab-r2|5.20", "#pf-lab-r3|6.60", "#pf-lab-f1|9.30", "#pf-lab-f2|11.20"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      tl.fromTo("#pf-big", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 13.00);
+      tl.fromTo("#pf-dim", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 14.50);
+      tl.fromTo("#pf-bubble", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 14.70);
+      popd("#pf-q1", 15.30); popd("#pf-q2", 15.50); popd("#pf-b1", 17.90); popd("#pf-b2", 18.90);
+      window.__timelines["stageF"] = tl;
+    })();
+
+  </script>
+</template>

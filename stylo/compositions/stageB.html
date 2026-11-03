@@ -1,0 +1,74 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #pb-canvas, #pb-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #pb-leaders { pointer-events: none; }
+    .pb-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .pb-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .pb-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .pb-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .pb-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .pb-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+  </style>
+  <div id="root" data-composition-id="stageB" data-width="1080" data-height="1920">
+    <canvas id="pb-canvas" width="1080" height="1920"></canvas>
+    <div id="pb-tag-a" class="pb-mono clip" data-start="0.20" data-duration="11.8" style="left: 60px; top: 200px"><span class="pb-dot"></span>LA POINTE</div>
+    <div id="pb-illu" class="pb-mono clip" data-start="0.20" data-duration="11.9" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="pb-lab-tip" class="pb-chip pb-neon clip" data-start="0.30" data-duration="11.7" style="left: 70px; top: 290px; --c: #4aa8ff;">EXTRÉMITÉ DU STYLO</div>
+    <div id="pb-lab-ball" class="pb-chip  clip" data-start="2.00" data-duration="1.8" style="left: 70px; top: 370px; background: #cfd6e6; color: #0a1020;">BILLE EN MÉTAL</div>
+    <div id="pb-lab-small" class="pb-chip  clip" data-start="3.80" data-duration="1.9" style="left: 70px; top: 450px;">PLUS PETITE QU'UN GRAIN DE RIZ</div>
+    <div id="pb-lab-cage" class="pb-chip pb-neon clip" data-start="5.90" data-duration="6.1" style="left: 70px; top: 370px; --c: #b8c0d4;">MAINTENUE DANS UNE CAGE</div>
+    <div id="pb-lab-turn" class="pb-chip  clip" data-start="8.70" data-duration="3.3" style="left: 70px; top: 1010px; background: #ffc41a; color: #1a1400;">ELLE TOURNE DANS TOUS LES SENS</div>
+    <div id="pb-lab-fall" class="pb-chip  clip" data-start="10.60" data-duration="1.4" style="left: 70px; top: 1090px; background: #38d27a; color: #04230f;">MAIS NE PEUT PAS TOMBER</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/bp.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 11.7, T1 = 23.8;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+
+      var renderer = HF.makeRenderer($("pb-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 6, 8); scene.add(fl);
+
+      var tip = HF.makeTip(); scene.add(tip.group);
+      var paper = HF.makePaper(9, 2.4); scene.add(paper);
+      var trail = HF.makeTrail(); scene.add(trail.mesh);
+      var kCut = [{ t: 0, p: [0, 2.2, 17.5], l: [0, 0.1, 0] }];
+
+      var rice = new THREE.Mesh(new THREE.SphereGeometry(0.5, 20, 14), HF.std(0xf1ece0, { roughness: 0.7, transparent: true, opacity: 0 })); rice.scale.set(1.6, 0.55, 0.55); rice.position.set(2.5, 0.0, 0); scene.add(rice);
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        var wob = ease(seg(t, 20.2, 21.0));
+        tip.ballG.rotation.set(t * 1.1 * wob + 0.3 * Math.sin(t), t * 0.7 * wob, t * 0.5 * wob);
+        tip.inkMat.opacity = 0.25; tip.inkMat.emissiveIntensity = 0.2; tip.beads.visible = false; trail.mesh.visible = false;
+        tip.ballMat.emissiveIntensity = 0.7 * w(t, 13.7, 15.7);
+        tip.sockMat.emissiveIntensity = 0.8 * w(t, 17.6, 20.2);
+        rice.material.opacity = 0.95 * w(t, 15.6, 17.4);
+        HF.camKeys(camera, kCut, t, 0.05);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#pb-lab-tip|0.30", "#pb-lab-ball|2.00", "#pb-lab-small|3.80", "#pb-lab-cage|5.90", "#pb-lab-turn|8.70", "#pb-lab-fall|10.60"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageB"] = tl;
+    })();
+
+  </script>
+</template>

@@ -1,0 +1,71 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #pc-canvas, #pc-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #pc-leaders { pointer-events: none; }
+    .pc-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .pc-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .pc-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .pc-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .pc-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .pc-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+  </style>
+  <div id="root" data-composition-id="stageC" data-width="1080" data-height="1920">
+    <canvas id="pc-canvas" width="1080" height="1920"></canvas>
+    <div id="pc-tag-a" class="pc-mono clip" data-start="0.10" data-duration="7.0" style="left: 60px; top: 200px"><span class="pc-dot"></span>L'ENCRE</div>
+    <div id="pc-illu" class="pc-mono clip" data-start="0.10" data-duration="7.1" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="pc-lab-tube" class="pc-chip pc-neon clip" data-start="0.20" data-duration="6.9" style="left: 70px; top: 290px; --c: #4aa8ff;">TUBE D'ENCRE</div>
+    <div id="pc-lab-thick" class="pc-chip  clip" data-start="2.40" data-duration="2.6" style="left: 70px; top: 370px;">ENCRE TRÈS ÉPAISSE</div>
+    <div id="pc-lab-paste" class="pc-chip  clip" data-start="3.90" data-duration="3.2" style="left: 70px; top: 450px; background: #ffc41a; color: #1a1400;">PRESQUE COMME UNE PÂTE</div>
+    <div id="pc-lab-visc" class="pc-chip pc-neon clip" data-start="5.20" data-duration="1.9" style="left: 70px; top: 370px; --c: #b26bff;">= VISQUEUSE</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/bp.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 23.8, T1 = 31.0;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+
+      var renderer = HF.makeRenderer($("pc-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 6, 8); scene.add(fl);
+
+      var tip = HF.makeTip(); scene.add(tip.group);
+      var paper = HF.makePaper(9, 2.4); scene.add(paper);
+      var trail = HF.makeTrail(); scene.add(trail.mesh);
+      var kCut = [{ t: 0, p: [0, 2.2, 17.5], l: [0, 0.1, 0] }];
+
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        tip.ballG.rotation.set(0.4, t * 0.3, 0.2);
+        var on = ease(seg(t, 24.0, 24.9));
+        tip.inkMat.opacity = lerp(0.25, 0.85, on); tip.inkMat.emissiveIntensity = 0.2 + 0.5 * on + 0.3 * w(t, 26.2, 28.8);
+        tip.tubeMat.emissiveIntensity = 0.5 * w(t, 24.9, 26.4);
+        tip.beads.visible = true; HF.updateInkBeads(tip, t, 0.05, on);
+        trail.mesh.visible = false;
+        HF.camKeys(camera, kCut, t, 0.05);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#pc-lab-tube|0.20", "#pc-lab-thick|2.40", "#pc-lab-paste|3.90", "#pc-lab-visc|5.20"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageC"] = tl;
+    })();
+
+  </script>
+</template>
