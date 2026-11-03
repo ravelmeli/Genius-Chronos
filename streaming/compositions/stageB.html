@@ -1,0 +1,85 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #sb-canvas, #sb-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #sb-leaders { pointer-events: none; }
+    .sb-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .sb-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .sb-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .sb-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .sb-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .sb-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+  </style>
+  <div id="root" data-composition-id="stageB" data-width="1080" data-height="1920">
+    <canvas id="sb-canvas" width="1080" height="1920"></canvas>
+    <div id="sb-tag-a" class="sb-mono clip" data-start="0.20" data-duration="11.9" style="left: 60px; top: 200px"><span class="sb-dot"></span>LES MORCEAUX</div>
+    <div id="sb-illu" class="sb-mono clip" data-start="0.20" data-duration="12.0" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="sb-lab-s1" class="sb-chip sb-neon clip" data-start="0.30" data-duration="11.8" style="left: 70px; top: 290px; --c: #ffc41a;">PREMIER SECRET : LES MORCEAUX</div>
+    <div id="sb-lab-bloc" class="sb-chip  clip" data-start="1.30" data-duration="2.2" style="left: 70px; top: 370px; background: #ff4a4a; color: #fff;">PAS D'UN SEUL BLOC</div>
+    <div id="sb-lab-cut" class="sb-chip  clip" data-start="3.70" data-duration="3.4" style="left: 70px; top: 370px;">DÉCOUPÉE EN PETITS MORCEAUX</div>
+    <div id="sb-lab-few" class="sb-chip  clip" data-start="7.30" data-duration="2.4" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">PAS BESOIN DE TOUT TÉLÉCHARGER</div>
+    <div id="sb-lab-first" class="sb-chip  clip" data-start="9.80" data-duration="2.3" style="left: 70px; top: 370px; background: #38d27a; color: #04230f;">LE PREMIER MORCEAU SUFFIT</div>
+    <div id="sb-lab-secs" class="sb-chip  clip" data-start="5.50" data-duration="1.7" style="left: 70px; top: 450px;">QUELQUES SECONDES CHACUN</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/sv.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 10.0, T1 = 22.2;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+
+      var renderer = HF.makeRenderer($("sb-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      var ph = HF.makeVideoPhone(); ph.scale.setScalar(0.8); ph.position.y = -0.7; scene.add(ph);
+
+      var CH = [];
+      var cols = [0xff4a6a, 0xffa21a, 0xffe21a, 0x3ad23a, 0x2a8aff, 0x8a4aff, 0xff4aaa, 0x38d6ff];
+      for (var i = 0; i < 8; i++) { var m = new THREE.Mesh(new THREE.BoxGeometry(0.62, 0.8, 0.3), new THREE.MeshStandardMaterial({ color: cols[i], emissive: cols[i], emissiveIntensity: 0.35, transparent: true, opacity: 1, roughness: 0.5 })); scene.add(m); CH.push(m); }
+      var big = new THREE.Mesh(new THREE.BoxGeometry(5.9, 0.8, 0.3), new THREE.MeshStandardMaterial({ color: 0x4a4a8a, emissive: 0x3a3a8a, emissiveIntensity: 0.4 })); big.position.set(0, 0.7, 0); scene.add(big);
+      var kB = [{ t: 0, p: [0, -0.9, 15.5], l: [0, -1.19, 0] }];
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        var split = ease(seg(t, 13.6, 15.4)), bigv = 1 - ease(seg(t, 13.5, 13.9));
+        big.visible = bigv > 0.01; big.scale.set(0.001 + 1 * bigv + (bigv < 0.99 ? 0 : 0), 1, 1);
+        big.material.opacity = 1; big.scale.x = 1;
+        var moved = ease(seg(t, 19.8, 21.2)), dim = ease(seg(t, 17.3, 18.0));
+        CH.forEach(function (m, i) {
+          var x = -2.6 + 0.75 * i, gap = split;
+          m.visible = t >= 13.5;
+          var xx = lerp(-2.6 + 0.66 * i * (5.9 / 4.62) * 0.0 + (i - 3.5) * 0.74 * 0 + (i - 3.5) * 0.7, x, 0);
+          m.position.set(lerp((i - 3.5) * 0.7, (i - 3.5) * 0.78, gap), 0.7, 0);
+          m.scale.set(lerp(1.0, 0.82, gap), 1, 1);
+          m.material.opacity = i === 0 ? 1 : 1 - 0.75 * dim;
+          if (i === 0) { m.position.x = lerp(m.position.x, 0, moved); m.position.y = lerp(0.7, -0.35, moved); m.position.z = lerp(0, 0.5, moved); m.scale.setScalar(lerp(0.82, 0.5, moved)); m.visible = t < 21.4; }
+        });
+        var pl = t > 21.4;
+        ph.userData.draw(t, { playing: pl, press: 0, quality: 0.5, play: Math.max(0, (t - 21.4) / 60), buf: Math.max(0, (t - 21.4) / 60) + 0.05 });
+        HF.camKeys(camera, kB, t, 0.04);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#sb-lab-s1|0.30", "#sb-lab-bloc|1.30", "#sb-lab-cut|3.70", "#sb-lab-few|7.30", "#sb-lab-first|9.80", "#sb-lab-secs|5.50"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageB"] = tl;
+    })();
+
+  </script>
+</template>
