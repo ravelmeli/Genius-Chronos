@@ -1,0 +1,81 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #ca-canvas, #ca-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #ca-leaders { pointer-events: none; }
+    .ca-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .ca-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .ca-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .ca-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .ca-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .ca-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #ca-card { position: absolute; left: 90px; top: 530px; width: 900px; height: 200px; border-radius: 28px; background: rgba(10,16,32,0.94); border: 3px solid rgba(255,255,255,0.22); box-shadow: 0 10px 40px rgba(0,0,0,0.5); overflow: hidden; }
+    #ca-card canvas { position: absolute; left: 0; top: 0; }
+    #ca-card .ttl { position: absolute; right: 24px; bottom: 8px; font-family: "Space Mono", monospace; font-size: 20px; letter-spacing: 0.12em; color: rgba(255,255,255,0.65); }
+  </style>
+  <div id="root" data-composition-id="stageA" data-width="1080" data-height="1920">
+    <canvas id="ca-canvas" width="1080" height="1920"></canvas>
+    <div id="ca-tag-a" class="ca-mono clip" data-start="0.3" data-duration="10.5" style="left: 60px; top: 200px"><span class="ca-dot"></span>LE CAFÉ</div>
+    <div id="ca-illu" class="ca-mono clip" data-start="0.3" data-duration="10.6" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="ca-card" class="clip" data-start="1.6" data-duration="9.3"><canvas id="ca-cc" width="900" height="200"></canvas><div class="ttl">ILLUSTRATIF</div></div>
+    <div id="ca-lab-cafe" class="ca-chip ca-neon clip" data-start="0.4" data-duration="10.5" style="left: 70px; top: 290px; --c: #c8884a;">TU BOIS UN CAFÉ</div>
+    <div id="ca-lab-awake" class="ca-chip  clip" data-start="2.6" data-duration="8.3" style="left: 70px; top: 370px; background: #38d27a; color: #04230f;">PLUS RÉVEILLÉ QUELQUES MINUTES APRÈS</div>
+    <div id="ca-lab-noenergy" class="ca-chip  clip" data-start="5.3" data-duration="5.6" style="left: 70px; top: 450px; background: #ff4a4a; color: #fff;">PAS D'ÉNERGIE EN PLUS</div>
+    <div id="ca-lab-mask" class="ca-chip ca-neon clip" data-start="9.0" data-duration="1.9" style="left: 70px; top: 1010px; --c: #ffc41a;">IL MASQUE TA FATIGUE</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/cf.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 0, T1 = 11.0;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+
+      var renderer = HF.makeRenderer($("ca-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      var cup = HF.makeCup(); cup.group.scale.setScalar(1.2); cup.group.position.y = -0.9; scene.add(cup.group);
+      var kA = [{ t: 0, p: [0, 1.4, 11], l: [0, 0.0, 0] }];
+      var cctx = $("ca-cc").getContext("2d");
+      function drawCard(t) {
+        var c = cctx; c.clearRect(0, 0, 900, 200);
+        c.font = "700 28px 'Space Mono', monospace"; c.textAlign = "left"; c.fillStyle = "rgba(255,255,255,0.88)"; c.fillText("FATIGUE", 28, 70);
+        c.fillStyle = "rgba(255,255,255,0.15)"; c.fillRect(250, 40, 620, 42); c.fillStyle = "#ff6a4a"; c.fillRect(250, 40, 620 * 0.8 * ease(seg(t, 1.8, 3.0)), 42);
+        var m = ease(seg(t, 9.0, 9.9));
+        if (m > 0) { c.fillStyle = "#6a3a1a"; c.fillRect(250, 40, 620 * m, 42); c.fillStyle = "#ffe7c8"; c.font = "700 24px 'Space Mono', monospace"; if (m > 0.6) c.fillText("MASQUÉE", 480, 70); }
+        c.fillStyle = "rgba(255,255,255,0.88)"; c.font = "700 28px 'Space Mono', monospace"; c.fillText("ÉNERGIE", 28, 150);
+        c.fillStyle = "rgba(255,255,255,0.15)"; c.fillRect(250, 120, 620, 42); c.fillStyle = "#4aa8ff"; c.fillRect(250, 120, 620 * 0.0 + 6, 42);
+      }
+      function renderAt(t) {
+        if (t > T1 + 0.05) return;
+        HF.updateParticles(cup.steam, t, ease(seg(t, 0.4, 1.4)), 1.8, 1.4);
+        cup.group.rotation.y = 0.25 * Math.sin(t * 0.5);
+        HF.camKeys(camera, kA, t, 0.04);
+        drawCard(t);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#ca-lab-cafe|0.4", "#ca-lab-awake|2.6", "#ca-lab-noenergy|5.3", "#ca-lab-mask|9.0"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageA"] = tl;
+    })();
+
+  </script>
+</template>
