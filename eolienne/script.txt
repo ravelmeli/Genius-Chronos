@@ -1,0 +1,19 @@
+Le vent souffle, les pales tournent, et une éolienne fabrique du courant. Mais comment un mouvement devient-il de l'électricité ? La réponse tient en deux mots : un aimant et une bobine.
+
+D'abord, le vent. Les pales ont une forme étudiée : quand l'air passe dessus, elles sont poussées et se mettent à tourner. Elles entraînent un axe, appelé rotor.
+
+Cet axe tourne assez lentement. Alors, dans beaucoup d'éoliennes, un multiplicateur augmente sa vitesse de rotation avant de la transmettre à l'alternateur. Certaines éoliennes n'en ont pas, mais le principe reste le même.
+
+L'alternateur, c'est le cœur de la machine. À l'intérieur, il y a des aimants qui tournent, et autour d'eux, des bobines de fil de cuivre qui restent fixes.
+
+Quand un aimant passe devant une bobine, le champ magnétique qui traverse la bobine change. Et un champ magnétique qui change fait naître une tension dans le fil. C'est le phénomène d'induction.
+
+Les aimants tournent : le champ change tout le temps, et il change de sens à chaque passage d'un pôle. Le courant produit change donc de sens, lui aussi. C'est du courant alternatif.
+
+Plus les aimants tournent vite, plus la tension produite est forte. Et plus il y a de tours de fil dans les bobines, plus elle l'est aussi.
+
+Enfin, ce courant passe dans un transformateur, puis il part dans le réseau, jusqu'à ta prise.
+
+Du vent, des aimants qui tournent, des bobines : voilà le secret.
+
+Tu as déjà vu une éolienne de près ? Dis-le en commentaire, et abonne-toi pour comprendre l'objet suivant.

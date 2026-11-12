@@ -6,13 +6,12 @@ Vidéos courtes (9:16, environ 85 s) de vulgarisation science et technologie, fa
 
 Chaque script se termine par une invitation à laisser un commentaire et à s'abonner (par exemple une question liée au sujet, puis « abonne-toi pour comprendre l'objet suivant »). La vidéo reprend cette fin avec la bulle de question et les boutons COMMENTE / ABONNE-TOI.
 
-## Voix off (générée par Claude, montage enchaîné)
+## Voix off (générée par l'utilisateur)
 
-- Après le script, génère la voix off avec `templates/tts.py` : modèle `gemini-3.8-flash-tts`, voix **Koda**, style **Promote** (« High energy, elongated vowels »).
-- Le style va dans `speech_metadata.style`, jamais dans le texte : le modèle le lirait à voix haute.
-- La clé API vient de la variable d'environnement `GEMINI_API_KEY`. Ne l'écris jamais dans le dépôt.
-- Valide la voix automatiquement : transcris-la, compare avec le script, puis enchaîne sur le montage sans attendre l'utilisateur. Joins le WAV à la livraison, et signale les mots mal prononcés. S'il en refuse la voix, régénère.
-- Dans `publication.md`, la voix est « Koda, style Promote (Gemini TTS) ».
+- L'utilisateur génère la voix lui-même (voix Koda, style Promote dans AI Studio). Ne génère plus la voix via l'API Google et n'utilise plus de clé API.
+- Après le script, donne-lui le texte brut à copier-coller dans le générateur de voix, avec le plan visuel et la liste « à vérifier ». Puis attends son WAV.
+- Quand il envoie le WAV : transcris-le en local avec faster-whisper (mots horodatés), corrige les mots mal transcrits d'après le script, puis enchaîne sur le montage et le rendu.
+- Dans `publication.md`, la voix est « Koda, style Promote ».
 
 ## Sous-titres
 
