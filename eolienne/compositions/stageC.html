@@ -1,0 +1,92 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #wc-canvas, #wc-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #wc-leaders { pointer-events: none; }
+    .wc-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .wc-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .wc-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .wc-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .wc-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .wc-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+    .wc-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageC" data-width="1080" data-height="1920">
+    <canvas id="wc-canvas" width="1080" height="1920"></canvas>
+    <div id="wc-tag-a" class="wc-mono clip" data-start="0.10" data-duration="11.2" style="left: 60px; top: 200px"><span class="wc-dot"></span>LA VITESSE</div>
+    <div id="wc-illu" class="wc-mono clip" data-start="0.10" data-duration="11.3" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="wc-lab-slow" class="wc-chip wc-neon clip" data-start="0.20" data-duration="3.0" style="left: 70px; top: 290px; --c: #4aa8ff;">L'AXE TOURNE LENTEMENT</div>
+    <div id="wc-lab-mult" class="wc-chip wc-neon clip" data-start="3.40" data-duration="7.9" style="left: 70px; top: 290px; --c: #ffc41a;">MULTIPLICATEUR</div>
+    <div id="wc-lab-fast" class="wc-chip  clip" data-start="4.60" data-duration="2.1" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">IL AUGMENTE LA VITESSE</div>
+    <div id="wc-lab-trans" class="wc-chip  clip" data-start="6.80" data-duration="4.5" style="left: 70px; top: 370px; background: #38d27a; color: #04230f;">VERS L'ALTERNATEUR</div>
+    <div id="wc-lab-some" class="wc-chip  clip" data-start="8.40" data-duration="1.6" style="left: 70px; top: 450px;">CERTAINES N'EN ONT PAS</div>
+    <div id="wc-lab-same" class="wc-chip  clip" data-start="10.00" data-duration="1.4" style="left: 70px; top: 450px; background: #ffc41a; color: #1a1400;">MÊME PRINCIPE</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 21.0, T1 = 32.4;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("wc-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      function gear(r, n, col) {
+        var g = new THREE.Group(), m = HF.std(col, { metalness: 0.7, roughness: 0.4 });
+        var d = new THREE.Mesh(new THREE.CylinderGeometry(r, r, 0.24, 40), m); d.rotation.x = Math.PI / 2; g.add(d);
+        var h = 0.14, tw = 0.4 * 6.2832 * r / n;
+        for (var i = 0; i < n; i++) { var a = i / n * 6.2832, tt = new THREE.Mesh(new THREE.BoxGeometry(h, tw, 0.24), m); tt.position.set(Math.cos(a) * (r + h / 2 - 0.01), Math.sin(a) * (r + h / 2 - 0.01), 0); tt.rotation.z = a; g.add(tt); }
+        var hb = new THREE.Mesh(new THREE.CylinderGeometry(r * 0.22, r * 0.22, 0.34, 18), HF.std(0x9aa3b8, { metalness: 0.8 })); hb.rotation.x = Math.PI / 2; g.add(hb);
+        var mk = new THREE.Mesh(new THREE.BoxGeometry(r * 0.5, 0.09, 0.28), new THREE.MeshBasicMaterial({ color: 0xffc41a })); mk.position.set(r * 0.58, 0, 0); g.add(mk);
+        return g;
+      }
+      var R1 = 0.85, R2 = R1 / 2.4, X1 = -1.05, X2 = X1 + R1 + R2 + 0.14, Y0 = 0.4;
+      var gG = new THREE.Group(); scene.add(gG);
+      var big = gear(R1, 24, 0x5a6a92); big.position.set(X1, Y0, 0); gG.add(big);
+      var small = gear(R2, 10, 0xc9a24a); small.position.set(X2, Y0, 0); gG.add(small);
+      var rod = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1, 10), HF.std(0x9aa3b8, { metalness: 0.8 })); rod.rotation.z = Math.PI / 2; scene.add(rod);
+      var dr = new THREE.Group(); dr.position.set(1.6, Y0, 0); scene.add(dr);
+      var dmat = HF.std(0x3a4a78, { metalness: 0.6, roughness: 0.45, emissive: 0xffa23a, emissiveIntensity: 0 });
+      var cyl = new THREE.Mesh(new THREE.CylinderGeometry(0.46, 0.46, 0.8, 24), dmat); cyl.rotation.z = Math.PI / 2; dr.add(cyl);
+      var cm = HF.std(0xd98a4a, { metalness: 0.8, roughness: 0.35, emissive: 0xffa23a, emissiveIntensity: 0.1 });
+      [-0.25, 0.25].forEach(function (x) { var q = new THREE.Mesh(new THREE.TorusGeometry(0.47, 0.05, 8, 26), cm); q.rotation.y = Math.PI / 2; q.position.x = x; dr.add(q); });
+      var fin = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.08, 0.22), new THREE.MeshBasicMaterial({ color: 0xffc41a })); fin.position.set(0, 0.5, 0); dr.add(fin);
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        camera.position.set(0.5 + 0.2 * Math.sin(t * 0.4), 0.9, 12); camera.lookAt(0, 0.3, 0); camera.updateMatrixWorld();
+        var th1 = 1.0 * (t - 21) * (0.3 + 0.7 * ease(seg(t, 21.0, 23.0))), th2 = Math.PI / 10 - 2.4 * th1;
+        big.rotation.z = th1; small.rotation.z = th2;
+        var sp = ease(seg(t, 24.4, 25.2)); dr.rotation.x = -th2 * 0 + (-2.4 * th1) * sp + (-th1) * (1 - sp);
+        var gs = 1 - ease(seg(t, 29.6, 30.4)); gG.scale.setScalar(Math.max(0.001, gs)); gG.visible = gs > 0.01;
+        var direct = ease(seg(t, 29.8, 30.6));
+        var x0 = lerp(X2 + R2, -1.7, direct); rod.position.set((x0 + 1.3) / 2, Y0, 0); rod.scale.set(1, Math.max(0.01, 1.3 - x0), 1);
+        dmat.emissiveIntensity = 0.55 * ease(seg(t, 27.8, 28.8)); cm.emissiveIntensity = 0.1 + 0.6 * ease(seg(t, 27.8, 28.8));
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#wc-lab-slow|0.20", "#wc-lab-mult|3.40", "#wc-lab-fast|4.60", "#wc-lab-trans|6.80", "#wc-lab-some|8.40", "#wc-lab-same|10.00"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageC"] = tl;
+    })();
+
+  </script>
+</template>
