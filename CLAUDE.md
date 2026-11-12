@@ -13,6 +13,11 @@ Chaque script se termine par une invitation à laisser un commentaire et à s'ab
 - Quand il envoie le WAV : transcris-le en local avec faster-whisper (mots horodatés), corrige les mots mal transcrits d'après le script, puis enchaîne sur le montage et le rendu.
 - Dans `publication.md`, la voix est « Koda, style Promote ».
 
+## Lots de 4 vidéos
+
+- L'utilisateur donne désormais 4 sujets à la fois. Livre les 4 scripts d'un coup (texte brut pour la voix, plan visuel, liste « à vérifier » pour chacun), puis attends ses 4 WAV.
+- Il génère les voix lui-même dans Google AI Studio. Quand il envoie un WAV, monte et rends cette vidéo (tu peux traiter les WAV dans l'ordre où ils arrivent).
+
 ## Sous-titres
 
 - Les sous-titres sont plus bas qu'avant, à `top: 1430px` (sur 1920). Demande de l'utilisateur : il les veut à cet endroit sur toutes les prochaines vidéos.
