@@ -1,0 +1,110 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #pc-canvas, #pc-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #pc-leaders { pointer-events: none; }
+    .pc-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .pc-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .pc-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .pc-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .pc-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .pc-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+    .pc-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+
+    #pc-card { position: absolute; left: 90px; top: 545px; width: 906px; height: 251px; border-radius: 28px; background: rgba(10,16,32,0.94); border: 3px solid rgba(255,255,255,0.22); box-shadow: 0 10px 40px rgba(0,0,0,0.5); overflow: hidden; }
+    #pc-card canvas { position: absolute; left: 0; top: 0; }
+    #pc-card .ttl { position: absolute; right: 24px; bottom: 6px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.12em; color: rgba(255,255,255,0.65); }
+  </style>
+  <div id="root" data-composition-id="stageC" data-width="1080" data-height="1920">
+    <canvas id="pc-canvas" width="1080" height="1920"></canvas>
+    <div id="pc-tag-a" class="pc-mono clip" data-start="0.10" data-duration="13.9" style="left: 60px; top: 200px"><span class="pc-dot"></span>LE RADAR</div>
+    <div id="pc-illu" class="pc-mono clip" data-start="0.10" data-duration="14.0" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="pc-card" class="clip" data-start="4.60" data-duration="9.4"><canvas id="pc-cc" width="900" height="245"></canvas><div class="ttl">ILLUSTRATIF</div></div>
+    <div id="pc-lab-radar" class="pc-chip pc-neon clip" data-start="0.20" data-duration="13.8" style="left: 70px; top: 290px; --c: #b26bff;">CAPTEUR RADAR</div>
+    <div id="pc-lab-waves" class="pc-chip  clip" data-start="1.80" data-duration="4.2" style="left: 70px; top: 370px; background: #b26bff; color: #fff;">ONDES RADIO : ELLES REBONDISSENT</div>
+    <div id="pc-lab-still" class="pc-chip  clip" data-start="6.20" data-duration="2.9" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">IMMOBILE : ONDES IDENTIQUES</div>
+    <div id="pc-lab-move" class="pc-chip  clip" data-start="9.20" data-duration="2.7" style="left: 70px; top: 370px; background: #38d27a; color: #04230f;">TU BOUGES : LA FRÉQUENCE CHANGE</div>
+    <div id="pc-lab-dop" class="pc-chip  clip" data-start="12.10" data-duration="1.9" style="left: 70px; top: 450px; background: #38d6ff; color: #03242c;">EFFET DOPPLER</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 26.4, T1 = 40.5;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("pc-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      function cam(t, x, y, d, ly) { camera.position.set(x + 0.15 * Math.sin(t * 0.4), y, d); camera.lookAt(0, ly, 0); camera.updateMatrixWorld(); }
+      var flo = new THREE.Mesh(new THREE.PlaneGeometry(14, 10), HF.std(0x0f1628, { roughness: 0.3, metalness: 0.5 })); flo.rotation.x = -Math.PI / 2; flo.position.set(0, 0, 2); scene.add(flo);
+      var hdr = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.5, 0.3), HF.std(0x5a6a92, { metalness: 0.5, roughness: 0.5 })); hdr.position.set(0, 2.45, 0); scene.add(hdr);
+      [-1.55, 1.55].forEach(function (x) { var pst = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.3, 0.3), HF.std(0x5a6a92, { metalness: 0.5 })); pst.position.set(x, 1.15, 0); scene.add(pst); });
+      var gm = new THREE.MeshStandardMaterial({ color: 0x9fc4ff, transparent: true, opacity: 0.32, roughness: 0.1, metalness: 0.2, depthWrite: false });
+      var pL = new THREE.Mesh(new THREE.BoxGeometry(1.45, 2.2, 0.06), gm), pR = new THREE.Mesh(new THREE.BoxGeometry(1.45, 2.2, 0.06), gm); pL.position.y = pR.position.y = 1.1; scene.add(pL); scene.add(pR);
+      var edgeM = HF.std(0xdfe6ff, { metalness: 0.6 }); [pL, pR].forEach(function (pp) { var e = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.06, 0.08), edgeM); e.position.y = 1.08; pp.add(e); });
+      var sens = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.16, 0.14), HF.std(0x1d2230, { metalness: 0.5 })); sens.position.set(0, 2.1, 0.18); scene.add(sens);
+      var ledM = new THREE.MeshBasicMaterial({ color: 0xff4a4a }), led = new THREE.Mesh(new THREE.SphereGeometry(0.035, 10, 8), ledM); led.position.set(0, 2.1, 0.27); scene.add(led);
+      function door(o) { pL.position.x = -0.725 - 1.35 * o; pR.position.x = 0.725 + 1.35 * o; pL.position.z = 0.04; pR.position.z = -0.04; }
+      function mkPerson(col) {
+        var g = new THREE.Group(), m = HF.std(col, { roughness: 0.6 });
+        var body = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.23, 0.85, 12), m); body.position.y = 1.0; g.add(body);
+        var head = new THREE.Mesh(new THREE.SphereGeometry(0.17, 14, 10), HF.std(0xf2d0b0)); head.position.y = 1.58; g.add(head);
+        var legs = [-0.1, 0.1].map(function (x) { var pv = new THREE.Group(); pv.position.set(x, 0.62, 0); var l = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.64, 0.13), HF.std(0x1d2a4a)); l.position.y = -0.31; pv.add(l); g.add(pv); return pv; });
+        var arms = [-0.3, 0.3].map(function (x) { var pv = new THREE.Group(); pv.position.set(x, 1.38, 0); var l = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.6, 0.1), m); l.position.y = -0.28; pv.add(l); g.add(pv); return pv; });
+        return { group: g, legs: legs, arms: arms };
+      }
+      function walk(pr, ph, amp) { pr.legs[0].rotation.x = Math.sin(ph) * 0.5 * amp; pr.legs[1].rotation.x = -Math.sin(ph) * 0.5 * amp; pr.arms[0].rotation.x = -Math.sin(ph) * 0.4 * amp; pr.arms[1].rotation.x = Math.sin(ph) * 0.4 * amp; }
+      var pr = mkPerson(0xffc41a); pr.group.scale.setScalar(0.9); scene.add(pr.group);
+
+      var S = new THREE.Vector3(0, 2.1, 0.2), RE = [], RR = [];
+      for (var i = 0; i < 4; i++) { var r = new THREE.Mesh(new THREE.TorusGeometry(1, 0.018, 6, 60), new THREE.MeshBasicMaterial({ color: 0xb26bff, transparent: true, opacity: 0 })); scene.add(r); RE.push(r); }
+      for (var i = 0; i < 4; i++) { var r = new THREE.Mesh(new THREE.TorusGeometry(1, 0.018, 6, 60), new THREE.MeshBasicMaterial({ color: 0x38d6ff, transparent: true, opacity: 0 })); scene.add(r); RR.push(r); }
+      var cctx = $("pc-cc").getContext("2d");
+      function drawCard(t) {
+        var c = cctx; c.clearRect(0, 0, 900, 245);
+        c.font = "700 22px 'Space Mono', monospace"; c.textAlign = "left"; c.fillStyle = "#b26bff"; c.fillText("ÉMISE", 26, 36); c.fillStyle = "#38d6ff"; c.fillText("REVENUE", 26, 140);
+        var f1 = 6, f2 = t < 35.6 ? 6 : 6 + 4 * ease(seg(t, 35.6, 36.4));
+        c.lineWidth = 5; c.lineCap = "round";
+        c.strokeStyle = "#b26bff"; c.beginPath(); for (var x = 0; x <= 840; x += 4) { var y = 70 - 26 * Math.sin(x / 840 * f1 * 6.2832 - t * 3); x === 0 ? c.moveTo(130 + x * 0.85, y) : c.lineTo(130 + x * 0.85, y); } c.stroke();
+        c.strokeStyle = "#38d6ff"; c.beginPath(); for (var x = 0; x <= 840; x += 4) { var y = 175 - 26 * Math.sin(x / 840 * f2 * 6.2832 - t * 3); x === 0 ? c.moveTo(130 + x * 0.85, y) : c.lineTo(130 + x * 0.85, y); } c.stroke();
+      }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        cam(t, 0, 1.7, 12, 1.63); door(0);
+        var mv = ease(seg(t, 35.6, 36.3)), px = 0.9 * Math.sin(2.2 * (t - 35.6)) * mv;
+        pr.group.position.set(px, 0, 0.6); walk(pr, t * 6, mv);
+        var ve = ease(seg(t, 28.3, 28.9)), C = new THREE.Vector3(px, 1.1, 0.6);
+        RE.forEach(function (r, i) { var a = (t * 0.45 + i / 4) % 1; r.position.copy(S); r.scale.setScalar(0.1 + 2.2 * a); r.material.opacity = 0.75 * ve * (1 - a) * (t < 26.6 ? 0 : 1); });
+        var phi = 0.45 * (t + 0.8 * Math.max(0, t - 35.6)), vr = ease(seg(t, 29.2, 29.8));
+        RR.forEach(function (r, i) { var a = (phi + i / 4) % 1; r.position.copy(C); r.scale.setScalar(0.1 + 2.0 * a); r.material.opacity = 0.75 * vr * (1 - a); });
+        ledM.color.setHex(0xb26bff);
+        drawCard(t);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#pc-lab-radar|0.20", "#pc-lab-waves|1.80", "#pc-lab-still|6.20", "#pc-lab-move|9.20", "#pc-lab-dop|12.10"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageC"] = tl;
+    })();
+
+  </script>
+</template>

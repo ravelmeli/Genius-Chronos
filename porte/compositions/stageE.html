@@ -1,0 +1,107 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #pe-canvas, #pe-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #pe-leaders { pointer-events: none; }
+    .pe-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .pe-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .pe-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .pe-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .pe-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .pe-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #pe-bubble { position: absolute; left: 130px; top: 700px; width: 820px; padding: 36px 40px; border-radius: 40px; background: #1c2b52; border: 4px solid #4aa8ff; box-shadow: 0 0 40px rgba(74,168,255,0.5); color: #fff; font-weight: 800; font-size: 60px; line-height: 1.15; text-align: center; }
+    #pe-bubble::after { content: ""; position: absolute; left: 90px; bottom: -34px; width: 0; height: 0; border-left: 28px solid transparent; border-right: 28px solid transparent; border-top: 36px solid #4aa8ff; }
+    .pe-btn { position: absolute; padding: 20px 40px; border-radius: 999px; font-weight: 800; font-size: 40px; white-space: nowrap; }
+    .pe-big { position: absolute; left: 0; width: 1080px; text-align: center; color: #fff; font-weight: 800; letter-spacing: -0.02em; text-shadow: 0 6px 40px rgba(0,0,0,0.7); }
+
+    #pe-dim { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: rgba(7,11,22,0.5); }
+    .pe-q { position: absolute; font-size: 150px; font-weight: 800; color: #ffc41a; text-shadow: 0 0 40px rgba(255,196,26,0.8); }
+    .pe-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageE" data-width="1080" data-height="1920">
+    <canvas id="pe-canvas" width="1080" height="1920"></canvas>
+    <div id="pe-tag-a" class="pe-mono clip" data-start="0.10" data-duration="5.3" style="left: 60px; top: 200px"><span class="pe-dot"></span>LE RÉSUMÉ</div>
+    <div id="pe-tag-b" class="pe-mono clip" data-start="5.60" data-duration="5.4" style="left: 60px; top: 200px"><span class="pe-dot"></span>ET TOI ?</div>
+    <div id="pe-illu" class="pe-mono clip" data-start="0.10" data-duration="11.0" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="pe-lab-s1" class="pe-chip  clip" data-start="0.30" data-duration="4.9" style="left: 70px; top: 290px; background: #4aa8ff; color: #04152a;">UN CAPTEUR QUI VOIT</div>
+    <div id="pe-lab-s2" class="pe-chip  clip" data-start="1.70" data-duration="3.5" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">UNE UNITÉ QUI DÉCIDE</div>
+    <div id="pe-lab-s3" class="pe-chip  clip" data-start="3.10" data-duration="2.1" style="left: 70px; top: 450px; background: #38d27a; color: #04230f;">UN MOTEUR QUI OUVRE</div>
+    <div id="pe-big" class="pe-big clip" data-start="4.20" data-duration="1.4" style="top: 640px; font-size: 96px; text-shadow: 0 4px 24px rgba(0,0,0,0.8)">Voilà le secret.</div>
+    <div id="pe-dim" class="clip" data-start="5.50" data-duration="5.66"></div>
+    <div id="pe-q1" class="pe-q clip" data-start="6.30" data-duration="4.86" style="left: 100px; top: 450px">?</div>
+    <div id="pe-q2" class="pe-q clip" data-start="6.50" data-duration="4.66" style="left: 850px; top: 560px">?</div>
+    <div id="pe-bubble" class="clip" data-start="5.60" data-duration="5.56" style="top: 700px">Tu as déjà fait ouvrir<br>une porte en agitant<br>la main ?</div>
+    <div id="pe-b1" class="pe-btn clip" data-start="8.40" data-duration="2.76" style="left: 90px; top: 1100px; background: #fff; color: #0a0f1c">COMMENTE</div>
+    <div id="pe-b2" class="pe-btn clip" data-start="9.30" data-duration="1.86" style="left: 540px; top: 1100px; background: #ff3b3b; color: #fff">ABONNE-TOI</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 54.0, T1 = 65.16;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("pe-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      function cam(t, x, y, d, ly) { camera.position.set(x + 0.15 * Math.sin(t * 0.4), y, d); camera.lookAt(0, ly, 0); camera.updateMatrixWorld(); }
+      var flo = new THREE.Mesh(new THREE.PlaneGeometry(14, 10), HF.std(0x0f1628, { roughness: 0.3, metalness: 0.5 })); flo.rotation.x = -Math.PI / 2; flo.position.set(0, 0, 2); scene.add(flo);
+      var hdr = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.5, 0.3), HF.std(0x5a6a92, { metalness: 0.5, roughness: 0.5 })); hdr.position.set(0, 2.45, 0); scene.add(hdr);
+      [-1.55, 1.55].forEach(function (x) { var pst = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.3, 0.3), HF.std(0x5a6a92, { metalness: 0.5 })); pst.position.set(x, 1.15, 0); scene.add(pst); });
+      var gm = new THREE.MeshStandardMaterial({ color: 0x9fc4ff, transparent: true, opacity: 0.32, roughness: 0.1, metalness: 0.2, depthWrite: false });
+      var pL = new THREE.Mesh(new THREE.BoxGeometry(1.45, 2.2, 0.06), gm), pR = new THREE.Mesh(new THREE.BoxGeometry(1.45, 2.2, 0.06), gm); pL.position.y = pR.position.y = 1.1; scene.add(pL); scene.add(pR);
+      var edgeM = HF.std(0xdfe6ff, { metalness: 0.6 }); [pL, pR].forEach(function (pp) { var e = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.06, 0.08), edgeM); e.position.y = 1.08; pp.add(e); });
+      var sens = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.16, 0.14), HF.std(0x1d2230, { metalness: 0.5 })); sens.position.set(0, 2.1, 0.18); scene.add(sens);
+      var ledM = new THREE.MeshBasicMaterial({ color: 0xff4a4a }), led = new THREE.Mesh(new THREE.SphereGeometry(0.035, 10, 8), ledM); led.position.set(0, 2.1, 0.27); scene.add(led);
+      function door(o) { pL.position.x = -0.725 - 1.35 * o; pR.position.x = 0.725 + 1.35 * o; pL.position.z = 0.04; pR.position.z = -0.04; }
+      function mkPerson(col) {
+        var g = new THREE.Group(), m = HF.std(col, { roughness: 0.6 });
+        var body = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.23, 0.85, 12), m); body.position.y = 1.0; g.add(body);
+        var head = new THREE.Mesh(new THREE.SphereGeometry(0.17, 14, 10), HF.std(0xf2d0b0)); head.position.y = 1.58; g.add(head);
+        var legs = [-0.1, 0.1].map(function (x) { var pv = new THREE.Group(); pv.position.set(x, 0.62, 0); var l = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.64, 0.13), HF.std(0x1d2a4a)); l.position.y = -0.31; pv.add(l); g.add(pv); return pv; });
+        var arms = [-0.3, 0.3].map(function (x) { var pv = new THREE.Group(); pv.position.set(x, 1.38, 0); var l = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.6, 0.1), m); l.position.y = -0.28; pv.add(l); g.add(pv); return pv; });
+        return { group: g, legs: legs, arms: arms };
+      }
+      function walk(pr, ph, amp) { pr.legs[0].rotation.x = Math.sin(ph) * 0.5 * amp; pr.legs[1].rotation.x = -Math.sin(ph) * 0.5 * amp; pr.arms[0].rotation.x = -Math.sin(ph) * 0.4 * amp; pr.arms[1].rotation.x = Math.sin(ph) * 0.4 * amp; }
+      var pr = mkPerson(0xffc41a); pr.group.scale.setScalar(0.9); scene.add(pr.group);
+
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        cam(t, 0, 1.6, 9.5, 1.0);
+        var tt = (t - 54.0) % 6.5, px = lerp(-2.2, 0, ease(seg(tt, 0, 3.0))), pz = lerp(2.6, 1.2, ease(seg(tt, 0, 3.0)));
+        pr.group.position.set(px, 0, pz); walk(pr, t * 6, tt < 3.2 ? 1 : 0);
+        door(ease(seg(tt, 2.6, 3.7)) * (1 - ease(seg(tt, 5.7, 6.4))));
+        ledM.color.setHex(tt > 2.7 ? 0x38d27a : 0xff4a4a);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#pe-lab-s1|0.30", "#pe-lab-s2|1.70", "#pe-lab-s3|3.10"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      tl.fromTo("#pe-big", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 4.20);
+      tl.fromTo("#pe-dim", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 5.50);
+      tl.fromTo("#pe-bubble", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 5.60);
+      popd("#pe-q1", 6.30); popd("#pe-q2", 6.50); popd("#pe-b1", 8.40); popd("#pe-b2", 9.30);
+      window.__timelines["stageE"] = tl;
+    })();
+
+  </script>
+</template>

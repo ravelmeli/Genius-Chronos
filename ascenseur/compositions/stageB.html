@@ -1,0 +1,108 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #sb-canvas, #sb-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #sb-leaders { pointer-events: none; }
+    .sb-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .sb-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .sb-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .sb-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .sb-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .sb-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+    .sb-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+
+    #sc-card { position: absolute; left: 90px; top: 545px; width: 906px; height: 251px; border-radius: 28px; background: rgba(10,16,32,0.94); border: 3px solid rgba(255,255,255,0.22); box-shadow: 0 10px 40px rgba(0,0,0,0.5); overflow: hidden; }
+    #sc-card canvas { position: absolute; left: 0; top: 0; }
+    #sc-card .ttl { position: absolute; right: 24px; bottom: 6px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.12em; color: rgba(255,255,255,0.65); }
+  </style>
+  <div id="root" data-composition-id="stageB" data-width="1080" data-height="1920">
+    <canvas id="sb-canvas" width="1080" height="1920"></canvas>
+    <div id="sb-tag-a" class="sb-mono clip" data-start="0.10" data-duration="7.9" style="left: 60px; top: 200px"><span class="sb-dot"></span>LES ONDES</div>
+    <div id="sb-illu" class="sb-mono clip" data-start="0.10" data-duration="8.0" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="sc-card" class="clip" data-start="5.70" data-duration="2.3"><canvas id="sc-cc" width="900" height="245"></canvas><div class="ttl">ILLUSTRATIF</div></div>
+    <div id="sb-lab-radio" class="sb-chip sb-neon clip" data-start="0.50" data-duration="7.5" style="left: 70px; top: 290px; --c: #38d6ff;">TÉLÉPHONE ET ANTENNE : ONDES RADIO</div>
+    <div id="sb-lab-em" class="sb-chip  clip" data-start="3.70" data-duration="4.3" style="left: 70px; top: 370px; background: #b26bff; color: #fff;">ONDES ÉLECTROMAGNÉTIQUES</div>
+    <div id="sb-lab-field" class="sb-chip  clip" data-start="5.60" data-duration="2.4" style="left: 70px; top: 450px; background: #ffc41a; color: #1a1400;">CHAMP ÉLECTRIQUE QUI VARIE</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 9.9, T1 = 18.0;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("sb-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      function cam(t, x, y, d, ly, lx) { camera.position.set(x + 0.12 * Math.sin(t * 0.4), y, d); camera.lookAt(lx || x, ly, 0); camera.updateMatrixWorld(); }
+      var flo = new THREE.Mesh(new THREE.PlaneGeometry(16, 10), HF.std(0x0f1628, { roughness: 0.3, metalness: 0.5 })); flo.rotation.x = -Math.PI / 2; flo.position.set(0, 0, 1); scene.add(flo);
+      function mkCab() {
+        var g = new THREE.Group(), W = 2.4, H = 2.6, D = 2.2;
+        var wm = new THREE.MeshStandardMaterial({ color: 0x9aa8c8, transparent: true, opacity: 0.22, metalness: 0.7, roughness: 0.3, depthWrite: false });
+        var box = new THREE.Mesh(new THREE.BoxGeometry(W, H, D), wm); box.position.y = H / 2; g.add(box);
+        var em = HF.std(0xdfe6ff, { metalness: 0.8, roughness: 0.3, emissive: 0x6a7aa0, emissiveIntensity: 0.4 }), ed = [];
+        [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (s) { var b = new THREE.Mesh(new THREE.BoxGeometry(0.07, H, 0.07), em); b.position.set(s[0] * W / 2, H / 2, s[1] * D / 2); g.add(b); ed.push(b); });
+        [0, H].forEach(function (y) { [-1, 1].forEach(function (s) { var a = new THREE.Mesh(new THREE.BoxGeometry(W, 0.07, 0.07), em); a.position.set(0, y, s * D / 2); g.add(a); var b = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, D), em); b.position.set(s * W / 2, y, 0); g.add(b); ed.push(a, b); }); });
+        var dm = new THREE.MeshStandardMaterial({ color: 0xaab6d4, metalness: 0.8, roughness: 0.3, transparent: true, opacity: 0.75 });
+        var dl = new THREE.Mesh(new THREE.BoxGeometry(W / 2, H - 0.1, 0.06), dm), dr = new THREE.Mesh(new THREE.BoxGeometry(W / 2, H - 0.1, 0.06), dm); dl.position.set(-W / 4, H / 2, D / 2); dr.position.set(W / 4, H / 2, D / 2); g.add(dl); g.add(dr);
+        return { group: g, dl: dl, dr: dr, em: em, W: W, H: H, D: D, setDoor: function (c) { dl.position.x = -W / 4 - (1 - c) * W / 2 * 0.95; dr.position.x = W / 4 + (1 - c) * W / 2 * 0.95; dl.visible = dr.visible = true; } };
+      }
+      function mkAnt() {
+        var g = new THREE.Group(), m = HF.std(0xcfd6e6, { metalness: 0.7, roughness: 0.4 });
+        var mast = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.12, 2.6, 10), m); mast.position.y = 1.3; g.add(mast);
+        [1.8, 2.2, 2.5].forEach(function (y, i) { var b = new THREE.Mesh(new THREE.BoxGeometry(0.9 - i * 0.2, 0.05, 0.05), m); b.position.y = y; g.add(b); });
+        var tip = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 8), new THREE.MeshBasicMaterial({ color: 0xff4a4a })); tip.position.y = 2.65; g.add(tip);
+        return g;
+      }
+      function mkBars() { var g = new THREE.Group(), bs = []; for (var i = 0; i < 4; i++) { var b = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.14 + 0.12 * i, 0.06), new THREE.MeshBasicMaterial({ color: 0x38d27a })); b.position.set(i * 0.15, (0.14 + 0.12 * i) / 2, 0); g.add(b); bs.push(b); } return { group: g, bars: bs }; }
+      function setBars(o, n, col) { o.bars.forEach(function (b, i) { b.material.color.setHex(i < n ? col : 0x2a3350); }); }
+      function mkRings(n, col) { var a = []; for (var i = 0; i < n; i++) { var r = new THREE.Mesh(new THREE.TorusGeometry(1, 0.02, 6, 64), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0 })); scene.add(r); a.push(r); } return a; }
+
+      var an = mkAnt(); an.position.set(-1.6, 0, 0); scene.add(an);
+      var ph = HF.makePhone2(0x4aa8ff); ph.scale.setScalar(3.2); ph.position.set(1.5, 0.7, 0.2); scene.add(ph);
+      var br = mkBars(); br.group.position.set(1.95, 0.6, 0.2); br.group.scale.setScalar(1.4); scene.add(br.group);
+      var RG = mkRings(4, 0x38d6ff);
+      var cctx = $("sc-cc").getContext("2d");
+      function drawCard(t) {
+        var c = cctx; c.clearRect(0, 0, 900, 245);
+        c.fillStyle = "rgba(255,255,255,0.85)"; c.font = "700 22px 'Space Mono', monospace"; c.textAlign = "left"; c.fillText("CHAMP ÉLECTRIQUE", 26, 36);
+        c.strokeStyle = "rgba(255,255,255,0.25)"; c.lineWidth = 2; c.beginPath(); c.moveTo(20, 140); c.lineTo(880, 140); c.stroke();
+        c.strokeStyle = "#ffc41a"; c.lineWidth = 6; c.lineCap = "round"; c.beginPath();
+        for (var x = 0; x <= 860; x += 4) { var y = 140 - 70 * Math.sin(x / 860 * 5 * 6.2832 - t * 5); x === 0 ? c.moveTo(20 + x, y) : c.lineTo(20 + x, y); } c.stroke();
+        var yy = 140 - 70 * Math.sin(-t * 5); c.fillStyle = "#fff"; c.beginPath(); c.arc(20, yy, 9, 0, 6.2832); c.fill();
+      }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        cam(t, 0, 2.2, 13, 2.2);
+        var vis = ease(seg(t, 10.9, 11.4));
+        RG.forEach(function (r, i) { var a = (t * 0.35 + i / 4) % 1; r.position.set(-1.6, 2.65, 0); r.scale.setScalar(0.1 + 4.2 * a); r.material.opacity = 0.7 * vis * (1 - a); });
+        setBars(br, vis > 0.5 ? 4 : 0, 0x38d27a); br.group.visible = vis > 0.3;
+        drawCard(t);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#sb-lab-radio|0.50", "#sb-lab-em|3.70", "#sb-lab-field|5.60"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageB"] = tl;
+    })();
+
+  </script>
+</template>

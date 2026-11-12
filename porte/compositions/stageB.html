@@ -1,0 +1,106 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #pb-canvas, #pb-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #pb-leaders { pointer-events: none; }
+    .pb-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .pb-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .pb-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .pb-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .pb-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .pb-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+    .pb-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageB" data-width="1080" data-height="1920">
+    <canvas id="pb-canvas" width="1080" height="1920"></canvas>
+    <div id="pb-tag-a" class="pb-mono clip" data-start="0.10" data-duration="14.2" style="left: 60px; top: 200px"><span class="pb-dot"></span>L'INFRAROUGE</div>
+    <div id="pb-illu" class="pb-mono clip" data-start="0.10" data-duration="14.3" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="pb-lab-ir" class="pb-chip pb-neon clip" data-start="0.30" data-duration="14.0" style="left: 70px; top: 290px; --c: #ff4a4a;">CAPTEUR INFRAROUGE</div>
+    <div id="pb-lab-emit" class="pb-chip  clip" data-start="1.80" data-duration="3.5" style="left: 70px; top: 370px; background: #ff4a4a; color: #fff;">LUMIÈRE INFRAROUGE : INVISIBLE</div>
+    <div id="pb-lab-back" class="pb-chip  clip" data-start="5.50" data-duration="5.1" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">LA LUMIÈRE REVIENT VERS LE CAPTEUR</div>
+    <div id="pb-lab-det" class="pb-chip  clip" data-start="9.40" data-duration="1.3" style="left: 70px; top: 450px; background: #38d27a; color: #04230f;">IL DÉTECTE</div>
+    <div id="pb-lab-passive" class="pb-chip  clip" data-start="10.80" data-duration="3.5" style="left: 70px; top: 370px; background: #ff8a2a; color: #1a0c00;">D'AUTRES REPÈRENT LA CHALEUR</div>
+    <div id="pb-lab-body" class="pb-chip  clip" data-start="12.60" data-duration="1.7" style="left: 70px; top: 450px; background: #ff8a2a; color: #1a0c00;">CELLE DE TON CORPS</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 12.0, T1 = 26.4;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("pb-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      function cam(t, x, y, d, ly) { camera.position.set(x + 0.15 * Math.sin(t * 0.4), y, d); camera.lookAt(0, ly, 0); camera.updateMatrixWorld(); }
+      var flo = new THREE.Mesh(new THREE.PlaneGeometry(14, 10), HF.std(0x0f1628, { roughness: 0.3, metalness: 0.5 })); flo.rotation.x = -Math.PI / 2; flo.position.set(0, 0, 2); scene.add(flo);
+      var hdr = new THREE.Mesh(new THREE.BoxGeometry(3.2, 0.5, 0.3), HF.std(0x5a6a92, { metalness: 0.5, roughness: 0.5 })); hdr.position.set(0, 2.45, 0); scene.add(hdr);
+      [-1.55, 1.55].forEach(function (x) { var pst = new THREE.Mesh(new THREE.BoxGeometry(0.1, 2.3, 0.3), HF.std(0x5a6a92, { metalness: 0.5 })); pst.position.set(x, 1.15, 0); scene.add(pst); });
+      var gm = new THREE.MeshStandardMaterial({ color: 0x9fc4ff, transparent: true, opacity: 0.32, roughness: 0.1, metalness: 0.2, depthWrite: false });
+      var pL = new THREE.Mesh(new THREE.BoxGeometry(1.45, 2.2, 0.06), gm), pR = new THREE.Mesh(new THREE.BoxGeometry(1.45, 2.2, 0.06), gm); pL.position.y = pR.position.y = 1.1; scene.add(pL); scene.add(pR);
+      var edgeM = HF.std(0xdfe6ff, { metalness: 0.6 }); [pL, pR].forEach(function (pp) { var e = new THREE.Mesh(new THREE.BoxGeometry(1.45, 0.06, 0.08), edgeM); e.position.y = 1.08; pp.add(e); });
+      var sens = new THREE.Mesh(new THREE.BoxGeometry(0.34, 0.16, 0.14), HF.std(0x1d2230, { metalness: 0.5 })); sens.position.set(0, 2.1, 0.18); scene.add(sens);
+      var ledM = new THREE.MeshBasicMaterial({ color: 0xff4a4a }), led = new THREE.Mesh(new THREE.SphereGeometry(0.035, 10, 8), ledM); led.position.set(0, 2.1, 0.27); scene.add(led);
+      function door(o) { pL.position.x = -0.725 - 1.35 * o; pR.position.x = 0.725 + 1.35 * o; pL.position.z = 0.04; pR.position.z = -0.04; }
+      function mkPerson(col) {
+        var g = new THREE.Group(), m = HF.std(col, { roughness: 0.6 });
+        var body = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.23, 0.85, 12), m); body.position.y = 1.0; g.add(body);
+        var head = new THREE.Mesh(new THREE.SphereGeometry(0.17, 14, 10), HF.std(0xf2d0b0)); head.position.y = 1.58; g.add(head);
+        var legs = [-0.1, 0.1].map(function (x) { var pv = new THREE.Group(); pv.position.set(x, 0.62, 0); var l = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.64, 0.13), HF.std(0x1d2a4a)); l.position.y = -0.31; pv.add(l); g.add(pv); return pv; });
+        var arms = [-0.3, 0.3].map(function (x) { var pv = new THREE.Group(); pv.position.set(x, 1.38, 0); var l = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.6, 0.1), m); l.position.y = -0.28; pv.add(l); g.add(pv); return pv; });
+        return { group: g, legs: legs, arms: arms };
+      }
+      function walk(pr, ph, amp) { pr.legs[0].rotation.x = Math.sin(ph) * 0.5 * amp; pr.legs[1].rotation.x = -Math.sin(ph) * 0.5 * amp; pr.arms[0].rotation.x = -Math.sin(ph) * 0.4 * amp; pr.arms[1].rotation.x = Math.sin(ph) * 0.4 * amp; }
+      var pr = mkPerson(0xffc41a); pr.group.scale.setScalar(0.9); scene.add(pr.group);
+
+      var S = new THREE.Vector3(0, 2.1, 0.2);
+      var BM = []; for (var i = 0; i < 7; i++) { var b = HF.makeBeam(0xff4a4a); scene.add(b); BM.push(b); }
+      var back = HF.makeBeam(0xffc41a); scene.add(back);
+      var aura = new THREE.Mesh(new THREE.SphereGeometry(0.95, 20, 14), new THREE.MeshBasicMaterial({ color: 0xff8a2a, transparent: true, opacity: 0, depthWrite: false })); scene.add(aura);
+      var HR = []; for (var i = 0; i < 3; i++) { var r = new THREE.Mesh(new THREE.TorusGeometry(1, 0.02, 6, 40), new THREE.MeshBasicMaterial({ color: 0xff8a2a, transparent: true, opacity: 0 })); scene.add(r); HR.push(r); }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        cam(t, 0, 1.6, 9.5, 1.0); door(0);
+        var px = lerp(-2.6, 0.1, ease(seg(t, 17.2, 19.8))), moving = t > 17.2 && t < 19.9;
+        pr.group.position.set(px, 0, 1.2); walk(pr, t * 6, moving ? 1 : 0);
+        var vis = ease(seg(t, 13.9, 14.6)) * (1 - ease(seg(t, 22.7, 23.2)));
+        BM.forEach(function (b, i) {
+          var T = new THREE.Vector3(-1.8 + 0.6 * i, 0, 1.4), E = T.clone();
+          if (Math.abs(T.x - px) < 0.4 && t > 17.2) E = S.clone().lerp(T, (2.1 - 1.3) / 2.1 + 0.0);
+          HF.setBeam(b, S, E, 0.013, 0.65 * vis * (0.7 + 0.3 * Math.sin(t * 8 + i)));
+        });
+        var rb = ease(seg(t, 17.8, 18.3)) * (1 - ease(seg(t, 22.7, 23.2)));
+        var C = new THREE.Vector3(px, 1.3, 1.1), pp = (t * 1.4) % 1;
+        HF.setBeam(back, C.clone().lerp(S, Math.max(0, pp - 0.3)), C.clone().lerp(S, pp), 0.04, rb);
+        ledM.color.setHex(t > 21.4 ? 0x38d27a : 0xff4a4a);
+        var ha = ease(seg(t, 22.9, 23.6));
+        aura.position.set(px, 1.0, 1.1); aura.material.opacity = 0.22 * ha * (0.8 + 0.2 * Math.sin(t * 4));
+        HR.forEach(function (r, i) { var a = (t * 0.6 + i / 3) % 1, c = new THREE.Vector3(px, 1.0, 1.1).lerp(S, a); r.position.copy(c); r.scale.setScalar(0.25 + 0.25 * a); r.material.opacity = 0.8 * ha * Math.sin(a * 3.14); });
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#pb-lab-ir|0.30", "#pb-lab-emit|1.80", "#pb-lab-back|5.50", "#pb-lab-det|9.40", "#pb-lab-passive|10.80", "#pb-lab-body|12.60"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageB"] = tl;
+    })();
+
+  </script>
+</template>

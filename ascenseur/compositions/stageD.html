@@ -1,0 +1,103 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #sd-canvas, #sd-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #sd-leaders { pointer-events: none; }
+    .sd-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .sd-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .sd-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .sd-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .sd-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .sd-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+    .sd-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageD" data-width="1080" data-height="1920">
+    <canvas id="sd-canvas" width="1080" height="1920"></canvas>
+    <div id="sd-tag-a" class="sd-mono clip" data-start="0.10" data-duration="12.4" style="left: 60px; top: 200px"><span class="sd-dot"></span>L'EFFET</div>
+    <div id="sd-illu" class="sd-mono clip" data-start="0.10" data-duration="12.5" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="sd-lab-wave" class="sd-chip sd-neon clip" data-start="0.20" data-duration="2.3" style="left: 70px; top: 290px; --c: #b26bff;">L'ONDE ARRIVE SUR LE MÉTAL</div>
+    <div id="sd-lab-move" class="sd-chip  clip" data-start="2.60" data-duration="2.1" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">LES CHARGES SE DÉPLACENT</div>
+    <div id="sd-lab-opp" class="sd-chip sd-neon clip" data-start="4.80" data-duration="2.6" style="left: 70px; top: 290px; --c: #ff4a4a;">ELLES CRÉENT UN CHAMP OPPOSÉ</div>
+    <div id="sd-lab-weak" class="sd-chip  clip" data-start="7.50" data-duration="2.3" style="left: 70px; top: 370px; background: #38d27a; color: #04230f;">CHAMP TRÈS AFFAIBLI DEDANS</div>
+    <div id="sd-lab-far" class="sd-chip sd-neon clip" data-start="10.10" data-duration="2.4" style="left: 70px; top: 290px; --c: #ffc41a;">CAGE DE FARADAY</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 25.6, T1 = 38.2;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("sd-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      function cam(t, x, y, d, ly, lx) { camera.position.set(x + 0.12 * Math.sin(t * 0.4), y, d); camera.lookAt(lx || x, ly, 0); camera.updateMatrixWorld(); }
+      var flo = new THREE.Mesh(new THREE.PlaneGeometry(16, 10), HF.std(0x0f1628, { roughness: 0.3, metalness: 0.5 })); flo.rotation.x = -Math.PI / 2; flo.position.set(0, 0, 1); scene.add(flo);
+      function mkCab() {
+        var g = new THREE.Group(), W = 2.4, H = 2.6, D = 2.2;
+        var wm = new THREE.MeshStandardMaterial({ color: 0x9aa8c8, transparent: true, opacity: 0.22, metalness: 0.7, roughness: 0.3, depthWrite: false });
+        var box = new THREE.Mesh(new THREE.BoxGeometry(W, H, D), wm); box.position.y = H / 2; g.add(box);
+        var em = HF.std(0xdfe6ff, { metalness: 0.8, roughness: 0.3, emissive: 0x6a7aa0, emissiveIntensity: 0.4 }), ed = [];
+        [[-1, -1], [1, -1], [-1, 1], [1, 1]].forEach(function (s) { var b = new THREE.Mesh(new THREE.BoxGeometry(0.07, H, 0.07), em); b.position.set(s[0] * W / 2, H / 2, s[1] * D / 2); g.add(b); ed.push(b); });
+        [0, H].forEach(function (y) { [-1, 1].forEach(function (s) { var a = new THREE.Mesh(new THREE.BoxGeometry(W, 0.07, 0.07), em); a.position.set(0, y, s * D / 2); g.add(a); var b = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.07, D), em); b.position.set(s * W / 2, y, 0); g.add(b); ed.push(a, b); }); });
+        var dm = new THREE.MeshStandardMaterial({ color: 0xaab6d4, metalness: 0.8, roughness: 0.3, transparent: true, opacity: 0.75 });
+        var dl = new THREE.Mesh(new THREE.BoxGeometry(W / 2, H - 0.1, 0.06), dm), dr = new THREE.Mesh(new THREE.BoxGeometry(W / 2, H - 0.1, 0.06), dm); dl.position.set(-W / 4, H / 2, D / 2); dr.position.set(W / 4, H / 2, D / 2); g.add(dl); g.add(dr);
+        return { group: g, dl: dl, dr: dr, em: em, W: W, H: H, D: D, setDoor: function (c) { dl.position.x = -W / 4 - (1 - c) * W / 2 * 0.95; dr.position.x = W / 4 + (1 - c) * W / 2 * 0.95; dl.visible = dr.visible = true; } };
+      }
+      function mkAnt() {
+        var g = new THREE.Group(), m = HF.std(0xcfd6e6, { metalness: 0.7, roughness: 0.4 });
+        var mast = new THREE.Mesh(new THREE.CylinderGeometry(0.05, 0.12, 2.6, 10), m); mast.position.y = 1.3; g.add(mast);
+        [1.8, 2.2, 2.5].forEach(function (y, i) { var b = new THREE.Mesh(new THREE.BoxGeometry(0.9 - i * 0.2, 0.05, 0.05), m); b.position.y = y; g.add(b); });
+        var tip = new THREE.Mesh(new THREE.SphereGeometry(0.09, 12, 8), new THREE.MeshBasicMaterial({ color: 0xff4a4a })); tip.position.y = 2.65; g.add(tip);
+        return g;
+      }
+      function mkBars() { var g = new THREE.Group(), bs = []; for (var i = 0; i < 4; i++) { var b = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.14 + 0.12 * i, 0.06), new THREE.MeshBasicMaterial({ color: 0x38d27a })); b.position.set(i * 0.15, (0.14 + 0.12 * i) / 2, 0); g.add(b); bs.push(b); } return { group: g, bars: bs }; }
+      function setBars(o, n, col) { o.bars.forEach(function (b, i) { b.material.color.setHex(i < n ? col : 0x2a3350); }); }
+      function mkRings(n, col) { var a = []; for (var i = 0; i < n; i++) { var r = new THREE.Mesh(new THREE.TorusGeometry(1, 0.02, 6, 64), new THREE.MeshBasicMaterial({ color: col, transparent: true, opacity: 0 })); scene.add(r); a.push(r); } return a; }
+
+      var wall = new THREE.Mesh(new THREE.BoxGeometry(0.35, 4.2, 0.5), HF.std(0x8a93a8, { metalness: 0.8, roughness: 0.35 })); wall.position.set(0, 2.0, 0); scene.add(wall);
+      var NW = 36, WL = [], WR = []; for (var i = 0; i < NW; i++) { var a = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 6), new THREE.MeshBasicMaterial({ color: 0xb26bff })), b = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 6), new THREE.MeshBasicMaterial({ color: 0xb26bff })); scene.add(a); scene.add(b); WL.push(a); WR.push(b); }
+      var NE = 14, ES = []; for (var i = 0; i < NE; i++) { var m = new THREE.Mesh(new THREE.SphereGeometry(0.1, 10, 8), new THREE.MeshBasicMaterial({ color: 0xffc41a })); scene.add(m); ES.push(m); }
+      var OP = []; for (var i = 0; i < 4; i++) { var b = HF.makeBeam(0xff4a4a); scene.add(b); OP.push(b); }
+      function Ef(x, t) { return Math.sin(3.2 * x - 5 * t); }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        cam(t, 0, 2.0, 11, 1.7); flo.visible = false;
+        var arr = ease(seg(t, 25.8, 26.4)), amp = 0.6;
+        var weak = 1 - 0.9 * ease(seg(t, 31.5, 33.5));
+        for (var i = 0; i < NW; i++) {
+          var x = -3.0 + 2.75 * i / (NW - 1), y = 2.0 + amp * Ef(x, t) * arr; WL[i].position.set(x, y, 0.1); WL[i].visible = arr > 0.02;
+          var x2 = 0.25 + 2.75 * i / (NW - 1), y2 = 2.0 + amp * weak * Ef(x2, t) * arr; WR[i].position.set(x2, y2, 0.1); WR[i].visible = arr > 0.02;
+        }
+        var mv = ease(seg(t, 28.2, 29.0)), E0 = Ef(0, t);
+        ES.forEach(function (m, i) { var y0 = 0.5 + 3.0 * (i / (NE - 1)); m.position.set(-0.08 + 0.16 * ((i * 7) % 3) / 2, y0 - 0.35 * E0 * mv, 0.3); });
+        var op = ease(seg(t, 30.4, 31.2));
+        OP.forEach(function (b, i) { var y = 0.8 + i * 0.9; HF.setBeam(b, new THREE.Vector3(0.0, y, 0.35), new THREE.Vector3(0.0, y + 0.45 * E0, 0.35), 0.05, op * 0.9 * (Math.abs(E0) > 0.05 ? 1 : 0)); });
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#sd-lab-wave|0.20", "#sd-lab-move|2.60", "#sd-lab-opp|4.80", "#sd-lab-weak|7.50", "#sd-lab-far|10.10"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageD"] = tl;
+    })();
+
+  </script>
+</template>
