@@ -1,0 +1,90 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #td-canvas, #td-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #td-leaders { pointer-events: none; }
+    .td-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .td-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .td-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .td-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .td-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .td-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+    .td-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageD" data-width="1080" data-height="1920">
+    <canvas id="td-canvas" width="1080" height="1920"></canvas>
+    <div id="td-tag-a" class="td-mono clip" data-start="0.10" data-duration="6.6" style="left: 60px; top: 200px"><span class="td-dot"></span>LA GLACE</div>
+    <div id="td-illu" class="td-mono clip" data-start="0.10" data-duration="6.7" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="td-lab-cry" class="td-chip td-neon clip" data-start="0.30" data-duration="6.4" style="left: 70px; top: 290px; --c: #38d6ff;">LA VAPEUR SE TRANSFORME</div>
+    <div id="td-lab-drops" class="td-chip  clip" data-start="0.90" data-duration="1.8" style="left: 70px; top: 370px; background: #4aa8ff; color: #04152a;">EN GOUTTELETTES</div>
+    <div id="td-lab-ice" class="td-chip  clip" data-start="2.80" data-duration="1.5" style="left: 70px; top: 370px; background: #38d6ff; color: #03242c;">QUI GÈLENT EN GLACE</div>
+    <div id="td-lab-white" class="td-chip  clip" data-start="4.40" data-duration="2.3" style="left: 70px; top: 450px;">CES CRISTAUX FORMENT LE TRAIT BLANC</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 22.8, T1 = 29.6;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("td-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      scene.background.setHex(0x0f2f6a); scene.fog.color.setHex(0x0f2f6a);
+      function cam(t, x, y, z, lx, ly, lz) { camera.position.set(x + 0.1 * Math.sin(t * 0.4), y, z); camera.lookAt(lx, ly, lz); camera.updateMatrixWorld(); }
+      function mkPlane() {
+        var g = new THREE.Group(), m = HF.std(0xeef1f8, { metalness: 0.3, roughness: 0.4 }), dk = HF.std(0x5a6a92, { metalness: 0.5 });
+        var f = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.13, 2.0, 14), m); f.rotation.z = Math.PI / 2; g.add(f);
+        var n = new THREE.Mesh(new THREE.ConeGeometry(0.17, 0.45, 14), m); n.rotation.z = -Math.PI / 2; n.position.x = 1.22; g.add(n);
+        var w = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.04, 2.5), dk); w.position.set(0.1, -0.03, 0); g.add(w);
+        var tf = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.55, 0.04), dk); tf.position.set(-0.95, 0.35, 0); g.add(tf);
+        var ts = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.04, 0.95), dk); ts.position.set(-0.95, 0.05, 0); g.add(ts);
+        var eng = []; [-0.62, 0.62].forEach(function (z) { var e = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.1, 0.5, 12), HF.std(0xc9cfdd, { metalness: 0.6 })); e.rotation.z = Math.PI / 2; e.position.set(0.28, -0.14, z); g.add(e); eng.push(new THREE.Vector3(0.0, -0.14, z)); });
+        return { group: g, eng: eng };
+      }
+      function mkPuffs(n) { var a = []; for (var i = 0; i < n; i++) { var m = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 0), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false })); scene.add(m); a.push(m); } return a; }
+      function trail(P, x0, y, z, sp, grow, lifeLen, mx, op) { P.forEach(function (m, k) { var x = x0 - k * sp; m.position.set(x, y + 0.03 * Math.sin(k * 1.7), z + 0.04 * Math.cos(k * 2.3)); m.scale.setScalar(0.05 + grow * k); var o = op * Math.pow(Math.max(0, 1 - k / lifeLen), 1.2); if (x < mx) o = 0; m.material.opacity = o; m.visible = o > 0.01; }); }
+      var HOT = new THREE.Color(0xff8a2a), WARM = new THREE.Color(0xffd9a0), COLD = new THREE.Color(0x9fd8ff);
+
+      var pl = mkPlane(); pl.group.position.set(1.8, 0.3, 0); scene.add(pl.group);
+      var ND = 50, DR = [], CR = []; for (var i = 0; i < ND; i++) { var d = new THREE.Mesh(new THREE.SphereGeometry(1, 10, 8), new THREE.MeshBasicMaterial({ color: 0x6fc0ff, transparent: true, opacity: 0, depthWrite: false })), c = new THREE.Mesh(new THREE.OctahedronGeometry(1, 0), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false })); scene.add(d); scene.add(c); DR.push(d); CR.push(c); }
+      var TP = mkPuffs(26);
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        cam(t, 0, 1.4, 12, -0.4, 0.2, 0); scene.background.setHex(0x0b2250);
+        var dv = ease(seg(t, 23.2, 23.9)) * (1 - ease(seg(t, 25.4, 26.0))), cv = ease(seg(t, 25.6, 26.3));
+        for (var i = 0; i < ND; i++) {
+          var u = (t * 0.3 + rnd(i, 1)) % 1, x = 1.8 - u * 5.6, y = 0.16 + (rnd(i, 2) - 0.5) * 0.6 * u, z = 0.62 + (rnd(i, 3) - 0.5) * 0.4;
+          var inD = u < 0.45 ? 1 : 0;
+          DR[i].position.set(x, y, z); DR[i].scale.setScalar(0.05 + 0.03 * rnd(i, 5)); DR[i].material.opacity = 0.9 * (dv * inD + (1 - inD) * dv * 0.0) * (1 - u); DR[i].visible = DR[i].material.opacity > 0.02;
+          CR[i].position.set(x, y, z); CR[i].rotation.set(t * 2 + i, t * 1.5, 0); CR[i].scale.setScalar(0.06 + 0.04 * rnd(i, 6)); CR[i].material.opacity = 0.95 * cv * (u >= 0.3 ? 1 : 0) * (1 - u * 0.6); CR[i].visible = CR[i].material.opacity > 0.02;
+        }
+        trail(TP, 1.8 - 0.4, 0.16, 0.62, 0.3, 0.03, 26, -3.6, 0.9 * ease(seg(t, 27.2, 28.4)));
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#td-lab-cry|0.30", "#td-lab-drops|0.90", "#td-lab-ice|2.80", "#td-lab-white|4.40"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageD"] = tl;
+    })();
+
+  </script>
+</template>

@@ -1,0 +1,108 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #yf-canvas, #yf-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #yf-leaders { pointer-events: none; }
+    .yf-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .yf-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .yf-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .yf-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .yf-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .yf-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #yf-bubble { position: absolute; left: 130px; top: 700px; width: 820px; padding: 36px 40px; border-radius: 40px; background: #1c2b52; border: 4px solid #4aa8ff; box-shadow: 0 0 40px rgba(74,168,255,0.5); color: #fff; font-weight: 800; font-size: 60px; line-height: 1.15; text-align: center; }
+    #yf-bubble::after { content: ""; position: absolute; left: 90px; bottom: -34px; width: 0; height: 0; border-left: 28px solid transparent; border-right: 28px solid transparent; border-top: 36px solid #4aa8ff; }
+    .yf-btn { position: absolute; padding: 20px 40px; border-radius: 999px; font-weight: 800; font-size: 40px; white-space: nowrap; }
+    .yf-big { position: absolute; left: 0; width: 1080px; text-align: center; color: #fff; font-weight: 800; letter-spacing: -0.02em; text-shadow: 0 6px 40px rgba(0,0,0,0.7); }
+
+    #yf-dim { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: rgba(7,11,22,0.5); }
+    .yf-q { position: absolute; font-size: 150px; font-weight: 800; color: #ffc41a; text-shadow: 0 0 40px rgba(255,196,26,0.8); }
+    .yf-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageF" data-width="1080" data-height="1920">
+    <canvas id="yf-canvas" width="1080" height="1920"></canvas>
+    <div id="yf-tag-a" class="yf-mono clip" data-start="0.10" data-duration="5.3" style="left: 60px; top: 200px"><span class="yf-dot"></span>LE RÉSUMÉ</div>
+    <div id="yf-tag-b" class="yf-mono clip" data-start="5.60" data-duration="4.82" style="left: 60px; top: 200px"><span class="yf-dot"></span>ET TOI ?</div>
+    <div id="yf-illu" class="yf-mono clip" data-start="0.10" data-duration="10.32" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="yf-lab-s1" class="yf-chip  clip" data-start="0.40" data-duration="4.9" style="left: 70px; top: 290px; background: #38d27a; color: #04230f;">UNE PUPILLE OUVERTE</div>
+    <div id="yf-lab-s2" class="yf-chip  clip" data-start="1.50" data-duration="3.8" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">UN FLASH TROP PROCHE</div>
+    <div id="yf-lab-s3" class="yf-chip  clip" data-start="2.60" data-duration="2.7" style="left: 70px; top: 450px; background: #ff4a4a; color: #fff;">UN FOND D'ŒIL ROUGE</div>
+    <div id="yf-big" class="yf-big clip" data-start="4.00" data-duration="1.4" style="top: 640px; font-size: 96px; text-shadow: 0 4px 24px rgba(0,0,0,0.8)">Voilà le secret.</div>
+    <div id="yf-dim" class="clip" data-start="5.40" data-duration="5.12"></div>
+    <div id="yf-q1" class="yf-q clip" data-start="6.20" data-duration="4.32" style="left: 100px; top: 450px">?</div>
+    <div id="yf-q2" class="yf-q clip" data-start="6.40" data-duration="4.12" style="left: 850px; top: 560px">?</div>
+    <div id="yf-bubble" class="clip" data-start="5.50" data-duration="5.02" style="top: 700px">Tu as déjà eu les yeux<br>rouges sur une photo ?</div>
+    <div id="yf-b1" class="yf-btn clip" data-start="7.80" data-duration="2.72" style="left: 90px; top: 1100px; background: #fff; color: #0a0f1c">COMMENTE</div>
+    <div id="yf-b2" class="yf-btn clip" data-start="8.50" data-duration="2.02" style="left: 540px; top: 1100px; background: #ff3b3b; color: #fff">ABONNE-TOI</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 48.6, T1 = 59.12;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("yf-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      function cam(t, x, y, z, lx, ly, lz) { camera.position.set(x + 0.08 * Math.sin(t * 0.4), y, z); camera.lookAt(lx, ly, lz); camera.updateMatrixWorld(); }
+      function mkEye() {
+        var g = new THREE.Group(), o = { group: g };
+        var sc = new THREE.Mesh(new THREE.SphereGeometry(1, 28, 20), HF.std(0xf1f3f8, { roughness: 0.5 })); sc.scale.set(1.25, 0.85, 0.5); g.add(sc);
+        o.iris = new THREE.Mesh(new THREE.CircleGeometry(0.56, 36), new THREE.MeshBasicMaterial({ color: 0x4a86b0 })); o.iris.position.z = 0.505; g.add(o.iris);
+        o.ring = new THREE.Mesh(new THREE.RingGeometry(0.5, 0.56, 36), new THREE.MeshBasicMaterial({ color: 0x1d3f5a })); o.ring.position.z = 0.51; g.add(o.ring);
+        o.pup = new THREE.Mesh(new THREE.CircleGeometry(1, 36), new THREE.MeshBasicMaterial({ color: 0x05070d })); o.pup.position.z = 0.515; g.add(o.pup);
+        o.glow = new THREE.Mesh(new THREE.CircleGeometry(1, 36), new THREE.MeshBasicMaterial({ color: 0xff2a1a, transparent: true, opacity: 0, depthWrite: false })); o.glow.position.z = 0.52; g.add(o.glow);
+        var hl = new THREE.Mesh(new THREE.CircleGeometry(0.07, 12), new THREE.MeshBasicMaterial({ color: 0xffffff })); hl.position.set(0.18, 0.2, 0.53); g.add(hl);
+        return o;
+      }
+      function setEye(o, r, red) { o.pup.scale.setScalar(r); o.pup.material.color.setRGB(0.02 + 0.9 * red, 0.03 + 0.05 * red, 0.05 + 0.04 * red); o.glow.scale.setScalar(r * (1 + 0.5 * red)); o.glow.material.opacity = 0.7 * red; }
+      function mkHead() {
+        var g = new THREE.Group();
+        var h = new THREE.Mesh(new THREE.SphereGeometry(1.5, 28, 20), HF.std(0xe8b99a, { roughness: 0.7 })); g.add(h);
+        var e1 = mkEye(), e2 = mkEye(); [e1, e2].forEach(function (e, i) { e.group.scale.setScalar(0.42); e.group.position.set(i ? 0.62 : -0.62, 0.25, 1.3); g.add(e.group); });
+        var mo = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.07, 0.1), new THREE.MeshBasicMaterial({ color: 0x7a3a3a })); mo.position.set(0, -0.6, 1.42); g.add(mo);
+        var no = new THREE.Mesh(new THREE.ConeGeometry(0.12, 0.35, 8), HF.std(0xd9a888)); no.rotation.x = Math.PI / 2; no.position.set(0, -0.1, 1.55); g.add(no);
+        return { group: g, eyes: [e1, e2] };
+      }
+      var flashM = new THREE.Mesh(new THREE.PlaneGeometry(40, 40), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, depthTest: false })); flashM.renderOrder = 99; scene.add(flashM);
+      function flashAt(t, t0, k) { return Math.max(0, 1 - Math.abs(t - t0 - 0.08) / 0.18) * k; }
+      function placeFlash(o) { var f = new THREE.Vector3(); camera.getWorldDirection(f); flashM.position.copy(camera.position).addScaledVector(f, 1.0); flashM.quaternion.copy(camera.quaternion); flashM.material.opacity = o; flashM.visible = o > 0.01; }
+
+      var hd = mkHead(); scene.add(hd.group);
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        cam(t, 0, 0.3, 9, 0, 0.2, 0); hd.group.rotation.y = 0.15 * Math.sin(t * 0.5);
+        hd.eyes.forEach(function (e) { setEye(e, 0.3, 1); });
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#yf-lab-s1|0.40", "#yf-lab-s2|1.50", "#yf-lab-s3|2.60"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      tl.fromTo("#yf-big", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 4.00);
+      tl.fromTo("#yf-dim", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 5.40);
+      tl.fromTo("#yf-bubble", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 5.50);
+      popd("#yf-q1", 6.20); popd("#yf-q2", 6.40); popd("#yf-b1", 7.80); popd("#yf-b2", 8.50);
+      window.__timelines["stageF"] = tl;
+    })();
+
+  </script>
+</template>

@@ -1,0 +1,119 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #wd-canvas, #wd-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #wd-leaders { pointer-events: none; }
+    .wd-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .wd-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .wd-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .wd-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .wd-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .wd-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+    .wd-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageD" data-width="1080" data-height="1920">
+    <canvas id="wd-canvas" width="1080" height="1920"></canvas>
+    <div id="wd-tag-a" class="wd-mono clip" data-start="0.10" data-duration="9.8" style="left: 60px; top: 200px"><span class="wd-dot"></span>L'ÉCOUTE</div>
+    <div id="wd-illu" class="wd-mono clip" data-start="0.10" data-duration="9.9" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="wd-lab-listen" class="wd-chip wd-neon clip" data-start="0.10" data-duration="2.8" style="left: 70px; top: 290px; --c: #38d6ff;">CHAQUE APPAREIL ÉCOUTE AVANT D'ENVOYER</div>
+    <div id="wd-lab-busy" class="wd-chip  clip" data-start="3.00" data-duration="2.1" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">CANAL OCCUPÉ : IL ATTEND</div>
+    <div id="wd-lab-rand" class="wd-chip wd-neon clip" data-start="5.20" data-duration="4.7" style="left: 70px; top: 290px; --c: #ffc41a;">APRÈS UNE COLLISION : TEMPS ALÉATOIRE</div>
+    <div id="wd-lab-again" class="wd-chip  clip" data-start="8.20" data-duration="1.7" style="left: 70px; top: 370px; background: #38d27a; color: #04230f;">PUIS IL RECOMMENCE</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 29.4, T1 = 39.4;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("wd-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      var CO = [0xff6b6b, 0x4aa8ff, 0x38d27a, 0xffc41a, 0xb26bff, 0x38d6ff], RX = 0, RY = 0.5, NIN = 8, NOUT = 16, NDEV = 24;
+      function cam(t) { camera.position.set(0.08 * Math.sin(t * 0.4), 0.65, 13); camera.lookAt(0, 0.65, 0); camera.updateMatrixWorld(); }
+      function devPos(i) { if (i < NIN) { var a = i / NIN * 6.2832 + 0.55; return new THREE.Vector3(Math.cos(a) * 1.55, RY + Math.sin(a) * 1.25, 0); } var j = i - NIN, b = j / NOUT * 6.2832 + 0.25; return new THREE.Vector3(Math.cos(b) * 2.05, RY + Math.sin(b) * 1.45, 0); }
+      function mkDev(i) {
+        var g = new THREE.Group(), k = i % 3, w = k === 0 ? 0.3 : k === 1 ? 0.62 : 0.52, h = k === 0 ? 0.5 : k === 1 ? 0.4 : 0.4;
+        var b = new THREE.Mesh(new THREE.BoxGeometry(w, h, 0.14), HF.std(0x1d2230, { metalness: 0.5 })); g.add(b);
+        var s = new THREE.Mesh(new THREE.BoxGeometry(w * 0.82, h * 0.82, 0.02), new THREE.MeshBasicMaterial({ color: CO[i % 6] })); s.position.z = 0.08; g.add(s);
+        return g;
+      }
+      var RT = new THREE.Group(); RT.position.set(RX, RY, 0); scene.add(RT);
+      var rb = new THREE.Mesh(new THREE.BoxGeometry(0.9, 0.34, 0.5), HF.std(0xeef1f8, { roughness: 0.4 })); RT.add(rb);
+      [-0.32, 0.32].forEach(function (x) { var a = new THREE.Mesh(new THREE.BoxGeometry(0.05, 0.6, 0.05), HF.std(0xeef1f8)); a.position.set(x, 0.42, 0); RT.add(a); });
+      var ledM = new THREE.MeshBasicMaterial({ color: 0x38d27a }), led = new THREE.Mesh(new THREE.SphereGeometry(0.05, 10, 8), ledM); led.position.set(0.3, 0.0, 0.27); RT.add(led);
+      var DEV = [], PK = [], BU = [];
+      for (var i = 0; i < NDEV; i++) {
+        var d = mkDev(i); d.visible = false; scene.add(d); DEV.push(d);
+        var pk = new THREE.Mesh(new THREE.BoxGeometry(0.15, 0.15, 0.15), new THREE.MeshBasicMaterial({ color: CO[i % 6] })); pk.visible = false; scene.add(pk); PK.push(pk);
+        var bu = new THREE.Mesh(new THREE.TorusGeometry(1, 0.035, 6, 24), new THREE.MeshBasicMaterial({ color: 0xff3a3a, transparent: true, opacity: 0 })); bu.visible = false; scene.add(bu); BU.push(bu);
+      }
+      var SR = []; for (var i = 0; i < 3; i++) { var r = new THREE.Mesh(new THREE.TorusGeometry(1, 0.02, 6, 60), new THREE.MeshBasicMaterial({ color: 0xb26bff, transparent: true, opacity: 0 })); r.position.set(RX, RY, 0); scene.add(r); SR.push(r); }
+      function rings(t, k, rmax) { SR.forEach(function (r, i) { var a = (t * 0.4 + i / 3) % 1; r.scale.setScalar(0.3 + rmax * a); r.material.opacity = 0.5 * k * (1 - a); }); }
+      function traffic(t, ct, pl, rate, vis) {
+        for (var i = 0; i < NDEV; i++) {
+          var dv = DEV[i], s = ct[i] == null ? 0 : ease(seg(t, ct[i], ct[i] + 0.35)); dv.visible = s > 0.01; dv.position.copy(devPos(i)); dv.scale.setScalar(Math.max(0.01, s) * (i < NIN ? 1 : 0.78));
+          var pk = PK[i], bu = BU[i]; pk.visible = false; bu.visible = false;
+          if (s < 0.99 || !vis) continue;
+          var Pi = (1.2 + 1.0 * rnd(i, 1)) / rate, off = rnd(i, 2) * Pi, k = Math.floor((t + off) / Pi), p = ((t + off) - k * Pi) / 0.9, lost = rnd(i * 13 + k, 3) < pl, pe = lost ? 0.55 : 1;
+          var dp = devPos(i), R = new THREE.Vector3(RX, RY, 0.05);
+          if (p >= 0 && p <= pe) { pk.visible = true; pk.position.copy(dp).lerp(R, p); pk.rotation.set(t * 3, t * 2, 0); pk.scale.setScalar(i < NIN ? 1 : 0.8); }
+          else if (lost && p > pe && p < pe + 0.45) { var a = (p - pe) / 0.45; bu.visible = true; bu.position.copy(dp).lerp(R, pe); bu.scale.setScalar(0.1 + 0.35 * a); bu.material.opacity = 0.9 * (1 - a); }
+        }
+      }
+      function drawGauge(c, v, label) {
+        c.clearRect(0, 0, 900, 245); c.fillStyle = "rgba(255,255,255,0.85)"; c.font = "700 24px 'Space Mono', monospace"; c.textAlign = "left"; c.fillText(label, 26, 44);
+        c.fillStyle = "rgba(255,255,255,0.18)"; c.fillRect(26, 90, 848, 70); c.fillStyle = v > 0.55 ? "#38d27a" : v > 0.3 ? "#ffc41a" : "#ff4a4a"; c.fillRect(26, 90, 848 * v, 70);
+        c.fillStyle = "#fff"; c.font = "700 24px 'Space Mono', monospace"; c.fillText("LENT", 26, 200); c.textAlign = "right"; c.fillText("RAPIDE", 874, 200);
+      }
+
+      var pa = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.22, 0.22), new THREE.MeshBasicMaterial({ color: 0xff6b6b })), pb = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.22, 0.22), new THREE.MeshBasicMaterial({ color: 0x4aa8ff })); scene.add(pa); scene.add(pb);
+      var da = mkDev(0), db = mkDev(1); da.position.set(-2.0, RY, 0); db.position.set(2.0, RY, 0); da.scale.setScalar(1.4); db.scale.setScalar(1.4); scene.add(da); scene.add(db);
+      var EA = new THREE.Mesh(new THREE.TorusGeometry(1, 0.03, 6, 30), new THREE.MeshBasicMaterial({ color: 0x38d6ff, transparent: true, opacity: 0 })), EB = EA.clone(); EB.material = EA.material.clone(); scene.add(EA); scene.add(EB);
+      var wA = new THREE.Mesh(new THREE.BoxGeometry(1, 0.1, 0.05), new THREE.MeshBasicMaterial({ color: 0xffc41a })), wB = wA.clone(); wA.geometry.translate(0.5, 0, 0); wB.geometry = wA.geometry; scene.add(wA); scene.add(wB);
+      var R0 = new THREE.Vector3(RX, RY, 0.05);
+      function mv(m, from, t0, t1, t) { var p = (t - t0) / (t1 - t0); if (p < 0 || p > 1) { m.visible = false; return; } m.visible = true; m.position.copy(from).lerp(R0, p); m.rotation.set(t * 3, t * 2, 0); }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        cam(t); rings(t, 0.3, 1.8); DEV.forEach(function (d) { d.visible = false; }); PK.forEach(function (m) { m.visible = false; }); BU.forEach(function (b) { b.visible = false; });
+        var A = da.position, B = db.position, busy = (t > 30.6 && t < 32.0) || (t > 32.4 && t < 33.4);
+        pa.visible = pb.visible = false;
+        mv(pa, A, 30.6, 32.0, t);
+        if (t < 34.6) mv(pb, B, 33.0, 33.9, t);
+        // after collision: random waits then resend
+        if (t > 34.6) { mv(pa, A, 36.0, 36.9, t); mv(pb, B, 38.0, 38.9, t); }
+        var lA = ease(seg(t, 29.7, 30.2)) * (1 - ease(seg(t, 30.5, 30.7))), lB = ease(seg(t, 31.0, 31.4)) * (t < 34.6 ? 1 : 0) * (1 - ease(seg(t, 32.9, 33.0))) + 0;
+        EA.position.copy(A); EA.scale.setScalar(0.7 + 0.3 * ((t * 1.5) % 1) * 1.0); EA.material.opacity = 0.7 * lA; EB.position.copy(B); EB.scale.setScalar(0.7 + 0.3 * ((t * 1.5) % 1)); EB.material.opacity = 0.7 * (t > 31.0 && t < 33.0 ? 1 : 0);
+        var wa = t < 34.6 ? 0 : seg(t, 34.7, 36.0), wb2 = t < 34.6 ? (t > 32.4 ? seg(t, 32.4, 33.0) : 0) : seg(t, 34.7, 38.0);
+        wA.position.set(A.x - 0.6, A.y + 0.9, 0.1); wA.scale.set(Math.max(0.01, 1.2 * wa * (t < 36.0 ? 1 : 0)), 1, 1); wA.visible = t > 34.7 && t < 36.0;
+        wB.position.set(B.x - 0.6, B.y + 0.9, 0.1); wB.scale.set(Math.max(0.01, 1.2 * (t < 34.6 ? wb2 : wb2)), 1, 1); wB.visible = (t > 32.4 && t < 33.0) || (t > 34.7 && t < 38.0);
+        ledM.color.setHex(busy ? 0xff3a3a : 0x38d27a);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#wd-lab-listen|0.10", "#wd-lab-busy|3.00", "#wd-lab-rand|5.20", "#wd-lab-again|8.20"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageD"] = tl;
+    })();
+
+  </script>
+</template>

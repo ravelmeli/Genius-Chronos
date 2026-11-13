@@ -1,0 +1,91 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #tb-canvas, #tb-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #tb-leaders { pointer-events: none; }
+    .tb-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .tb-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .tb-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .tb-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .tb-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .tb-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+    .tb-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageB" data-width="1080" data-height="1920">
+    <canvas id="tb-canvas" width="1080" height="1920"></canvas>
+    <div id="tb-tag-a" class="tb-mono clip" data-start="0.10" data-duration="7.6" style="left: 60px; top: 200px"><span class="tb-dot"></span>LES MOTEURS</div>
+    <div id="tb-illu" class="tb-mono clip" data-start="0.10" data-duration="7.7" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="tb-lab-eng" class="tb-chip tb-neon clip" data-start="0.40" data-duration="7.3" style="left: 70px; top: 290px; --c: #ff8a2a;">LES MOTEURS</div>
+    <div id="tb-lab-fuel" class="tb-chip  clip" data-start="1.80" data-duration="1.8" style="left: 70px; top: 370px; background: #ff8a2a; color: #1a0c00;">IL BRÛLE DU CARBURANT</div>
+    <div id="tb-lab-hot" class="tb-chip  clip" data-start="3.70" data-duration="1.8" style="left: 70px; top: 370px; background: #ff4a4a; color: #fff;">GAZ TRÈS CHAUDS</div>
+    <div id="tb-lab-vap" class="tb-chip  clip" data-start="5.60" data-duration="2.1" style="left: 70px; top: 370px; background: #38d6ff; color: #03242c;">CONTIENNENT DE LA VAPEUR D'EAU</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 7.2, T1 = 15.0;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("tb-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      scene.background.setHex(0x0f2f6a); scene.fog.color.setHex(0x0f2f6a);
+      function cam(t, x, y, z, lx, ly, lz) { camera.position.set(x + 0.1 * Math.sin(t * 0.4), y, z); camera.lookAt(lx, ly, lz); camera.updateMatrixWorld(); }
+      function mkPlane() {
+        var g = new THREE.Group(), m = HF.std(0xeef1f8, { metalness: 0.3, roughness: 0.4 }), dk = HF.std(0x5a6a92, { metalness: 0.5 });
+        var f = new THREE.Mesh(new THREE.CylinderGeometry(0.17, 0.13, 2.0, 14), m); f.rotation.z = Math.PI / 2; g.add(f);
+        var n = new THREE.Mesh(new THREE.ConeGeometry(0.17, 0.45, 14), m); n.rotation.z = -Math.PI / 2; n.position.x = 1.22; g.add(n);
+        var w = new THREE.Mesh(new THREE.BoxGeometry(0.7, 0.04, 2.5), dk); w.position.set(0.1, -0.03, 0); g.add(w);
+        var tf = new THREE.Mesh(new THREE.BoxGeometry(0.45, 0.55, 0.04), dk); tf.position.set(-0.95, 0.35, 0); g.add(tf);
+        var ts = new THREE.Mesh(new THREE.BoxGeometry(0.32, 0.04, 0.95), dk); ts.position.set(-0.95, 0.05, 0); g.add(ts);
+        var eng = []; [-0.62, 0.62].forEach(function (z) { var e = new THREE.Mesh(new THREE.CylinderGeometry(0.11, 0.1, 0.5, 12), HF.std(0xc9cfdd, { metalness: 0.6 })); e.rotation.z = Math.PI / 2; e.position.set(0.28, -0.14, z); g.add(e); eng.push(new THREE.Vector3(0.0, -0.14, z)); });
+        return { group: g, eng: eng };
+      }
+      function mkPuffs(n) { var a = []; for (var i = 0; i < n; i++) { var m = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 0), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false })); scene.add(m); a.push(m); } return a; }
+      function trail(P, x0, y, z, sp, grow, lifeLen, mx, op) { P.forEach(function (m, k) { var x = x0 - k * sp; m.position.set(x, y + 0.03 * Math.sin(k * 1.7), z + 0.04 * Math.cos(k * 2.3)); m.scale.setScalar(0.05 + grow * k); var o = op * Math.pow(Math.max(0, 1 - k / lifeLen), 1.2); if (x < mx) o = 0; m.material.opacity = o; m.visible = o > 0.01; }); }
+      var HOT = new THREE.Color(0xff8a2a), WARM = new THREE.Color(0xffd9a0), COLD = new THREE.Color(0x9fd8ff);
+
+      var NG = 80, GS = []; for (var i = 0; i < NG; i++) { var m = new THREE.Mesh(new THREE.IcosahedronGeometry(1, 0), new THREE.MeshBasicMaterial({ color: 0xff8a2a, transparent: true, opacity: 0, depthWrite: false })); scene.add(m); GS.push(m); }
+      var NV = 40, VS = []; for (var i = 0; i < NV; i++) { var m = new THREE.Mesh(new THREE.SphereGeometry(1, 8, 6), new THREE.MeshBasicMaterial({ color: 0x9fd8ff, transparent: true, opacity: 0, depthWrite: false })); scene.add(m); VS.push(m); }
+      function gas(t, ex, ey, ez, L, on, cool, vap) {
+        GS.forEach(function (m, i) { var u = (t * 0.45 + rnd(i, 1)) % 1; m.position.set(ex - u * L, ey + (rnd(i, 2) - 0.5) * 0.35 * u, ez + (rnd(i, 3) - 0.5) * 0.35 * u); m.scale.setScalar(0.04 + 0.1 * u);
+          m.material.color.copy(HOT).lerp(WARM, u * 0.6).lerp(COLD, cool * Math.min(1, u * 2.2)); m.material.opacity = on * 0.85 * (1 - u * u); m.visible = on > 0.01; });
+        VS.forEach(function (m, i) { var u = (t * 0.45 + rnd(i, 7)) % 1; m.position.set(ex - u * L, ey + (rnd(i, 8) - 0.5) * 0.3 * u, ez + (rnd(i, 9) - 0.5) * 0.3 * u + 0.05); m.scale.setScalar(0.035); m.material.opacity = vap * (1 - u * u); m.visible = vap > 0.01; });
+      }
+
+      var pl = mkPlane(); scene.add(pl.group);
+      var fl = new THREE.Mesh(new THREE.ConeGeometry(0.1, 0.5, 10), new THREE.MeshBasicMaterial({ color: 0xff8a2a, transparent: true, opacity: 0 })); fl.rotation.z = Math.PI / 2; fl.position.set(-0.2, -0.14, 0.62); scene.add(fl);
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        cam(t, 1.4, 0.7, 4.2, -0.3, -0.12, 0.6);
+        var fa = ease(seg(t, 9.0, 9.6)); fl.material.opacity = 0.85 * fa * (0.8 + 0.2 * Math.sin(t * 20)); fl.scale.set(1, 1 + 0.2 * Math.sin(t * 17), 1);
+        gas(t, 0.0, -0.14, 0.62, 3.0, ease(seg(t, 10.8, 11.4)), 0, ease(seg(t, 12.8, 13.4)));
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#tb-lab-eng|0.40", "#tb-lab-fuel|1.80", "#tb-lab-hot|3.70", "#tb-lab-vap|5.60"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageB"] = tl;
+    })();
+
+  </script>
+</template>
