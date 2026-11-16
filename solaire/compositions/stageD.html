@@ -1,0 +1,95 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #sd-canvas, #sd-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #sd-leaders { pointer-events: none; }
+    .sd-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .sd-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .sd-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .sd-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .sd-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .sd-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+    .sd-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageD" data-width="1080" data-height="1920">
+    <canvas id="sd-canvas" width="1080" height="1920"></canvas>
+    <div id="sd-tag-a" class="sd-mono clip" data-start="0.10" data-duration="13.2" style="left: 60px; top: 200px"><span class="sd-dot"></span>LA JONCTION</div>
+    <div id="sd-illu" class="sd-mono clip" data-start="0.10" data-duration="13.3" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="sd-lab-free" class="sd-chip sd-neon clip" data-start="0.30" data-duration="2.9" style="left: 70px; top: 290px; --c: #ff8a2a;">ÉLECTRON LIBRE ≠ COURANT</div>
+    <div id="sd-lab-dir" class="sd-chip  clip" data-start="3.50" data-duration="1.8" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">IL FAUT LE POUSSER</div>
+    <div id="sd-lab-two" class="sd-chip sd-neon clip" data-start="5.50" data-duration="3.7" style="left: 70px; top: 290px; --c: #4aa8ff;">DEUX COUCHES DE SILICIUM</div>
+    <div id="sd-lab-field" class="sd-chip sd-neon clip" data-start="9.30" data-duration="4.0" style="left: 70px; top: 290px; --c: #b26bff;">UN CHAMP ÉLECTRIQUE LES ORIENTE</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 23.0, T1 = 36.4;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("sd-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      function cam(t, x, y, d, ly, lx) { camera.position.set(x + 0.1 * Math.sin(t * 0.4), y, d); camera.lookAt(lx == null ? x : lx, ly, 0); camera.updateMatrixWorld(); }
+      function mkLabel(txt, bg, fg, w) {
+        var c = document.createElement("canvas"); c.width = 384; c.height = 128; var x = c.getContext("2d");
+        x.fillStyle = bg; x.beginPath(); x.moveTo(24, 6); x.lineTo(360, 6); x.quadraticCurveTo(378, 6, 378, 24); x.lineTo(378, 104); x.quadraticCurveTo(378, 122, 360, 122); x.lineTo(24, 122); x.quadraticCurveTo(6, 122, 6, 104); x.lineTo(6, 24); x.quadraticCurveTo(6, 6, 24, 6); x.fill();
+        x.fillStyle = fg; x.font = "700 46px monospace"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(txt, 192, 66);
+        return new THREE.Mesh(new THREE.PlaneGeometry(w || 1.5, (w || 1.5) / 3), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
+      }
+      function mkPanel(cols, rows, w, h) {
+        var g = new THREE.Group(), fr = new THREE.Mesh(new THREE.BoxGeometry(w + 0.14, h + 0.14, 0.08), HF.std(0xcfd6e6, { metalness: 0.7, roughness: 0.4 })); g.add(fr);
+        var cw = w / cols, ch = h / rows, cells = [];
+        for (var i = 0; i < cols; i++) for (var j = 0; j < rows; j++) { var c = new THREE.Mesh(new THREE.BoxGeometry(cw * 0.9, ch * 0.9, 0.03), HF.std(0x1b3f8a, { metalness: 0.6, roughness: 0.25, emissive: 0x0a2a6a, emissiveIntensity: 0.5 })); c.position.set(-w / 2 + cw * (i + 0.5), -h / 2 + ch * (j + 0.5), 0.05); g.add(c); cells.push(c); }
+        for (var i = 1; i < cols; i++) { var l = new THREE.Mesh(new THREE.BoxGeometry(0.02, h, 0.035), new THREE.MeshBasicMaterial({ color: 0xc9d3ea })); l.position.set(-w / 2 + cw * i, 0, 0.055); g.add(l); }
+        return { group: g, cells: cells, cw: cw, ch: ch };
+      }
+      function mkSun() { var g = new THREE.Group(); var s = new THREE.Mesh(new THREE.SphereGeometry(0.42, 20, 14), new THREE.MeshBasicMaterial({ color: 0xffd23a })); g.add(s); return g; }
+      function mkBulb() { var g = new THREE.Group(), m = new THREE.MeshBasicMaterial({ color: 0x3a4258 }), b = new THREE.Mesh(new THREE.SphereGeometry(0.32, 18, 12), m); b.position.y = 0.3; g.add(b); var s = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.2, 0.3, 12), HF.std(0x9aa3b8, { metalness: 0.7 })); s.position.y = -0.05; g.add(s); return { group: g, mat: m }; }
+      function mkLattice(n, sp) {
+        var g = new THREE.Group(), at = []; var m = HF.std(0x8a93a8, { metalness: 0.6, roughness: 0.4 });
+        for (var i = 0; i < n; i++) for (var j = 0; j < n; j++) { var a = new THREE.Mesh(new THREE.SphereGeometry(0.13, 14, 10), m); a.position.set((i - (n - 1) / 2) * sp, (j - (n - 1) / 2) * sp, 0); g.add(a); at.push(a); }
+        for (var i = 0; i < n; i++) for (var j = 0; j < n; j++) { if (i < n - 1) { var b = HF.makeBeam(0x5a6a92); b.material.opacity = 1; g.add(b); HF.setBeam(b, at[i * n + j].position, at[(i + 1) * n + j].position, 0.025, 0.9); } if (j < n - 1) { var b2 = HF.makeBeam(0x5a6a92); g.add(b2); HF.setBeam(b2, at[i * n + j].position, at[i * n + j + 1].position, 0.025, 0.9); } }
+        return { group: g, atoms: at };
+      }
+
+      var top = new THREE.Mesh(new THREE.BoxGeometry(3.8, 1.2, 0.4), HF.std(0x2a5ac8, { metalness: 0.4, roughness: 0.5 })), bot = new THREE.Mesh(new THREE.BoxGeometry(3.8, 1.2, 0.4), HF.std(0xc2412a, { metalness: 0.4, roughness: 0.5 })); top.position.y = 0.65; bot.position.y = -0.65; scene.add(top); scene.add(bot);
+      var jn = new THREE.Mesh(new THREE.BoxGeometry(3.9, 0.06, 0.45), new THREE.MeshBasicMaterial({ color: 0xb26bff })); scene.add(jn);
+      var NE = 14, EL = []; for (var i = 0; i < NE; i++) { var m = new THREE.Mesh(new THREE.SphereGeometry(0.11, 10, 8), new THREE.MeshBasicMaterial({ color: 0x9fd8ff })); scene.add(m); EL.push(m); }
+      var FA = [], FH = []; for (var i = 0; i < 5; i++) { var b = HF.makeBeam(0xb26bff); scene.add(b); FA.push(b); var h = new THREE.Mesh(new THREE.ConeGeometry(0.13, 0.28, 8), new THREE.MeshBasicMaterial({ color: 0xb26bff })); scene.add(h); FH.push(h); }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        cam(t, 0, 0, 11, 0);
+        var ap = ease(seg(t, 23.3, 23.9)), ps = ease(seg(t, 32.9, 35.6)), ar = ease(seg(t, 26.5, 27.2)) * (1 - ease(seg(t, 28.2, 28.6)));
+        EL.forEach(function (m, i) { var bx = -1.6 + 3.2 * rnd(i, 1), by = -0.65 + (rnd(i, 2) - 0.5) * 0.8, tx = bx, ty = 0.65 + (rnd(i, 3) - 0.5) * 0.8; var x = lerp(bx, tx, ps) + 0.12 * Math.sin(t * 3 + i * 2), y = lerp(by, ty, ps) + 0.1 * Math.cos(t * 2.7 + i); m.position.set(x, y, 0.35); m.visible = ap > 0.01; m.scale.setScalar(Math.max(0.01, ap)); });
+        var fa = ease(seg(t, 32.4, 33.2));
+        FA.forEach(function (b, i) { var x = -1.4 + i * 0.7; HF.setBeam(b, new THREE.Vector3(x, -0.3, 0.4), new THREE.Vector3(x, 0.25, 0.4), 0.04, fa); FH[i].position.set(x, 0.38, 0.4); FH[i].visible = fa > 0.05; FH[i].scale.setScalar(Math.max(0.01, fa)); });
+        jn.material.opacity = 1; 
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#sd-lab-free|0.30", "#sd-lab-dir|3.50", "#sd-lab-two|5.50", "#sd-lab-field|9.30"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageD"] = tl;
+    })();
+
+  </script>
+</template>

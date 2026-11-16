@@ -1,0 +1,112 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #qg-canvas, #qg-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #qg-leaders { pointer-events: none; }
+    .qg-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .qg-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .qg-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .qg-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .qg-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .qg-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #qg-bubble { position: absolute; left: 130px; top: 700px; width: 820px; padding: 36px 40px; border-radius: 40px; background: #1c2b52; border: 4px solid #4aa8ff; box-shadow: 0 0 40px rgba(74,168,255,0.5); color: #fff; font-weight: 800; font-size: 60px; line-height: 1.15; text-align: center; }
+    #qg-bubble::after { content: ""; position: absolute; left: 90px; bottom: -34px; width: 0; height: 0; border-left: 28px solid transparent; border-right: 28px solid transparent; border-top: 36px solid #4aa8ff; }
+    .qg-btn { position: absolute; padding: 20px 40px; border-radius: 999px; font-weight: 800; font-size: 40px; white-space: nowrap; }
+    .qg-big { position: absolute; left: 0; width: 1080px; text-align: center; color: #fff; font-weight: 800; letter-spacing: -0.02em; text-shadow: 0 6px 40px rgba(0,0,0,0.7); }
+
+    #qg-dim { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: rgba(7,11,22,0.5); }
+    .qg-q { position: absolute; font-size: 150px; font-weight: 800; color: #ffc41a; text-shadow: 0 0 40px rgba(255,196,26,0.8); }
+    .qg-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageG" data-width="1080" data-height="1920">
+    <canvas id="qg-canvas" width="1080" height="1920"></canvas>
+    <div id="qg-tag-a" class="qg-mono clip" data-start="0.10" data-duration="6.2" style="left: 60px; top: 200px"><span class="qg-dot"></span>LE RÉSUMÉ</div>
+    <div id="qg-tag-b" class="qg-mono clip" data-start="6.50" data-duration="5.14" style="left: 60px; top: 200px"><span class="qg-dot"></span>ET TOI ?</div>
+    <div id="qg-illu" class="qg-mono clip" data-start="0.10" data-duration="11.54" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="qg-lab-s1" class="qg-chip  clip" data-start="0.30" data-duration="5.9" style="left: 70px; top: 290px; background: #4aa8ff; color: #04152a;">UN CRISTAL QUI VIBRE TOUJOURS PAREIL</div>
+    <div id="qg-lab-s2" class="qg-chip  clip" data-start="2.30" data-duration="3.9" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">UN CIRCUIT QUI COMPTE</div>
+    <div id="qg-lab-s3" class="qg-chip  clip" data-start="3.70" data-duration="2.5" style="left: 70px; top: 450px; background: #38d27a; color: #04230f;">UN MOTEUR QUI AVANCE</div>
+    <div id="qg-big" class="qg-big clip" data-start="5.00" data-duration="1.4" style="top: 640px; font-size: 96px; text-shadow: 0 4px 24px rgba(0,0,0,0.8)">Voilà le secret.</div>
+    <div id="qg-dim" class="clip" data-start="6.40" data-duration="5.34"></div>
+    <div id="qg-q1" class="qg-q clip" data-start="7.20" data-duration="4.54" style="left: 100px; top: 450px">?</div>
+    <div id="qg-q2" class="qg-q clip" data-start="7.40" data-duration="4.34" style="left: 850px; top: 560px">?</div>
+    <div id="qg-bubble" class="clip" data-start="6.50" data-duration="5.24" style="top: 700px">As-tu déjà changé<br>la pile d'une montre ?</div>
+    <div id="qg-b1" class="qg-btn clip" data-start="8.80" data-duration="2.94" style="left: 90px; top: 1100px; background: #fff; color: #0a0f1c">COMMENTE</div>
+    <div id="qg-b2" class="qg-btn clip" data-start="9.50" data-duration="2.24" style="left: 540px; top: 1100px; background: #ff3b3b; color: #fff">ABONNE-TOI</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 48.7, T1 = 60.44;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("qg-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      function cam(t, x, y, d, ly, lx) { camera.position.set(x + 0.1 * Math.sin(t * 0.4), y, d); camera.lookAt(lx == null ? x : lx, ly, 0); camera.updateMatrixWorld(); }
+      function mkLabel(txt, bg, fg, w) {
+        var c = document.createElement("canvas"); c.width = 384; c.height = 128; var x = c.getContext("2d");
+        x.fillStyle = bg; x.beginPath(); x.moveTo(24, 6); x.lineTo(360, 6); x.quadraticCurveTo(378, 6, 378, 24); x.lineTo(378, 104); x.quadraticCurveTo(378, 122, 360, 122); x.lineTo(24, 122); x.quadraticCurveTo(6, 122, 6, 104); x.lineTo(6, 24); x.quadraticCurveTo(6, 6, 24, 6); x.fill();
+        x.fillStyle = fg; x.font = "700 46px monospace"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(txt, 192, 66);
+        var m = new THREE.Mesh(new THREE.PlaneGeometry(w || 1.5, (w || 1.5) / 3), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false })); m.userData.c = c; m.userData.bg = bg; m.userData.fg = fg; return m;
+      }
+      function setLabel(m, txt) { var c = m.userData.c, x = c.getContext("2d"); x.clearRect(0, 0, 384, 128); x.fillStyle = m.userData.bg; x.fillRect(6, 6, 372, 116); x.fillStyle = m.userData.fg; x.font = "700 46px monospace"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(txt, 192, 66); m.material.map.needsUpdate = true; }
+      function mkWatch() {
+        var g = new THREE.Group(), o = { group: g };
+        var cs = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 0.25, 40), HF.std(0x5a6a92, { metalness: 0.7, roughness: 0.35 })); cs.rotation.x = Math.PI / 2; g.add(cs);
+        var dl = new THREE.Mesh(new THREE.CircleGeometry(1.3, 40), new THREE.MeshBasicMaterial({ color: 0xe9ecf4 })); dl.position.z = 0.13; g.add(dl);
+        for (var i = 0; i < 12; i++) { var a = i / 12 * 6.2832, k = new THREE.Mesh(new THREE.BoxGeometry(0.06, i % 3 ? 0.14 : 0.24, 0.02), new THREE.MeshBasicMaterial({ color: 0x1d2230 })); k.position.set(Math.sin(a) * 1.12, Math.cos(a) * 1.12, 0.14); k.rotation.z = -a; g.add(k); }
+        var hr = new THREE.Mesh(new THREE.BoxGeometry(0.1, 0.7, 0.03), new THREE.MeshBasicMaterial({ color: 0x1d2230 })); hr.geometry.translate(0, 0.3, 0); hr.position.z = 0.15; hr.rotation.z = -1.9; g.add(hr);
+        var mn = new THREE.Mesh(new THREE.BoxGeometry(0.07, 1.0, 0.03), new THREE.MeshBasicMaterial({ color: 0x1d2230 })); mn.geometry.translate(0, 0.45, 0); mn.position.z = 0.16; mn.rotation.z = 0.7; g.add(mn);
+        o.sec = new THREE.Mesh(new THREE.BoxGeometry(0.035, 1.15, 0.03), new THREE.MeshBasicMaterial({ color: 0xff3a3a })); o.sec.geometry.translate(0, 0.5, 0); o.sec.position.z = 0.18; g.add(o.sec);
+        var hb = new THREE.Mesh(new THREE.CircleGeometry(0.07, 12), new THREE.MeshBasicMaterial({ color: 0xff3a3a })); hb.position.z = 0.19; g.add(hb);
+        return o;
+      }
+      function tick(t, t0) { var k = Math.floor(t - t0), f = (t - t0) - k, s = f < 0.18 ? Math.pow(f / 0.18, 1.5) : 1; return -(k + s) * 0.314; }
+      function mkFork() {
+        var g = new THREE.Group(), o = { group: g };
+        var m = new THREE.MeshStandardMaterial({ color: 0x9fd8ff, transparent: true, opacity: 0.88, roughness: 0.15, metalness: 0.1, emissive: 0x2a6ab0, emissiveIntensity: 0.5 });
+        var bs = new THREE.Mesh(new THREE.BoxGeometry(0.95, 0.3, 0.16), m); bs.position.y = 0; g.add(bs);
+        o.pr = [-1, 1].map(function (s) { var pv = new THREE.Group(); pv.position.set(s * 0.3, 0.12, 0); var p = new THREE.Mesh(new THREE.BoxGeometry(0.2, 1.6, 0.16), m); p.position.y = 0.8; pv.add(p); var el = new THREE.Mesh(new THREE.BoxGeometry(0.22, 0.3, 0.18), HF.std(0xd9a23a, { metalness: 0.8 })); el.position.y = 0.3; pv.add(el); g.add(pv); return pv; });
+        return o;
+      }
+      function setFork(o, a) { o.pr[0].rotation.z = -a; o.pr[1].rotation.z = a; }
+
+      var wt = mkWatch(); wt.group.scale.setScalar(1.15); scene.add(wt.group);
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        cam(t, 0, 0.3, 11, 0.3); wt.group.rotation.set(-0.15 + 0.05 * Math.sin(t * 0.5), 0.25 * Math.sin(t * 0.4), 0); wt.sec.rotation.z = tick(t, 48.7);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#qg-lab-s1|0.30", "#qg-lab-s2|2.30", "#qg-lab-s3|3.70"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      tl.fromTo("#qg-big", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 5.00);
+      tl.fromTo("#qg-dim", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 6.40);
+      tl.fromTo("#qg-bubble", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 6.50);
+      popd("#qg-q1", 7.20); popd("#qg-q2", 7.40); popd("#qg-b1", 8.80); popd("#qg-b2", 9.50);
+      window.__timelines["stageG"] = tl;
+    })();
+
+  </script>
+</template>

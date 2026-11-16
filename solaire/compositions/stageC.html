@@ -1,0 +1,97 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #sc-canvas, #sc-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #sc-leaders { pointer-events: none; }
+    .sc-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .sc-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .sc-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .sc-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .sc-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .sc-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+    .sc-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageC" data-width="1080" data-height="1920">
+    <canvas id="sc-canvas" width="1080" height="1920"></canvas>
+    <div id="sc-tag-a" class="sc-mono clip" data-start="0.10" data-duration="8.6" style="left: 60px; top: 200px"><span class="sc-dot"></span>LES PHOTONS</div>
+    <div id="sc-illu" class="sc-mono clip" data-start="0.10" data-duration="8.7" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="sc-lab-photon" class="sc-chip sc-neon clip" data-start="0.30" data-duration="8.4" style="left: 70px; top: 290px; --c: #ffc41a;">LES PHOTONS</div>
+    <div id="sc-lab-grain" class="sc-chip  clip" data-start="1.60" data-duration="2.2" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">DES GRAINS D'ÉNERGIE</div>
+    <div id="sc-lab-hit" class="sc-chip  clip" data-start="4.00" data-duration="4.7" style="left: 70px; top: 370px; background: #38d6ff; color: #03242c;">LE PHOTON LIBÈRE UN ÉLECTRON</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 14.2, T1 = 23.0;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("sc-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      function cam(t, x, y, d, ly, lx) { camera.position.set(x + 0.1 * Math.sin(t * 0.4), y, d); camera.lookAt(lx == null ? x : lx, ly, 0); camera.updateMatrixWorld(); }
+      function mkLabel(txt, bg, fg, w) {
+        var c = document.createElement("canvas"); c.width = 384; c.height = 128; var x = c.getContext("2d");
+        x.fillStyle = bg; x.beginPath(); x.moveTo(24, 6); x.lineTo(360, 6); x.quadraticCurveTo(378, 6, 378, 24); x.lineTo(378, 104); x.quadraticCurveTo(378, 122, 360, 122); x.lineTo(24, 122); x.quadraticCurveTo(6, 122, 6, 104); x.lineTo(6, 24); x.quadraticCurveTo(6, 6, 24, 6); x.fill();
+        x.fillStyle = fg; x.font = "700 46px monospace"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(txt, 192, 66);
+        return new THREE.Mesh(new THREE.PlaneGeometry(w || 1.5, (w || 1.5) / 3), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
+      }
+      function mkPanel(cols, rows, w, h) {
+        var g = new THREE.Group(), fr = new THREE.Mesh(new THREE.BoxGeometry(w + 0.14, h + 0.14, 0.08), HF.std(0xcfd6e6, { metalness: 0.7, roughness: 0.4 })); g.add(fr);
+        var cw = w / cols, ch = h / rows, cells = [];
+        for (var i = 0; i < cols; i++) for (var j = 0; j < rows; j++) { var c = new THREE.Mesh(new THREE.BoxGeometry(cw * 0.9, ch * 0.9, 0.03), HF.std(0x1b3f8a, { metalness: 0.6, roughness: 0.25, emissive: 0x0a2a6a, emissiveIntensity: 0.5 })); c.position.set(-w / 2 + cw * (i + 0.5), -h / 2 + ch * (j + 0.5), 0.05); g.add(c); cells.push(c); }
+        for (var i = 1; i < cols; i++) { var l = new THREE.Mesh(new THREE.BoxGeometry(0.02, h, 0.035), new THREE.MeshBasicMaterial({ color: 0xc9d3ea })); l.position.set(-w / 2 + cw * i, 0, 0.055); g.add(l); }
+        return { group: g, cells: cells, cw: cw, ch: ch };
+      }
+      function mkSun() { var g = new THREE.Group(); var s = new THREE.Mesh(new THREE.SphereGeometry(0.42, 20, 14), new THREE.MeshBasicMaterial({ color: 0xffd23a })); g.add(s); return g; }
+      function mkBulb() { var g = new THREE.Group(), m = new THREE.MeshBasicMaterial({ color: 0x3a4258 }), b = new THREE.Mesh(new THREE.SphereGeometry(0.32, 18, 12), m); b.position.y = 0.3; g.add(b); var s = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.2, 0.3, 12), HF.std(0x9aa3b8, { metalness: 0.7 })); s.position.y = -0.05; g.add(s); return { group: g, mat: m }; }
+      function mkLattice(n, sp) {
+        var g = new THREE.Group(), at = []; var m = HF.std(0x8a93a8, { metalness: 0.6, roughness: 0.4 });
+        for (var i = 0; i < n; i++) for (var j = 0; j < n; j++) { var a = new THREE.Mesh(new THREE.SphereGeometry(0.13, 14, 10), m); a.position.set((i - (n - 1) / 2) * sp, (j - (n - 1) / 2) * sp, 0); g.add(a); at.push(a); }
+        for (var i = 0; i < n; i++) for (var j = 0; j < n; j++) { if (i < n - 1) { var b = HF.makeBeam(0x5a6a92); b.material.opacity = 1; g.add(b); HF.setBeam(b, at[i * n + j].position, at[(i + 1) * n + j].position, 0.025, 0.9); } if (j < n - 1) { var b2 = HF.makeBeam(0x5a6a92); g.add(b2); HF.setBeam(b2, at[i * n + j].position, at[i * n + j + 1].position, 0.025, 0.9); } }
+        return { group: g, atoms: at };
+      }
+
+      var lt = mkLattice(9, 0.4); lt.group.position.y = -0.4; scene.add(lt.group);
+      var NP = 10, PH = []; for (var i = 0; i < NP; i++) { var b = HF.makeBeam(0xffd23a); scene.add(b); PH.push(b); }
+      var big = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 10), new THREE.MeshBasicMaterial({ color: 0xffe36a })); scene.add(big);
+      var el = new THREE.Mesh(new THREE.SphereGeometry(0.11, 12, 10), new THREE.MeshBasicMaterial({ color: 0x4aa8ff })); scene.add(el);
+      var fl2 = new THREE.Mesh(new THREE.TorusGeometry(1, 0.03, 6, 24), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0 })); scene.add(fl2);
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        cam(t, 0, 0.3, 11, 0);
+        var rain = ease(seg(t, 14.6, 15.2)) * (1 - ease(seg(t, 17.6, 18.2)));
+        PH.forEach(function (b, i) { var u = (t * 0.45 + i / NP) % 1, x = -1.8 + 3.6 * rnd(i, 1), y1 = 3.4 - 5.0 * u; HF.setBeam(b, new THREE.Vector3(x + 0.5 * (3.4 - y1) * 0.2, y1 + 0.5, 0.3), new THREE.Vector3(x + 0.5 * (3.4 - y1) * 0.2 - 0.0, y1, 0.3), 0.045, rain * 0.9); });
+        var AT = lt.atoms[4 * 9 + 4].position.clone(); AT.y += -0.4;
+        var hit = seg(t, 18.2, 19.6), bp = new THREE.Vector3(AT.x + 2.2 * (1 - hit), AT.y + 3.0 * (1 - hit), 0.3);
+        big.visible = t > 18.2 && t < 19.6; big.position.copy(bp);
+        var rel = ease(seg(t, 19.7, 22.2)); el.visible = t > 19.6; el.position.set(AT.x + rel * 1.2 + 0.05 * Math.sin(t * 9), AT.y + rel * 2.2, 0.3); lt.atoms[40].material.emissive.setHex(t > 19.6 ? 0x3a8aff : 0x000000);
+        fl2.visible = t > 19.55 && t < 20.4; fl2.position.copy(AT); fl2.scale.setScalar(0.1 + 0.8 * seg(t, 19.6, 20.4)); fl2.material.opacity = 0.9 * (1 - seg(t, 19.6, 20.4));
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#sc-lab-photon|0.30", "#sc-lab-grain|1.60", "#sc-lab-hit|4.00"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageC"] = tl;
+    })();
+
+  </script>
+</template>
