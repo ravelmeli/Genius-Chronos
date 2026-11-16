@@ -1,0 +1,108 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #dg-canvas, #dg-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #dg-leaders { pointer-events: none; }
+    .dg-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .dg-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .dg-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .dg-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .dg-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .dg-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #dg-bubble { position: absolute; left: 130px; top: 700px; width: 820px; padding: 36px 40px; border-radius: 40px; background: #1c2b52; border: 4px solid #4aa8ff; box-shadow: 0 0 40px rgba(74,168,255,0.5); color: #fff; font-weight: 800; font-size: 60px; line-height: 1.15; text-align: center; }
+    #dg-bubble::after { content: ""; position: absolute; left: 90px; bottom: -34px; width: 0; height: 0; border-left: 28px solid transparent; border-right: 28px solid transparent; border-top: 36px solid #4aa8ff; }
+    .dg-btn { position: absolute; padding: 20px 40px; border-radius: 999px; font-weight: 800; font-size: 40px; white-space: nowrap; }
+    .dg-big { position: absolute; left: 0; width: 1080px; text-align: center; color: #fff; font-weight: 800; letter-spacing: -0.02em; text-shadow: 0 6px 40px rgba(0,0,0,0.7); }
+
+    #dg-dim { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: rgba(7,11,22,0.5); }
+    .dg-q { position: absolute; font-size: 150px; font-weight: 800; color: #ffc41a; text-shadow: 0 0 40px rgba(255,196,26,0.8); }
+    .dg-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageG" data-width="1080" data-height="1920">
+    <canvas id="dg-canvas" width="1080" height="1920"></canvas>
+    <div id="dg-tag-a" class="dg-mono clip" data-start="0.10" data-duration="5.6" style="left: 60px; top: 200px"><span class="dg-dot"></span>LE RÉSUMÉ</div>
+    <div id="dg-tag-b" class="dg-mono clip" data-start="5.90" data-duration="5.0" style="left: 60px; top: 200px"><span class="dg-dot"></span>ET TOI ?</div>
+    <div id="dg-illu" class="dg-mono clip" data-start="0.10" data-duration="10.8" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="dg-lab-s1" class="dg-chip  clip" data-start="0.30" data-duration="5.3" style="left: 70px; top: 290px; background: #b26bff; color: #fff;">UN CHAMP QUI CHANGE</div>
+    <div id="dg-lab-s2" class="dg-chip  clip" data-start="1.60" data-duration="4.0" style="left: 70px; top: 370px; background: #38d27a; color: #04230f;">UN COURANT INDUIT</div>
+    <div id="dg-lab-s3" class="dg-chip  clip" data-start="2.80" data-duration="2.8" style="left: 70px; top: 450px; background: #ffc41a; color: #1a1400;">UNE RÉPONSE QUI VARIE SELON LE MÉTAL</div>
+    <div id="dg-big" class="dg-big clip" data-start="4.50" data-duration="1.4" style="top: 640px; font-size: 96px; text-shadow: 0 4px 24px rgba(0,0,0,0.8)">Voilà le secret.</div>
+    <div id="dg-dim" class="clip" data-start="5.80" data-duration="5.2"></div>
+    <div id="dg-q1" class="dg-q clip" data-start="6.60" data-duration="4.4" style="left: 100px; top: 450px">?</div>
+    <div id="dg-q2" class="dg-q clip" data-start="6.80" data-duration="4.2" style="left: 850px; top: 560px">?</div>
+    <div id="dg-bubble" class="clip" data-start="5.90" data-duration="5.1" style="top: 700px">Tu as déjà utilisé<br>un détecteur<br>de métaux ?</div>
+    <div id="dg-b1" class="dg-btn clip" data-start="8.30" data-duration="2.7" style="left: 90px; top: 1100px; background: #fff; color: #0a0f1c">COMMENTE</div>
+    <div id="dg-b2" class="dg-btn clip" data-start="8.90" data-duration="2.1" style="left: 540px; top: 1100px; background: #ff3b3b; color: #fff">ABONNE-TOI</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 57.4, T1 = 68.4;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("dg-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      function cam(t, x, y, d, ly, lx) { camera.position.set(x + 0.08 * Math.sin(t * 0.4), y, d); camera.lookAt(lx == null ? x : lx, ly, 0); camera.updateMatrixWorld(); }
+      function mkLabel(txt, bg, fg, w) {
+        var c = document.createElement("canvas"); c.width = 384; c.height = 128; var x = c.getContext("2d");
+        x.fillStyle = bg; x.beginPath(); x.moveTo(24, 6); x.lineTo(360, 6); x.quadraticCurveTo(378, 6, 378, 24); x.lineTo(378, 104); x.quadraticCurveTo(378, 122, 360, 122); x.lineTo(24, 122); x.quadraticCurveTo(6, 122, 6, 104); x.lineTo(6, 24); x.quadraticCurveTo(6, 6, 24, 6); x.fill();
+        x.fillStyle = fg; x.font = "700 46px monospace"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(txt, 192, 66);
+        return new THREE.Mesh(new THREE.PlaneGeometry(w || 1.5, (w || 1.5) / 3), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
+      }
+      var gr = new THREE.Mesh(new THREE.BoxGeometry(7, 1.2, 1.6), new THREE.MeshStandardMaterial({ color: 0x4a3a2a, transparent: true, opacity: 0.55, roughness: 1 })); gr.position.set(0, -0.75, 0); scene.add(gr);
+      var gt = new THREE.Mesh(new THREE.BoxGeometry(7, 0.06, 1.6), HF.std(0x2f6a3a, { roughness: 1 })); gt.position.set(0, -0.12, 0); scene.add(gt);
+      var DET = new THREE.Group(); scene.add(DET);
+      var housing = new THREE.Mesh(new THREE.CylinderGeometry(0.95, 0.95, 0.14, 32), HF.std(0x5a6a92, { metalness: 0.5, roughness: 0.4 })); DET.add(housing);
+      var tx = new THREE.Mesh(new THREE.TorusGeometry(0.8, 0.045, 8, 36), new THREE.MeshBasicMaterial({ color: 0xffc41a })); tx.rotation.x = Math.PI / 2; tx.position.y = -0.09; DET.add(tx);
+      var rx = new THREE.Mesh(new THREE.TorusGeometry(0.42, 0.04, 8, 30), new THREE.MeshBasicMaterial({ color: 0x38d6ff })); rx.rotation.x = Math.PI / 2; rx.position.y = -0.09; DET.add(rx);
+      var pole = HF.makeBeam(0xc9cfdd); DET.add(pole); HF.setBeam(pole, new THREE.Vector3(0, 0.07, 0), new THREE.Vector3(1.6, 2.3, 0), 0.05, 1);
+      var hd = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.12, 0.2), HF.std(0x1d2230)); hd.position.set(1.75, 2.38, 0); hd.rotation.z = 0.8; DET.add(hd);
+      function mkCoin() { var m = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.08, 24), HF.std(0xe0b030, { metalness: 0.9, roughness: 0.3 })); m.rotation.x = 0.9; return m; }
+      function mkNail() { var m = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.06, 1.3, 10), HF.std(0x7a5a4a, { metalness: 0.7, roughness: 0.5 })); m.rotation.z = 1.2; return m; }
+      var coin = mkCoin(), nail = mkNail(); scene.add(coin); scene.add(nail);
+      var NF = 4, FL = []; for (var j = 0; j < NF; j++) { var a = []; for (var i = 0; i < 26; i++) { var m = new THREE.Mesh(new THREE.SphereGeometry(0.045, 8, 6), new THREE.MeshBasicMaterial({ color: 0xb26bff, transparent: true, opacity: 0 })); scene.add(m); a.push(m); } FL.push(a); }
+      function fieldArcs(amt, cx, cy, t) {
+        var s = Math.sin(t * 5), col = s > 0 ? 0x4aa8ff : 0xff6b6b;
+        FL.forEach(function (a, j) { var A = 0.9 + 0.55 * j, B = 0.7 + 0.5 * j; a.forEach(function (m, i) { var th = Math.PI + (i / 25) * Math.PI, x = cx + A * Math.cos(th), y = cy + B * Math.sin(th) * 1.0 + 0.0; m.position.set(x, y, 0.1); m.material.color.setHex(col); m.material.opacity = amt * Math.abs(s) * (0.9 - 0.15 * j); m.visible = amt > 0.02 && y > -1.15; }); });
+      }
+
+      coin.position.set(-0.9, -0.62, 0.1); nail.position.set(0.9, -0.62, 0.1);
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        cam(t, 0, 1.0, 11, 0.5);
+        var x = 2.2 * Math.sin((t - 57.4) * 0.7); DET.position.set(x, 0.35 + 0.05 * Math.sin(t * 5), 0); fieldArcs(0.5, x, 0.25, t);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#dg-lab-s1|0.30", "#dg-lab-s2|1.60", "#dg-lab-s3|2.80"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      tl.fromTo("#dg-big", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 4.50);
+      tl.fromTo("#dg-dim", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 5.80);
+      tl.fromTo("#dg-bubble", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 5.90);
+      popd("#dg-q1", 6.60); popd("#dg-q2", 6.80); popd("#dg-b1", 8.30); popd("#dg-b2", 8.90);
+      window.__timelines["stageG"] = tl;
+    })();
+
+  </script>
+</template>

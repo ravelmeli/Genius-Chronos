@@ -1,0 +1,91 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #rd-canvas, #rd-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #rd-leaders { pointer-events: none; }
+    .rd-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .rd-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .rd-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .rd-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .rd-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .rd-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #rd-card { position: absolute; left: 90px; top: 545px; width: 906px; height: 251px; border-radius: 28px; background: rgba(10,16,32,0.94); border: 3px solid rgba(255,255,255,0.22); box-shadow: 0 10px 40px rgba(0,0,0,0.5); overflow: hidden; }
+    #rd-card canvas { position: absolute; left: 0; top: 0; }
+    #rd-card .ttl { position: absolute; right: 24px; bottom: 6px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.12em; color: rgba(255,255,255,0.65); }
+    .rd-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageD" data-width="1080" data-height="1920">
+    <canvas id="rd-canvas" width="1080" height="1920"></canvas>
+    <div id="rd-tag-a" class="rd-mono clip" data-start="0.10" data-duration="8.8" style="left: 60px; top: 200px"><span class="rd-dot"></span>LA VITESSE</div>
+    <div id="rd-illu" class="rd-mono clip" data-start="0.10" data-duration="8.9" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="rd-card" class="clip" data-start="2.20" data-duration="6.6"><canvas id="rd-cc" width="900" height="245"></canvas><div class="ttl">ILLUSTRATIF</div></div>
+    <div id="rd-lab-speed" class="rd-chip rd-neon clip" data-start="0.50" data-duration="8.3" style="left: 70px; top: 290px; --c: #4aa8ff;">LE RADAR MESURE AUSSI LA VITESSE</div>
+    <div id="rd-lab-slower" class="rd-chip  clip" data-start="2.40" data-duration="3.9" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">VOITURE PLUS LENTE : FRÉQUENCE CHANGE</div>
+    <div id="rd-lab-dop" class="rd-chip  clip" data-start="6.80" data-duration="2.0" style="left: 70px; top: 370px; background: #38d27a; color: #04230f;">EFFET DOPPLER</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 25.0, T1 = 34.0;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("rd-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      function cam(t, x, y, z, lx, ly, lz) { camera.position.set(x + 0.08 * Math.sin(t * 0.4), y, z); camera.lookAt(lx, ly, lz); camera.updateMatrixWorld(); }
+      function mkLabel(txt, bg, fg, w) {
+        var c = document.createElement("canvas"); c.width = 384; c.height = 128; var x = c.getContext("2d");
+        x.fillStyle = bg; x.beginPath(); x.moveTo(24, 6); x.lineTo(360, 6); x.quadraticCurveTo(378, 6, 378, 24); x.lineTo(378, 104); x.quadraticCurveTo(378, 122, 360, 122); x.lineTo(24, 122); x.quadraticCurveTo(6, 122, 6, 104); x.lineTo(6, 24); x.quadraticCurveTo(6, 6, 24, 6); x.fill();
+        x.fillStyle = fg; x.font = "700 44px monospace"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(txt, 192, 66);
+        return new THREE.Mesh(new THREE.PlaneGeometry(w || 1.5, (w || 1.5) / 3), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
+      }
+      function IE(t, a, d) { var x = Math.max(0, Math.min(1, (t - a) / d)); return t < a ? 0 : d * (x * x * x - x * x * x * x / 2) + Math.max(0, t - a - d); }
+      var road = HF.makeRoad(90, 3.2); scene.add(road.group);
+      var ego = HF.makeCar(0x2a6ad0), lead = HF.makeCar(0xc2412a); scene.add(ego.group); scene.add(lead.group);
+      function carsAt(D, dist, brake) { ego.group.position.set(0, 0, 0); lead.group.position.set(0, 0, D); HF.setRoad(road, dist); [ego, lead].forEach(function (c) { c.wheels.forEach(function (w) { w.spin.rotation.x = -dist / 0.26; }); }); ego.tail.emissiveIntensity = 0.2 + 1.6 * brake; }
+      var rm = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.12, 0.1), new THREE.MeshBasicMaterial({ color: 0xffc41a })); rm.position.set(0, 0.45, 1.3); scene.add(rm);
+      var RF = [], RB = []; for (var i = 0; i < 3; i++) { var a = new THREE.Mesh(new THREE.TorusGeometry(0.55, 0.03, 6, 30), new THREE.MeshBasicMaterial({ color: 0xb26bff, transparent: true, opacity: 0 })), b = new THREE.Mesh(new THREE.TorusGeometry(0.55, 0.03, 6, 30), new THREE.MeshBasicMaterial({ color: 0x38d6ff, transparent: true, opacity: 0 })); a.position.y = b.position.y = 0.55; scene.add(a); scene.add(b); RF.push(a); RB.push(b); }
+      function waves(t, D, sp, fo, ba) { RF.forEach(function (r, i) { var p = (t * sp + i / 3) % 1; r.position.z = 1.3 + (D - 1.3) * p; r.material.opacity = 0.8 * fo * (1 - 0.4 * p); r.visible = fo > 0.02; }); RB.forEach(function (r, i) { var p = (t * sp + i / 3) % 1; r.position.z = D - (D - 1.3) * p; r.material.opacity = 0.8 * ba * (1 - 0.4 * p); r.visible = ba > 0.02; }); }
+
+      var cctx = $("rd-cc").getContext("2d");
+      var ar1 = HF.makeBeam(0x38d27a), ar2 = HF.makeBeam(0xffc41a); scene.add(ar1); scene.add(ar2);
+      var lb = mkLabel("PLUS LENTE", "#ffc41a", "#1a1400", 1.5); scene.add(lb);
+      function card(t) { var c = cctx; c.clearRect(0, 0, 900, 245); c.lineWidth = 5; c.lineCap = "round"; c.font = "700 22px 'Space Mono', monospace"; c.fillStyle = "#b26bff"; c.fillText("ÉMISE", 20, 36); c.fillStyle = "#38d6ff"; c.fillText("REVENUE", 20, 150);
+        var f2 = t < 28.8 ? 6 : 6 + 4 * ease(seg(t, 28.8, 29.6)); c.strokeStyle = "#b26bff"; c.beginPath(); for (var x = 0; x <= 740; x += 4) { var y = 75 - 24 * Math.sin(x / 740 * 6 * 6.2832 - t * 3); x === 0 ? c.moveTo(150 + x, y) : c.lineTo(150 + x, y); } c.stroke();
+        c.strokeStyle = "#38d6ff"; c.beginPath(); for (var x = 0; x <= 740; x += 4) { var y = 185 - 24 * Math.sin(x / 740 * f2 * 6.2832 - t * 3); x === 0 ? c.moveTo(150 + x, y) : c.lineTo(150 + x, y); } c.stroke(); }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        cam(t, 0.0, 2.6, -7.8, 0, 1.7, 4.5);
+        var D = 9 - 1.8 * ease(seg(t, 27.4, 31.0)); carsAt(D, 4.5 * t - 1.0 * IE(t, 27.4, 2.0), 0); rm.visible = true; waves(t, D, 0.55 * 6 / D, 1, 1);
+        var av = ease(seg(t, 27.4, 28.0)); HF.setBeam(ar1, new THREE.Vector3(-1.4, 1.2, -0.2), new THREE.Vector3(-1.4, 1.2, 2.2), 0.06, av); HF.setBeam(ar2, new THREE.Vector3(-1.4, 1.2, D - 0.2), new THREE.Vector3(-1.4, 1.2, D + 0.8), 0.06, av);
+        lb.visible = av > 0.01; lb.position.set(-1.4, 1.9, D + 0.2); lb.rotation.y = Math.PI; lb.scale.setScalar(Math.max(0.01, av)); card(t);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#rd-lab-speed|0.50", "#rd-lab-slower|2.40", "#rd-lab-dop|6.80"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageD"] = tl;
+    })();
+
+  </script>
+</template>

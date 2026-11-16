@@ -1,0 +1,95 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #ia-canvas, #ia-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #ia-leaders { pointer-events: none; }
+    .ia-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .ia-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .ia-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .ia-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .ia-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .ia-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+    .ia-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageA" data-width="1080" data-height="1920">
+    <canvas id="ia-canvas" width="1080" height="1920"></canvas>
+    <div id="ia-tag-a" class="ia-mono clip" data-start="0.10" data-duration="10.2" style="left: 60px; top: 200px"><span class="ia-dot"></span>L'IRM</div>
+    <div id="ia-illu" class="ia-mono clip" data-start="0.10" data-duration="10.3" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="ia-lab-irm" class="ia-chip ia-neon clip" data-start="0.40" data-duration="9.8" style="left: 70px; top: 290px; --c: #4aa8ff;">L'IRM</div>
+    <div id="ia-lab-tube" class="ia-chip  clip" data-start="1.30" data-duration="1.7" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">TU T'ALLONGES DANS UN TUBE</div>
+    <div id="ia-lab-see" class="ia-chip  clip" data-start="3.10" data-duration="7.1" style="left: 70px; top: 370px; background: #38d27a; color: #04230f;">IL MONTRE L'INTÉRIEUR DU CORPS</div>
+    <div id="ia-lab-nox" class="ia-chip  clip" data-start="5.20" data-duration="2.3" style="left: 70px; top: 450px; background: #ff4a4a; color: #fff;">SANS AUCUN RAYON X</div>
+    <div id="ia-lab-mag" class="ia-chip  clip" data-start="7.70" data-duration="2.5" style="left: 70px; top: 450px; background: #b26bff; color: #fff;">AIMANTS + ONDES RADIO</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 0, T1 = 10.4;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("ia-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      function cam(t, x, y, d, ly, lx) { camera.position.set(x + 0.08 * Math.sin(t * 0.4), y, d); camera.lookAt(lx == null ? x : lx, ly, 0); camera.updateMatrixWorld(); }
+      function mkLabel(txt, bg, fg, w) {
+        var c = document.createElement("canvas"); c.width = 384; c.height = 128; var x = c.getContext("2d");
+        x.fillStyle = bg; x.beginPath(); x.moveTo(24, 6); x.lineTo(360, 6); x.quadraticCurveTo(378, 6, 378, 24); x.lineTo(378, 104); x.quadraticCurveTo(378, 122, 360, 122); x.lineTo(24, 122); x.quadraticCurveTo(6, 122, 6, 104); x.lineTo(6, 24); x.quadraticCurveTo(6, 6, 24, 6); x.fill();
+        x.fillStyle = fg; x.font = "700 46px monospace"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(txt, 192, 66);
+        return new THREE.Mesh(new THREE.PlaneGeometry(w || 1.5, (w || 1.5) / 3), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
+      }
+      function mkMag(s) { var g = new THREE.Group(), n = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.2, 0.07), new THREE.MeshBasicMaterial({ color: 0xff4a4a })), so = new THREE.Mesh(new THREE.BoxGeometry(0.13, 0.2, 0.07), new THREE.MeshBasicMaterial({ color: 0x4a8aff })); n.position.y = 0.1; so.position.y = -0.1; g.add(n); g.add(so); g.scale.setScalar(s || 1); return g; }
+      function mkGrid(nx, ny, sp) { var a = []; for (var i = 0; i < nx; i++) for (var j = 0; j < ny; j++) { var m = mkMag(1); m.position.set((i - (nx - 1) / 2) * sp, (j - (ny - 1) / 2) * sp, 0); m.userData.a0 = rnd(i * 31 + j, 1) * 6.2832; m.userData.ph = rnd(i * 17 + j, 2) * 6.2832; scene.add(m); a.push(m); } return a; }
+      function setGrid(G, t, align, tilt, vis) { G.forEach(function (m) { var a = lerp(m.userData.a0 + 0.8 * Math.sin(t * 1.4 + m.userData.ph), 0, align) + tilt + 0.05 * Math.sin(t * 6 + m.userData.ph) * tilt; m.rotation.z = a; m.visible = vis > 0.02; m.scale.setScalar(Math.max(0.01, vis)); }); }
+      function drawImg(c, W, prog) {
+        c.clearRect(0, 0, W, W); c.fillStyle = "#05070d"; c.fillRect(0, 0, W, W); var N = 64, cs = W / N, rows = Math.floor(N * prog);
+        for (var j = 0; j < rows; j++) for (var i = 0; i < N; i++) {
+          var x = (i / N - 0.5) * 2, y = (j / N - 0.5) * 2, e = Math.sqrt(x * x / 0.5 + y * y / 0.72), b = 0;
+          if (e < 1.0) { b = e > 0.88 ? 0.95 : 0.45 + 0.25 * Math.sin(x * 14) * Math.cos(y * 12); if (Math.abs(x) < 0.12 && Math.abs(y + 0.1) < 0.28) b = 0.1; if (Math.abs(x) > 0.18 && Math.abs(x) < 0.3 && Math.abs(y + 0.05) < 0.2) b = 0.15; }
+          var v = Math.floor(255 * Math.max(0, Math.min(1, b))); c.fillStyle = "rgb(" + v + "," + v + "," + Math.floor(v * 1.05) + ")"; c.fillRect(i * cs, j * cs, cs + 0.5, cs + 0.5);
+        }
+      }
+      function mkScanner() {
+        var g = new THREE.Group(), o = { group: g };
+        var rg = new THREE.Mesh(new THREE.TorusGeometry(2.0, 0.75, 20, 48), HF.std(0xdfe4f0, { roughness: 0.4, metalness: 0.2 })); g.add(rg);
+        var inn = new THREE.Mesh(new THREE.CircleGeometry(1.3, 40), new THREE.MeshBasicMaterial({ color: 0x0a0f1c })); inn.position.z = -0.1; g.add(inn);
+        o.bed = new THREE.Mesh(new THREE.BoxGeometry(1.2, 0.18, 6), HF.std(0x5a6a92, { metalness: 0.4 })); o.bed.position.set(0, -0.9, 0); g.add(o.bed);
+        o.pt = new THREE.Group(); var pb = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 1.6, 14), HF.std(0xffc41a)); pb.rotation.x = Math.PI / 2; o.pt.add(pb); var ph = new THREE.Mesh(new THREE.SphereGeometry(0.26, 14, 10), HF.std(0xf2d0b0)); ph.position.z = -1.0; o.pt.add(ph); o.pt.position.set(0, -0.52, 2.0); g.add(o.pt);
+        return o;
+      }
+
+      var sc = mkScanner(); sc.group.scale.setScalar(0.5); sc.group.position.set(0, -1.35, 0); scene.add(sc.group);
+      var ip = (function () { var c = document.createElement("canvas"); c.width = 512; c.height = 512; var m = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 1.4), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c) })); return { m: m, c: c.getContext("2d") }; })(); ip.m.position.set(0, 0.7, 0.2); scene.add(ip.m);
+      function renderAt(t) {
+        if (t > T1 + 0.05) return;
+        cam(t, 0.8, 0.8, 12, -0.3); sc.group.rotation.y = -0.45;
+        sc.pt.position.z = lerp(2.0, -0.6, ease(seg(t, 1.3, 3.0)));
+        var iv = ease(seg(t, 3.6, 4.2)); ip.m.visible = iv > 0.01; ip.m.scale.setScalar(Math.max(0.01, iv)); drawImg(ip.c, 512, 1); ip.m.material.map.needsUpdate = true;
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#ia-lab-irm|0.40", "#ia-lab-tube|1.30", "#ia-lab-see|3.10", "#ia-lab-nox|5.20", "#ia-lab-mag|7.70"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageA"] = tl;
+    })();
+
+  </script>
+</template>
