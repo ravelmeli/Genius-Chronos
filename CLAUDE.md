@@ -18,6 +18,12 @@ Chaque script se termine par une invitation à laisser un commentaire et à s'ab
 - L'utilisateur donne désormais 4 sujets à la fois. Livre les 4 scripts d'un coup (texte brut pour la voix, plan visuel, liste « à vérifier » pour chacun), puis attends ses 4 WAV.
 - Il génère les voix lui-même dans Google AI Studio. Quand il envoie un WAV, monte et rends cette vidéo (tu peux traiter les WAV dans l'ordre où ils arrivent).
 
+## Vidéos longues
+
+- Pour chaque vidéo longue, choisis le sujet dans le document des sujets (`templates/idees-sujets.md`, ou le dernier document de sujets envoyé par l'utilisateur).
+- Sélectionne à chaque fois le sujet qui a le plus fort potentiel de viralité, sans demander, et dis en une ou deux phrases pourquoi tu l'as choisi.
+- Ne reprends pas un sujet déjà traité en short sans le dire.
+
 ## Sous-titres
 
 - Les sous-titres sont plus bas qu'avant, à `top: 1430px` (sur 1920). Demande de l'utilisateur : il les veut à cet endroit sur toutes les prochaines vidéos.
