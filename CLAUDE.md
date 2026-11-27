@@ -23,6 +23,8 @@ Chaque script se termine par une invitation à laisser un commentaire et à s'ab
 - Les vidéos sont des shorts, pas des vidéos longues.
 - Le document des sujets est `templates/idees-sujets.md` (ou le dernier document de sujets envoyé par l'utilisateur).
 - Quand l'utilisateur ne donne pas de sujets, pioche dans ce document, par lot de 4, et prends à chaque fois les sujets au plus fort potentiel de viralité. Explique en une phrase par sujet pourquoi tu l'as choisi.
+- Cycle des sujets : un lot de 4 piochés dans le document, puis un lot de 4 sujets d'actualité, puis on recommence. Le premier lot d'actualité est le lot en cours (fin novembre 2026).
+- Sujets d'actualité : lis les tendances Google Trends (flux RSS `https://trends.google.com/trending/rss?geo=FR`, aussi BE, CH, CA), garde celles qui cadrent avec la chaîne (science et technologie du quotidien, « comment ça marche ») et propose 4 sujets avec le lien avec l'actualité. Dis honnêtement quand les tendances du moment sont surtout du sport ou de la politique et que tu as dû faire le lien toi-même.
 - Ne reprends pas un sujet déjà traité sans le dire.
 
 ## Sous-titres
