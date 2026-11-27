@@ -1,0 +1,84 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #ie-canvas, #ie-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #ie-leaders { pointer-events: none; }
+    .ie-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .ie-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .ie-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .ie-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .ie-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .ie-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+    .ie-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageE" data-width="1080" data-height="1920">
+    <canvas id="ie-canvas" width="1080" height="1920"></canvas>
+    <div id="ie-tag-a" class="ie-mono clip" data-start="0.10" data-duration="7.7" style="left: 60px; top: 200px"><span class="ie-dot"></span>LA BOUCLE</div>
+    <div id="ie-illu" class="ie-mono clip" data-start="0.10" data-duration="7.8" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="ie-lab-pick" class="ie-chip ie-neon clip" data-start="0.30" data-duration="7.5" style="left: 70px; top: 290px; --c: #ffc41a;">ELLE EN CHOISIT UN</div>
+    <div id="ie-lab-luck" class="ie-chip  clip" data-start="0.90" data-duration="2.2" style="left: 70px; top: 370px; background: #ffc41a; color: #1a1400;">AVEC UN PEU DE HASARD</div>
+    <div id="ie-lab-loop" class="ie-chip  clip" data-start="3.20" data-duration="4.6" style="left: 70px; top: 370px; background: #38d27a; color: #04230f;">ELLE L'AJOUTE ET RECOMMENCE</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 30.3, T1 = 38.2;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("ie-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      function cam(t, x, y, d, ly) { camera.position.set(x + 0.06 * Math.sin(t * 0.4), y, d); camera.lookAt(x, ly, 0); camera.updateMatrixWorld(); }
+      function mkCP(w, h, pw, ph) { var c = document.createElement("canvas"); c.width = pw; c.height = ph; var m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false })); return { m: m, c: c.getContext("2d"), w: pw, h: ph }; }
+      function upd(p) { p.m.material.map.needsUpdate = true; }
+      function rr(c, x, y, w, h, r) { c.beginPath(); c.moveTo(x + r, y); c.lineTo(x + w - r, y); c.quadraticCurveTo(x + w, y, x + w, y + r); c.lineTo(x + w, y + h - r); c.quadraticCurveTo(x + w, y + h, x + w - r, y + h); c.lineTo(x + r, y + h); c.quadraticCurveTo(x, y + h, x, y + h - r); c.lineTo(x, y + r); c.quadraticCurveTo(x, y, x + r, y); c.closePath(); }
+      function wrap(c, txt, x, y, mw, lh) { var words = txt.split(" "), line = "", yy = y; for (var i = 0; i < words.length; i++) { var t2 = line + words[i] + " "; if (c.measureText(t2).width > mw && line) { c.fillText(line, x, yy); line = words[i] + " "; yy += lh; } else line = t2; } c.fillText(line, x, yy); }
+      function drawChat(p, q, a, caret) {
+        var c = p.c; c.clearRect(0, 0, p.w, p.h);
+        c.fillStyle = "#2a5ac8"; rr(c, p.w - 520, 30, 490, 130, 36); c.fill(); c.fillStyle = "#fff"; c.font = "600 40px sans-serif"; c.textBaseline = "top"; wrap(c, q, p.w - 490, 52, 430, 50);
+        if (a !== null) { c.fillStyle = "#e4e8f2"; rr(c, 30, 210, p.w - 160, 620, 36); c.fill(); c.fillStyle = "#1d2230"; c.font = "600 42px sans-serif"; wrap(c, a + (caret ? "▌" : ""), 62, 236, p.w - 230, 56); }
+        upd(p);
+      }
+      var ANS = "Le ciel est bleu parce que l'air diffuse davantage la lumière bleue du soleil.";
+
+      var an = mkCP(3.8, 1.4, 900, 330); an.m.position.set(0, 1.0, 0); scene.add(an.m);
+      var bs = mkCP(3.8, 2.3, 900, 540); bs.m.position.set(0, -1.2, 0); scene.add(bs.m);
+      var SEQ = ["Parce", "que", "la", "lumière", "bleue", "est", "diffusée"], NAMES = [["Parce", "Car", "Le"], ["que", "qu'", "—"], ["la", "l'", "le"], ["lumière", "couleur", "teinte"], ["bleue", "du", "—"], ["est", "se", "—"], ["diffusée", "dispersée", "—"]];
+      function draw(t) {
+        var k = Math.max(0, Math.min(6, Math.floor((t - 31.2) / 0.95))), f = ((t - 31.2) % 0.95) / 0.95, c = an.c; c.clearRect(0, 0, an.w, an.h); c.font = "700 44px sans-serif"; c.textBaseline = "middle"; var x = 20, y = 60;
+        for (var i = 0; i < 7; i++) { if (i > k - (f < 0.6 ? 1 : 0) || t < 31.2) break; var w2 = c.measureText(SEQ[i]).width + 32; if (x + w2 > an.w - 10) { x = 20; y += 110; } c.fillStyle = "#38d27a"; rr(c, x, y - 40, w2, 80, 18); c.fill(); c.fillStyle = "#04230f"; c.fillText(SEQ[i], x + 16, y); x += w2 + 12; }
+        upd(an);
+        var d = bs.c; d.clearRect(0, 0, bs.w, bs.h); d.font = "700 44px monospace"; d.textBaseline = "middle"; if (t > 30.8) { var nm = NAMES[k]; for (var j = 0; j < 3; j++) { var yy = 40 + j * 150, ln = [0.5, 0.25, 0.15][j] * (0.8 + 0.2 * Math.sin(t * 7 + j)); d.fillStyle = "#e4e8f2"; d.fillText(nm[j], 20, yy + 40); d.fillStyle = (j === 0 ? (f > 0.4 ? "#38d27a" : "#ffc41a") : "#4a86f0"); d.fillRect(300, yy + 8, 560 * ln / 0.5, 64); } } upd(bs);
+      }
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        cam(t, 0, 0, 12, -0.1); draw(t);
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#ie-lab-pick|0.30", "#ie-lab-luck|0.90", "#ie-lab-loop|3.20"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      window.__timelines["stageE"] = tl;
+    })();
+
+  </script>
+</template>

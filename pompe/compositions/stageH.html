@@ -1,0 +1,128 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; background: #070b16; font-family: "Inter", sans-serif; overflow: hidden; }
+    #ph-canvas, #ph-leaders { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; }
+    #ph-leaders { pointer-events: none; }
+    .ph-chip { position: absolute; padding: 14px 26px; border-radius: 999px; background: rgba(255,255,255,0.96); color: #0a0f1c; font-weight: 700; font-size: 34px; white-space: nowrap; box-shadow: 0 6px 24px rgba(0,0,0,0.35); }
+    .ph-neon { background: rgba(10,16,32,0.92); color: #fff; border: 3px solid var(--c); box-shadow: 0 0 30px var(--c); }
+    .ph-mono { position: absolute; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.14em; color: rgba(255,255,255,0.82); white-space: nowrap; }
+    .ph-dot { display: inline-block; width: 16px; height: 16px; border-radius: 50%; background: #ff8a2a; margin-right: 14px; }
+    .ph-card { position: absolute; left: 90px; width: 900px; background: rgba(10,16,32,0.86); border: 3px solid rgba(255,255,255,0.2); border-radius: 28px; box-shadow: 0 10px 40px rgba(0,0,0,0.5); color: #fff; }
+    .ph-row { position: absolute; left: 36px; font-family: "Space Mono", monospace; font-size: 28px; letter-spacing: 0.1em; }
+
+    #ph-bubble { position: absolute; left: 130px; top: 700px; width: 820px; padding: 36px 40px; border-radius: 40px; background: #1c2b52; border: 4px solid #4aa8ff; box-shadow: 0 0 40px rgba(74,168,255,0.5); color: #fff; font-weight: 800; font-size: 60px; line-height: 1.15; text-align: center; }
+    #ph-bubble::after { content: ""; position: absolute; left: 90px; bottom: -34px; width: 0; height: 0; border-left: 28px solid transparent; border-right: 28px solid transparent; border-top: 36px solid #4aa8ff; }
+    .ph-btn { position: absolute; padding: 20px 40px; border-radius: 999px; font-weight: 800; font-size: 40px; white-space: nowrap; }
+    .ph-big { position: absolute; left: 0; width: 1080px; text-align: center; color: #fff; font-weight: 800; letter-spacing: -0.02em; text-shadow: 0 6px 40px rgba(0,0,0,0.7); }
+
+    #ph-dim { position: absolute; left: 0; top: 0; width: 1080px; height: 1920px; background: rgba(7,11,22,0.5); }
+    .ph-q { position: absolute; font-size: 150px; font-weight: 800; color: #ffc41a; text-shadow: 0 0 40px rgba(255,196,26,0.8); }
+    .ph-mono { background: rgba(7,11,22,0.72); padding: 4px 14px; border-radius: 999px; }
+  </style>
+  <div id="root" data-composition-id="stageH" data-width="1080" data-height="1920">
+    <canvas id="ph-canvas" width="1080" height="1920"></canvas>
+    <div id="ph-tag-a" class="ph-mono clip" data-start="0.10" data-duration="5.6" style="left: 60px; top: 200px"><span class="ph-dot"></span>LE RÉSUMÉ</div>
+    <div id="ph-tag-b" class="ph-mono clip" data-start="5.90" data-duration="4.62" style="left: 60px; top: 200px"><span class="ph-dot"></span>ET TOI ?</div>
+    <div id="ph-illu" class="ph-mono clip" data-start="0.10" data-duration="10.42" style="right: 60px; top: 190px; padding: 6px 16px; border-radius: 999px; background: rgba(10,16,32,0.6)">ILLUSTRATIF</div>
+    <div id="ph-lab-s1" class="ph-chip  clip" data-start="0.40" data-duration="5.1" style="left: 70px; top: 290px; background: #4aa8ff; color: #04152a;">UN FLUIDE QUI CIRCULE</div>
+    <div id="ph-lab-s2" class="ph-chip  clip" data-start="1.70" data-duration="3.8" style="left: 70px; top: 370px; background: #ff4a4a; color: #fff;">UN COMPRESSEUR QUI CHAUFFE</div>
+    <div id="ph-lab-s3" class="ph-chip  clip" data-start="3.00" data-duration="2.5" style="left: 70px; top: 450px; background: #ffc41a; color: #1a1400;">UNE CHALEUR QU'ON DÉPLACE</div>
+    <div id="ph-big" class="ph-big clip" data-start="4.40" data-duration="1.4" style="top: 640px; font-size: 96px; text-shadow: 0 4px 24px rgba(0,0,0,0.8)">Voilà le secret.</div>
+    <div id="ph-dim" class="clip" data-start="5.70" data-duration="4.92"></div>
+    <div id="ph-q1" class="ph-q clip" data-start="6.50" data-duration="4.12" style="left: 100px; top: 450px">?</div>
+    <div id="ph-q2" class="ph-q clip" data-start="6.70" data-duration="3.92" style="left: 850px; top: 560px">?</div>
+    <div id="ph-bubble" class="clip" data-start="5.80" data-duration="4.82" style="top: 700px">Tu as déjà vu une<br>pompe à chaleur ?</div>
+    <div id="ph-b1" class="ph-btn clip" data-start="7.90" data-duration="2.72" style="left: 90px; top: 1100px; background: #fff; color: #0a0f1c">COMMENTE</div>
+    <div id="ph-b2" class="ph-btn clip" data-start="8.60" data-duration="2.02" style="left: 540px; top: 1100px; background: #ff3b3b; color: #fff">ABONNE-TOI</div>
+  </div>
+  <script src="assets/vendor/three.min.js"></script>
+  <script src="assets/common.js"></script>
+  <script src="assets/beads.js"></script>
+  <script src="assets/abs.js"></script>
+  <script src="assets/cab.js"></script>
+  <script src="assets/wd.js"></script>
+  <script>
+
+    (function () {
+      var HF = window.HF, lerp = HF.lerp, ease = HF.ease, easeOut = HF.easeOut, seg = HF.seg, $ = HF.el;
+      var T0 = 55.9, T1 = 66.52;
+      function w(t, a, b) { return ease(seg(t, a, a + 0.25)) * (1 - ease(seg(t, b - 0.25, b))); }
+      function rnd(i, k) { var x = Math.sin(i * 12.9898 + k * 78.233) * 43758.5453; return x - Math.floor(x); }
+
+      var renderer = HF.makeRenderer($("ph-canvas"));
+      var scene = new THREE.Scene();
+      scene.background = new THREE.Color(0x070b16);
+      scene.fog = new THREE.Fog(0x070b16, 12, 34);
+      var camera = new THREE.PerspectiveCamera(38, HF.W / HF.H, 0.1, 80);
+      scene.add(new THREE.HemisphereLight(0x6f8cff, 0x120c08, 0.6));
+      var key = new THREE.DirectionalLight(0xffe2c0, 1.0); key.position.set(3, 5, 3); scene.add(key);
+      var rim = new THREE.DirectionalLight(0x5aa0ff, 0.9); rim.position.set(-3, 3, -4); scene.add(rim);
+
+      var fl = new THREE.PointLight(0xffffff, 0.5, 60); fl.position.set(0, 4, 10); scene.add(fl);
+
+      function cam(t, px, py, d, lx, ly) { camera.position.set(px + 0.1 * Math.sin(t * 0.4), py, d); camera.lookAt(lx, ly, 0); camera.updateMatrixWorld(); }
+      function mkLabel(txt, bg, fg, w) {
+        var c = document.createElement("canvas"); c.width = 384; c.height = 128; var x = c.getContext("2d");
+        x.fillStyle = bg; x.beginPath(); x.moveTo(24, 6); x.lineTo(360, 6); x.quadraticCurveTo(378, 6, 378, 24); x.lineTo(378, 104); x.quadraticCurveTo(378, 122, 360, 122); x.lineTo(24, 122); x.quadraticCurveTo(6, 122, 6, 104); x.lineTo(6, 24); x.quadraticCurveTo(6, 6, 24, 6); x.fill();
+        x.fillStyle = fg; x.font = "700 44px monospace"; x.textAlign = "center"; x.textBaseline = "middle"; x.fillText(txt, 192, 66);
+        return new THREE.Mesh(new THREE.PlaneGeometry(w || 1.5, (w || 1.5) / 3), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false }));
+      }
+      function zig(x, y0, y1, a, n) { var o = []; for (var i = 0; i <= n; i++) o.push([x + (i === 0 || i === n ? 0 : (i % 2 ? a : -a)), y0 + (y1 - y0) * i / n]); return o; }
+      var RAW = [[0.5, -2.0], [1.7, -2.0], [1.7, -1.5]].concat(zig(1.7, -1.5, 1.5, 0.35, 6)).concat([[1.7, 1.7], [0.2, 1.7], [-0.2, 1.7], [-1.7, 1.7], [-1.7, 1.5]]).concat(zig(-1.7, 1.5, -1.5, 0.35, 6)).concat([[-1.7, -2.0], [-0.5, -2.0], [0.5, -2.0]]);
+      var PTS = RAW.map(function (q) { return new THREE.Vector3(q[0], q[1], 0.1); }), LEN = [0];
+      for (var i = 1; i < PTS.length; i++) LEN.push(LEN[i - 1] + PTS[i].distanceTo(PTS[i - 1]));
+      var TOT = LEN[LEN.length - 1];
+      function uAt(k) { return LEN[k] / TOT; }
+      var iCS = 2, iCE = 2 + 6, iV1 = 11, iV2 = 12, iES = 14, iEE = 14 + 6;
+      var uCS = uAt(iCS), uCE = uAt(iCE + 1), uV = (uAt(iV1) + uAt(iV2)) / 2, uES = uAt(iES), uEE = uAt(iEE);
+      var RED = new THREE.Color(0xff4a3a), ORG = new THREE.Color(0xff9a2a), BLU = new THREE.Color(0x3a8aff), PAL = new THREE.Color(0xaee6ff);
+      var KEYS = [[0, RED], [uCS, RED], [uCE, ORG], [uV - 0.015, ORG], [uV + 0.015, BLU], [uES, BLU], [uEE, PAL], [0.985, PAL], [1, RED]];
+      function colAt(u) { for (var i = 1; i < KEYS.length; i++) if (u <= KEYS[i][0]) { var a = KEYS[i - 1], b = KEYS[i], k = (u - a[0]) / Math.max(1e-6, b[0] - a[0]); return a[1].clone().lerp(b[1], k); } return RED.clone(); }
+      function pathAt(u) { var s = ((u % 1) + 1) % 1 * TOT, i = 1; while (i < LEN.length - 1 && s > LEN[i]) i++; var k = (s - LEN[i - 1]) / (LEN[i] - LEN[i - 1]); return PTS[i - 1].clone().lerp(PTS[i], Math.max(0, Math.min(1, k))); }
+      var zl = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 4.7), new THREE.MeshBasicMaterial({ color: 0x3a8aff, transparent: true, opacity: 0.14, depthWrite: false })); zl.position.set(-1.65, -0.2, -0.3); scene.add(zl);
+      var zr = new THREE.Mesh(new THREE.PlaneGeometry(1.7, 4.7), new THREE.MeshBasicMaterial({ color: 0xff8a2a, transparent: true, opacity: 0.16, depthWrite: false })); zr.position.set(1.7, -0.2, -0.3); scene.add(zr);
+      var lzl = mkLabel("DEHORS", "#4aa8ff", "#04152a", 1.3), lzr = mkLabel("MAISON", "#ff8a2a", "#1a0c00", 1.3); lzl.position.set(-1.65, -0.2, -0.2); lzr.position.set(1.7, -0.2, -0.2); lzl.material.opacity = 0.7; lzr.material.opacity = 0.7; scene.add(lzl); scene.add(lzr);
+      var PIPE = []; for (var i = 1; i < PTS.length; i++) { var b = HF.makeBeam(0x6a7aa0); b.userData.u = (LEN[i - 1] + LEN[i]) / 2 / TOT; scene.add(b); PIPE.push(b); }
+      var comp = new THREE.Mesh(new THREE.CylinderGeometry(0.34, 0.34, 1.0, 20), HF.std(0x5a6a92, { metalness: 0.6, roughness: 0.4, emissive: 0xff3a1a, emissiveIntensity: 0 })); comp.rotation.z = Math.PI / 2; comp.position.set(0, -2.0, 0.1); scene.add(comp);
+      var vmat = HF.std(0x9aa3b8, { metalness: 0.7 }); var vl = new THREE.Mesh(new THREE.CylinderGeometry(0.06, 0.2, 0.34, 12), vmat), vr = new THREE.Mesh(new THREE.CylinderGeometry(0.2, 0.06, 0.34, 12), vmat);
+      vl.rotation.z = -Math.PI / 2; vr.rotation.z = -Math.PI / 2; vl.position.set(-0.17, 1.7, 0.1); vr.position.set(0.17, 1.7, 0.1); scene.add(vl); scene.add(vr);
+      var NB = 40, BD = []; for (var i = 0; i < NB; i++) { var m = new THREE.Mesh(new THREE.SphereGeometry(0.085, 10, 8), new THREE.MeshBasicMaterial({ color: 0xff4a3a, transparent: true, opacity: 1 })); scene.add(m); BD.push(m); }
+      var HA = []; for (var i = 0; i < 10; i++) { var b = HF.makeBeam(0xff8a2a); scene.add(b); HA.push(b); }
+      var SN = []; for (var i = 0; i < 26; i++) { var m = new THREE.Mesh(new THREE.SphereGeometry(0.05, 6, 5), new THREE.MeshBasicMaterial({ color: 0xeaf6ff, transparent: true, opacity: 0.8 })); scene.add(m); SN.push(m); }
+      function circ(t, o) {
+        PIPE.forEach(function (b, i) {
+          var a = PTS[i], e = PTS[i + 1], u = b.userData.u, c = (u > uCS && u < uCE) ? 0xff9a2a : (u > uES && u < uEE) ? 0x4a9aff : 0x6a7aa0;
+          b.material.color.setHex(c); HF.setBeam(b, a, e, 0.035, 0.75 * o.vis);
+        });
+        comp.visible = o.vis > 0.05; comp.material.emissiveIntensity = o.compGlow; comp.scale.set(1 + 0.04 * Math.sin(t * 14) * o.compGlow, 1, 1);
+        vl.visible = vr.visible = o.vis > 0.05;
+        BD.forEach(function (m, i) { var u = o.ph + i / NB; m.position.copy(pathAt(u)); var uu = ((u % 1) + 1) % 1; m.material.color.copy(colAt(uu)); var liq = uu > uCE && uu < uV; m.scale.setScalar(liq ? 1.2 : 1.0); m.visible = o.beads > 0.02; m.material.opacity = o.beads; });
+        HA.forEach(function (b, i) {
+          var side = i < 5 ? 1 : -1, y = -1.2 + 0.6 * (i % 5), p = (t * 0.6 + i * 0.21) % 1;
+          if (side > 0) { var x0 = 2.15 + 0.5 * p; b.material.color.setHex(0xff8a2a); HF.setBeam(b, new THREE.Vector3(x0, y, 0.2), new THREE.Vector3(x0 + 0.18, y, 0.2), 0.045, o.heatC * Math.sin(p * 3.14)); }
+          else { var x1 = -2.45 + 0.4 * p; b.material.color.setHex(0xff8a2a); HF.setBeam(b, new THREE.Vector3(x1, y, 0.2), new THREE.Vector3(x1 + 0.18, y, 0.2), 0.045, o.heatE * Math.sin(p * 3.14)); }
+        });
+        SN.forEach(function (m, i) { var u = (t * 0.25 + rnd(i, 1)) % 1; m.position.set(-2.5 + 1.7 * rnd(i, 2), 2.3 - 4.6 * u, 0.0); m.visible = o.snow > 0.02; m.material.opacity = 0.8 * o.snow; });
+      }
+
+      function renderAt(t) {
+        if (t < T0 - 0.05 || t > T1 + 0.05) return;
+        cam(t, 0.2, -0.2, 14.5, 0.2, -0.15);
+        circ(t, { vis: 1, beads: 1, ph: 0.12 * t, compGlow: 0.5, heatC: 0.5, heatE: 0.5, snow: 0.6 });
+        renderer.render(scene, camera);
+      }
+
+      window.addEventListener("hf-seek", function (e) { renderAt(e.detail.time); });
+      renderAt(T0);
+      var tl = gsap.timeline({ paused: true });
+      var popd = function (sel, at, dd) { tl.fromTo(sel, { opacity: 0, scale: 0.8 }, { opacity: 1, scale: 1, duration: dd || 0.25, ease: "back.out(2)" }, at); };
+      ["#ph-lab-s1|0.40", "#ph-lab-s2|1.70", "#ph-lab-s3|3.00"].forEach(function (q) { var a = q.split("|"); popd(a[0], parseFloat(a[1])); });
+      tl.fromTo("#ph-big", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.35, ease: "power3.out" }, 4.40);
+      tl.fromTo("#ph-dim", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 5.70);
+      tl.fromTo("#ph-bubble", { opacity: 0, scale: 0.6 }, { opacity: 1, scale: 1, duration: 0.35, ease: "back.out(2)" }, 5.80);
+      popd("#ph-q1", 6.50); popd("#ph-q2", 6.70); popd("#ph-b1", 7.90); popd("#ph-b2", 8.60);
+      window.__timelines["stageH"] = tl;
+    })();
+
+  </script>
+</template>
